@@ -1,0 +1,260 @@
+      1
+
+Lesson 29 Remote Control - Introduction to
+                              GUI
+
+29.1 Overview
+
+In this lesson, we will introduce the method of controlling the robot through a desktop GUI
+program written in Python. However, it is not recommended for beginners, as it requires some
+additional knowledge and experience.
+The GUI program is currently only compatible with the Windows operating system. Generally, it is
+named GUI.py and stored in the client directory of the robot software package.
+
+29.2 Installing GUI Dependent Libraries on Windows
+
+Installing Python3
+ You need to install Python on your computer to run the program for PC. Since the code of
+
+      this robot was developed and debugged by Python3, please download the Python3.7 version
+      or higher in case of any error caused by incompatibility.
+ Download Python3 at this link: https://www.python.org/downloads/windows/
+ Double click the installation package to install Python.
+ Pay attention to select Add Python to PATH when installing.
+
+Install the required dependency libraries.
+ Press Win + R key, type in "cmd", and click OK to start cmd.
+
+                                                                                                             support@adeept.com
+     2
+
+Installing NumPy
+ NumPy is a basic software package for scientific calculation through Python. OpenCV needs
+
+      to use some of its functions.
+ Type in the command below to install NumPy:
+pip3 install numpy
+
+Installing OpenCV
+pip3 install opencv-contrib-python
+
+Installing zmq and pybase64
+ zmq and pybase64 are the libraries for real time video
+
+                                                                                                             support@adeept.com
+      3
+pip3 install zmq pybase64
+
+GUI Client Program
+The GUI.py is included in the code file of the robot
+
+You can also download this code from GitHub:
+https://github.com/adeept/Adeept_4WD_Smart_Car_for_RPi
+
+                                                                                                             support@adeept.com
+      4
+
+29.3 Introducing GUI Control Program
+
+The web terminal and GUI are not connected. Therefore, to control the robot via GUI, you need
+to manually run GUIServer.py on Raspberry Pi. (similar to manually running WebServer.py, the
+only difference is the GUIServer.py program)
+1. Terminate the auto-run program of WebServer.py on Raspberry Pi:
+sudo killall python3
+2. Run the GUIServer.py program:
+sudo python3 Adeept_4WD_Smart_Car_for_RPi/Server/Server_OrdinaryWheels/GUIServer.py
+
+After GUIServer.py run successfully on Raspberry, run GUI.py on Windows.
+3. Run GUI.py in cmd. If you right click on the GUI.py file in the folder, there may be an error
+message.
+Access the folder of the robot program:
+
+Run the GUI.py program (run it after accessing the "Client" folder, or there may be an error).
+python GUI.py
+
+The GUI interface will appear after run successfully.
+
+                                                                                                             support@adeept.com
+            5
+
+ Enter the IP address of the Raspberry Pi in the GUI on PC, click Connect, and you can control the
+
+      robot now. For instance, enter 192.168.3.130
+
+                                                                                                                   support@adeept.com
+6
+
+The operation instructions are as follows:
+
+                      Button                   Instruction            Describe
+Forward/The W key on the keyboard             forward/DS          move forward
+Backward/The S key on the keyboard           backward/DS         move backward
+
+    Left/The A key on the keyboard                left/TS             move left
+  Right/The D key on the keyboard                right/TS            move right
+ SpinLeft/The 1 key on the keyboard          rotate-left/DS          Rotate left
+SpinRight/The 2 key on the keyboard         rotate-right/DS         Rotate right
+                                                                 Adjusting speed
+                      speed                       wsB X
+                                                             support@adeept.com
+  7                               up/UDstop                    The robotic head
+   UP/The I key on the keyboard                                      turns up
+  LEFT/The J key on the keyboard
+DOWN/The K key on the keyboard    lookleft/LRstopjj            The robotic head
+RIGHT/The L key on the keyboard                                     turns left
+
+                     CV FL        down/UDstop                  The robotic head
+                                                                   turns down
+             LineColorSwitch
+                       L1         lookright/LRstop             The robotic head
+                       L2                                          turns right
+
+                 RadarScan        CVFL/stopCV                  Switch video tracking
+                                                                     line function
+            <PWM0 Turn Left
+                                  CVFLColorSet 0/CVFLColorSet   Switch to search for
+           PWM0 Turn Right>                         255        white lines on black
+
+                                                                 or black lines on
+                                                                         white.
+
+                                  CVFLL1 X                     Set the height of L1
+                                                                    auxiliary line
+
+                                  CVFLL2 X                     Set the height of L2
+                                                                    auxiliary line
+
+                                  scan                         Used to perform the
+                                                                  ultrasound scan
+
+                                                               function and display
+                                                                  the scan results
+
+                                  SiLeft 0                      Click the button to
+                                                               control the 0 channel
+
+                                                                   servo to rotate
+                                                                       clockwise.
+
+                                  SiRight 0                     Click the button to
+                                                               control the 0 channel
+
+                                                                   servo to rotate
+
+                                                               support@adeept.com
+8                           PWMMS 0        counterclockwise
+       <PWM0 Middle set>      SiLeft 1
+          <PWM1 Turn Left                 Click the button to
+                             SiRight 1  control the 0 channel
+         PWM1 Turn Right>                servo to 90 degrees
+                            PWMMS 1
+       <PWM1 Middle set>    PWMINIT       Click the button to
+           Move to InitPos              control the 1 channel
+          PWM Default Set     PWMD
+               CPU Temp                      servo to rotate
+               CPU Usage                        clockwise.
+              RAM Usage
+                                          Click the button to
+                                        control the 1 channel
+
+                                             servo to rotate
+                                           counterclockwise
+
+                                          Click the button to
+                                        control the 1 channel
+                                         servo to 90 degrees
+
+                                        Move the servo to its
+                                             initial position
+
+                                         Set the PWM of the
+                                         servo to the default
+
+                                                  setting
+
+                                                 Shows the
+                                          temperature of the
+                                           Raspberry Pi CPU
+
+                                         Shows the usage of
+                                        the Raspberry Pi CPU
+
+                                         Shows the usage of
+                                            the Raspberry Pi
+                                                 memory
+
+                                          Switch to monitor
+
+                                        support@adeept.com
+9                          motionGet/stopCV                       mode, the robot
+               MotionGet                                        stops moving and
+                                                              reacts to the moving
+               Automatic                                       objects detected by
+                  Police                                      the camera, which are
+                                                               framed in the video
+                TrackLine
+             KeepDistance                                              module.
+
+               TrackLight  automatic/automaticOff             Switch to automatic
+                FindColor                                     obstacle avoidance
+                Color Set
+                                                                        mode
+
+                           police/policeOff                     Make the WS2812
+                                                                 LED lights on the
+                                                              robot flash alternately
+                                                                  in red and blue.
+
+                           trackLine/trackLineOff              Implement line
+                                                              tracking function
+                                                              using a 3-channel
+                                                              infrared module.
+
+                           keepDistance/keepDistanceOff       Implementing a
+
+                                                              distance maintenance
+
+                                                              function using an
+
+                                                              ultrasonic module
+
+                           trackLight/trackLightOff             Implementing the
+                                                                    light tracking
+
+                                                                  function using a
+                                                              light-tracking module
+
+                           findColor/stopCV                   Turn on/off the color
+                                                               detection function.
+
+                           {'title': 'findColorSet', 'data':  Select the color to be
+                                          [r,g,b]}                     detected
+
+                                                              support@adeept.com
+10                        Switch_1_on/Switch_2_off   Control the LED1
+                  Port 1  Switch_2_on/Switch_2_off  light to turn on and
+                  Port 2  Switch_3_on/Switch_3_off
+                  Port 3                                        off
+                                          AR
+                   ARM                    PT         Control the LED2
+                     PT                             light to turn on and
+
+                                                                off
+
+                                                     Control the LED3
+                                                    light to turn on and
+
+                                                                off
+
+                                                      In this mode, the
+                                                     three functions of
+                                                     "RadarScan", sand
+                                                    "Automatic" cannot
+
+                                                            be used
+
+                                                    All functions can be
+                                                     used in this mode
+
+                                                    support@adeept.com
+

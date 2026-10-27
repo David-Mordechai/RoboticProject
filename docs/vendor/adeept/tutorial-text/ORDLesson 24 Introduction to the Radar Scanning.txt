@@ -1,0 +1,84 @@
+     1
+
+      Lesson 24 Introduction to the Radar
+                          Scanning
+
+24.1 Function Introduction
+
+Radar Scanning refers to that when running the program, Smart_Car will turn the servo to rotate
+the ultrasonic module, detect the surroundings via the ultrasonic module, test the distance
+between the robot and surrounding objects, and display the corresponding distance in the WEB
+control interface.
+
+24.2 Turn on the Radar Scanning
+
+Run the Radar Scanning program
+1. Start up Raspberry Pi robot for about 30s-60s.
+2. When Smart_Car is started up, enter the IP address of your Raspberry Pi on the Google browser
+of your mobile phone or computer, and access Port 5000, for example: 192.168.3.130:5000. Then
+the web controller will be displayed on the browser.
+
+                                                                                                               support@adeept.com
+     2
+
+3. Place the trolley at the position to be detected.
+4. Click the pattern "SCAN" , and PiCar-B will rotate and detect the surroundings. The scanning
+results will be displayed in the pattern "SCAN" .
+
+                                                                                                               support@adeept.com
+3
+
+24.2 Main Code
+
+Please see the complete code in functions.py.
+
+   01 def radarScan(self):
+
+   02  pwm0_min = -90
+
+   03  pwm0_max = 90
+
+   04
+
+   05  scan_speed = 1
+
+   06  result = []
+
+   07
+
+   08  pwm0_pos = pwm0_max
+
+   09  scGear.moveAngle(1, 0)
+
+   10  time.sleep(0.8)
+
+   11
+
+   12  while pwm0_pos>pwm0_min:
+
+   13  pwm0_pos-=scan_speed
+
+   14  scGear.moveAngle(1, pwm0_pos)
+
+   15  dist = ultra.checkdist()
+
+   16  if dist > 200:
+
+   17  continue
+
+   18  theta = 90 - pwm0_pos
+
+   19  result.append([dist, theta])
+
+   20  time.sleep(0.02)
+
+   21
+
+   22  scGear.moveAngle(1, 0)
+
+   23  return result
+
+1.
+
+                                               support@adeept.com
+

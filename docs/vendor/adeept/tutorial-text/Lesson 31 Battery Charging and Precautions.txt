@@ -1,0 +1,71 @@
+     1
+
+         Lesson 31 Battery Charging and
+                        Precautions
+
+Note: When charging, ensure the power switch of the
+expansion board is turned off to avoid the Raspberry Pi and the
+charging function operating simultaneously.
+
+31.1 Overview
+
+The Adeept Robot HAT V3.2 we provide include charging functions, which provide convenient
+charging methods for the product and provide users with more flexible and convenient power
+solutions. This function usually uses the USB Type-C interface, which has the characteristics of
+
+                                                                                                               support@adeept.com
+2
+
+fast charging, high transfer rate and reverse plug function. The interface can also provide power
+to the motherboard at the same time.
+
+31.2 Introduction to Charging
+
+The Adeept Robot HAT V3.2 integrates a charging control chip and related circuits to ensure
+charging safety and efficiency. There are two LED indicators on the Adeept Robot HAT V3.2 to
+show the charging status.
+
+   LED color  Description
+
+Red LED is on, Green LED is off Charging the 18650 battery.
+
+Red LED is off, Green LED is on The battery is fully charged or the battery is not connected.
+
+Red LED is off, Green LED is off The USB cable is not connected.
+It is recommended that when the product is not in use, it is recommended to turn off the Adeept
+Robot HAT V3.2 switch and stop powering the HAT and Raspberry Pi.
+
+31.3 Instruction Manual
+
+1. Turn off the Adeept robot control board switch.
+
+                                                             support@adeept.com
+     3
+
+2. Use Type-C cable to correctly connect the Adeept Robot HAT V3.2 and 5V charger.
+
+3. Since the charging function is built into the Adeept Robot HAT V3.2 , using a larger power
+
+charging circuit will cause the charging chip to heat up and affect other circuit components on
+the Adeept Robot HAT V3.2 . Therefore, we control the charging power within a smaller range to
+avoid possible damage to other components and avoid scalding users with the exposed charging
+chip. At this time, there will only be slight heat on the Adeept Robot HAT V3.2, which is
+
+                                                                                                               support@adeept.com
+     4
+normal. But the charging time will be relatively long. It takes about 2-3 hours to fully charge two
+18650 batteries.
+
+31.4 Matters Needing Attention
+
+1. Please use a 5V charger to charge the battery. to ensure safe and efficient charging.
+2. Avoid use in humid and dusty environments to prevent damage to the charging interface.
+3. Avoid excessive heating when charging, and do not charge in high temperature
+environments to avoid affecting battery life or causing safety issues.
+4. During the charging process, the board will heat up slightly, which is normal. If the board
+temperature is too high, please unplug the power supply in time and stop charging.
+5. The built-in charging function of the board ensures flexible charging and use of the product,
+but you still need to pay attention to safety during use.
+
+                                                                                                               support@adeept.com
+

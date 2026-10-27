@@ -1,0 +1,12 @@
+# Python virtual envs
+.venv/
+__pycache__/
+
+# Third-party tool clones (re-created by scripts/setup-dev-windows.ps1)
+hardware/tools-freecad-mcp/
+
+# Vendor code/docs without a redistribution license (keep local, don't publish)
+docs/vendor/adeept/code-github/
+
+# Large re-downloadable vendor file (52 MB): https://datasheets.raspberrypi.com/rpi5/raspberry-pi-5-product-brief.pdf
+docs/vendor/raspberrypi/raspberry-pi-5-product-brief.pdf

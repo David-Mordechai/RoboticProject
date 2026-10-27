@@ -1,0 +1,92 @@
+     1
+
+Lesson 30 Remote Control - Introduction to
+                              APP
+
+30.1 Overview
+
+In this lesson, we will show you how to control the robot via the APP, covering the program
+service startup, APP connection process and full function introduction -- all to make robot
+control more convenient and intuitive.
+
+30.2 APP Connection Preparation
+
+1.Download the APP on your mobile phone: open the app store, search for "Adeept", then click
+to download and install it. (For Android phones, you can obtain the Adeept.apk file from the
+APP directory in the tutorial for installation.)
+
+2.By default, we have configured the WebServer.py service program to start automatically. If you
+want to control the robot via the APP, you must switch to the APPServer.py service program.
+Execute the following command to stop the running program:
+sudo killall python3
+
+                                                                                                             support@adeept.com
+     2
+Run the APPServer.py service program. After successful startup, the Raspberry Pi's IP address
+will be displayed on the command terminal or OLED screen:
+sudo python3 Adeept_4WD_Smart_Car_for_RPi/Server/Server_MecanumWheels/APPServer.py
+
+Note: If you want the APPServer.py program to run automatically on boot, you only need to
+modify the startup.sh script.
+sudo nano startup.sh
+
+Change WebServer.py to APPServer.py in the script.
+
+Press Ctrl+X, then enter Y, Enter to save and exit.
+Enter the following commands to test running the program -- if it starts normally, the
+configuration is successful:
+sudo killall python3
+./startup.sh
+
+                                                                                                             support@adeept.com
+     3
+
+3. Connect to WiFi and ensure that your operating device and the Raspberry Pi are on the same
+LAN.(I'm using the office LAN here; you should connect to your own network instead.)
+
+4. Open the APP, enter the product page, tap ADR036-Macanum to access the Robot control
+interface.
+
+                                                                                                             support@adeept.com
+     4
+
+5. Enter the Raspberry Pi's IP address in the IP field (the default port is 8888), then tap the
+'Connect' button.
+
+6. After a successful connection, the camera feed will be displayed on your mobile phone, and
+you can then control the robot normally.
+
+                                                                                                             support@adeept.com
+5
+
+30.3 Function Introduction
+
+                            Vision Line-following Function Switch:
+                            Enables switching between black and
+                            white color modes. L1 and L2 can be
+                            used to adjust the positions of the
+                            two reference lines in the video feed.
+                            The vision line-following function is
+                            significantly affected by light
+                            conditions.
+                            Color Recognition Function Switch:
+                            Allows selection of the target color
+                            for recognition.
+                            Robot Movement Control Joystick
+
+                            Adjust motor speed
+
+                                                      support@adeept.com
+6
+                                                                              Function Control: e.g., automatic
+                                                                              obstacle avoidance, line tracking, light
+                                                                              tracking, etc.
+                                                                              Functions such as photo taking and
+                                                                              radar scanning
+
+                                                                              WS2812 LED Color & Mode Switch
+                                                                              Buzzer Music Playback Switch
+                                                                              CPU / Memory / Battery Level Display
+
+                                                                                                        support@adeept.com
+

@@ -1,0 +1,267 @@
+     1
+
+Lesson 22 Remote Control - Introduction to
+               WEBUI (Recommended)
+
+22.1 Overview
+
+In this lesson, we will explore the Web - based User Interface (WEBUI) for remote - controlling a
+robot. This WEBUI provides a convenient and intuitive way to interact with the robot, enabling
+users to control various aspects such as movement, arm operations, and sensor - based functions.
+
+22.2 Getting Access to Web Controller
+
+ A web controller is a web interface to control the robot product to perform various actions
+and it can be applied on any device that is able to run a browser, including PC, mobile phones,
+tablets, etc.
+ If you've completed all installations based on the instructional document, it will be quite easy
+to open a web controller.
+1. Check that your device is under the same LAN with the Raspberry Pi.
+2. Obtain the Raspberry Pi's IP address.
+3. Open a web browser (recommended to use Chrome in case of any possible incompatibility
+with other browsers), enter the Raspberry Pi's IP address with the port :5000, for instance:
+192.168.3.31:5000
+Then the web controller will be loaded into the browser.
+
+                                                                                                             support@adeept.com
+     2
+
+Modules on the web controller may vary from products. Most of them are explained below
+with the method for application. You can check modules on your web controller accordingly to
+better understand their functions and how to use them.
+
+22.3 Principle Introduction
+
+1. Video Module
+Display the image captured by the camera.
+
+                                                                                                             support@adeept.com
+     3
+
+2. Hard Ware Module
+Display the CPU temperature, as well as the usage of CPU and RAM in real time.
+
+3. Move Control Module
+Control the movement of the robot towards the front, back, left, right, forward left, forward right,
+backward left, backward right, rotate left and rotate right.
+
+                                                                                                             support@adeept.com
+     4
+
+4. Head Control Module
+Control the movement of the robotic head.
+
+5. Actions Module
+The switches for some functions, such as motion detection, automatic obstacle avoidance,
+warning lights, speech recognition, and line tracking.
+
+6. FC Control Module
+Control the color detection function on/off and color setup.
+
+                                                              support@adeept.com
+     5
+7. PWM INIT SET Module
+Adjust the angle of the servo motor.
+8. Ports Control Module
+Control the on/off of three LED lights.
+
+9. Home Module
+
+10. Radar Scan Control Module Ultrasonic mode
+
+                                                                                                             support@adeept.com
+6
+
+The operation instructions are as follows:
+
+              Button                            Instruction           Describe
+                                                forward/DS        move forward
+               FORWARD/The W                  backward/DS       move backward
+              key on the keyboard
+                                                   left/TS           move left
+               BACKWARD/The S                     right/TS          move right
+              key on the keyboard            forward-left/DS   move forward-left
+
+Move Control  LEFT/The A key on             forward-right/DS  move forward-right
+                 the keyboard
+
+              RIGHT/The D key on
+                   the keyboard
+
+              FORWARD-LEFT/The
+                   Q key on the
+                      keyboard
+
+                    FORWARD-
+              RIGHT/The E key on
+
+                  the keyboard
+
+                                                              support@adeept.com
+7
+
+                  BACKWARD-        backward-left/DS             move backward-left
+              LEFT/The Z key on
+
+                 the keyboard
+
+                   BACKWARD-       backward-right/DS            move backward-right
+              RIGHT/The C key on
+
+                   the keyboard
+
+              SpinLeft/The 1 key   rotate-left/DS               Rotate left
+               on the keyboard
+
+              SpinRight/The 2 key  rotate-right/DS              Rotate right
+                on the keyboard
+
+              speed                wsB X                        Adjusting speed
+
+              UP/The I key on the  up/UDstop                    The robotic head
+                     keyboard                                         turns up
+
+              LEFT/The J key on    lookleft/LRstopjj            The robotic head
+                 the keyboard                                        turns left
+
+Head Control  DOWN/The K key on      down/UDstop                The robotic head
+                   the keyboard    lookright/LRstop                 turns down
+
+              RIGHT/The L key on                                The robotic head
+                   the keyboard                                     turns right
+
+              START                CVFL/stopCV                  Switch video tracking
+                                                                      line function
+
+              COLOR                CVFLColorSet 0/CVFLColorSet     Switch to search
+                                                     255         for white lines on
+                                                                black or black lines
+CVFL Control
+                                                                       on white.
+
+              L1                   CVFLL1 X                     Set the height of L1
+
+                                                                auxiliary line
+
+                                                                support@adeept.com
+8                                        CVFLL2 X    Set the height of L2
+                                    L2      scan           auxiliary line
+
+  Radar Scan  SCAN                        SiLeft X   Used to perform the
+     Control  NUM                        SiRight X      ultrasound scan
+                                        PWMMS X
+PWM INIT SET     <                                   function and display
+                                                        the scan results
+              >
+                                                       Servo connection
+              SETPWM                                    channel number
+
+              CPU Temp                                Click the button to
+                                                    control the x-channel
+Hard Ware     CPU Usage
+              RAM Usage                                  servo to rotate
+                                                            clockwise.
+
+                                                      Click the button to
+                                                    control the x-channel
+
+                                                         servo to rotate
+                                                       counterclockwise
+
+                                                      Click the button to
+                                                    control the x-channel
+                                                     servo to 90 degrees
+
+                                                              Shows the
+                                                      temperature of the
+                                                       Raspberry Pi CPU
+
+                                                      Shows the usage of
+                                                    the Raspberry Pi CPU
+
+                                                      Shows the usage of
+                                                        the Raspberry Pi
+                                                              memory
+
+                                                       Switch to monitor
+                                                        mode, the robot
+
+                                                    support@adeept.com
+ 9           MOTION GET    motionGet/stopCV                    stops moving and
+  Actions    AUTO MATIC                                       reacts to the moving
+             POLICE LIGHT                                     objects detected by
+FC Contorl
+              TRACK LINE                                       the camera, which
+             TRACK LIGHT                                        are framed in the
+            KEEP DISTANCE
+                                                                  video module.
+                  START
+                  COLOR    automatic/automaticOff             Switch to automatic
+                                                              obstacle avoidance
+
+                                                                        mode
+
+                           police/policeOff                     Make the WS2812
+                                                                 LED lights on the
+
+                                                                     robot flash
+                                                              alternately in red and
+
+                                                                         blue.
+
+                           trackLine/trackLineOff              Implement line
+                                                              tracking function
+                                                              using a 3-channel
+                                                              infrared module.
+
+                           trackLight/trackLightOff             Implementing the
+                                                                    light tracking
+
+                                                                  function using a
+                                                              light-tracking module
+
+                           keepDistance/keepDistanceOff        Implementing a
+                                                                     distance
+
+                                                                 maintenance
+                                                              function using an
+                                                              ultrasonic module
+
+                           findColor/stopCV                   Turn on/off the color
+                                                               detection function.
+
+                           {'title': 'findColorSet', 'data':  Select the color to be
+                                          [r,g,b]}                     detected
+
+                                                              support@adeept.com
+   10                                      Switch_1_on/Switch_2_off     Control the LED1
+                                       P1  Switch_2_on/Switch_2_off   light to turn on and
+                                           Switch_3_on/Switch_3_off
+Ports Control                                                                     off
+                                       P2                  AR
+                                                         home           Control the LED2
+                                       P3                             light to turn on and
+                                                           PT
+Home   ARM                                                                        off
+      HOME
+                                                                        Control the LED3
+        PT                                                            light to turn on and
+
+                                                                                  off
+
+                                                                        In this mode, the
+                                                                       three functions of
+                                                                     "SCAN", "Find Color",
+                                                                      and "AUTO MATIC"
+
+                                                                         cannot be used
+
+                                                                      Returning all servos
+                                                                          to their initial
+                                                                             positions.
+
+                                                                      All functions can be
+                                                                       used in this mode
+
+                                                                     support@adeept.com
+

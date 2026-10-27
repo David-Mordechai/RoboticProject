@@ -1,0 +1,355 @@
+     1
+
+ Lesson 1 Introduction to the Raspberry Pi
+
+The Raspberry Pi is not included in the product kit. Recommended Raspberry Pi version: 3B, 3B+,
+4B and 5.
+
+1.1 Overview of Raspberry Pi
+
+Raspberry Pi (Raspberry Pi, RasPi/RPi) is developed by the British charity organization "Raspberry
+Pi Foundation", based on ARM microcomputer motherboard, only the size of a credit card, but
+has the basic functions of a personal computer. The original purpose of the Foundation ' s
+development of the Raspberry Pi was to improve the teaching level of the school's computer
+science and related disciplines, and cultivate the youth 's computer programming interest and
+ability. Nowadays, most people use the Raspberry Pi for embedded development, which is
+mostly used in the Internet of Things, smart home, and artificial intelligence.
+
+1.2 Raspberry Pi Motherboard
+
+So far, at this writing, Raspberry Pi has advanced to its fifth generation product offering. Version
+changes are accompanied by increases in upgrades in hardware and capabilities.
+The A type and B type versions of the first generation products have been discontinued due to
+various reasons. What is most important is that other popular and currently available versions
+are consistent in the order and number of pins and their assigned designation of function,
+making compatibility of peripheral devices greatly enhanced between versions.
+Below are the raspberry pi pictures and model pictures supported by this product. They have 40
+pins.
+
+                                                                                                              support@adeept.com
+     2                                  Model diagram of Raspberry Pi 5
+Practicality picture of Raspberry Pi 5
+
+Actual image of Raspberry Pi 4 Model    CAD image of Raspberry Pi 4 Model B
+B
+
+                                        support@adeept.com
+3
+
+Actual image of Raspberry Pi 3 Model     CAD image of Raspberry Pi 3 Model
+B+                                       B+
+
+Actual image of Raspberry Pi 3 Model B:  CAD image of Raspberry Pi 3 Model B:
+
+                                         support@adeept.com
+     4                                   CAD image of Raspberry Pi 2 Model B:
+Actual image of Raspberry Pi 2 Model B:
+
+Actual image of Raspberry Pi 1 Model     CAD image of Raspberry Pi 1 Model B+:
+B+:
+
+                                         support@adeept.com
+     5                                    CAD image of Raspberry Pi 3 Model A+:
+
+Actual image of Raspberry Pi 3 Model
+A+:
+
+Actual image of Raspberry Pi 1 Model A+:  CAD image of Raspberry Pi 1 Model A+:
+
+                                          support@adeept.com
+     6                                CAD image of Raspberry Pi Zero W:
+Actual image of Raspberry Pi Zero W:
+
+Actual image of Raspberry Pi Zero     CAD image of Raspberry Pi Zero
+
+                                      support@adeept.com
+7
+
+Below are the raspberry pi pictures and model pictures supported by this product. They have 40
+pins. Hardware interface diagram of RPi 5 is shown below:
+
+      GPIO
+   Connector
+
+    PCl Express                                                         USB
+     interfance                                                   Connector x4
+
+On/Off button                                                       Ethernet
+                                                                   Connector
+  Power
+Connector                                                         Ethernet
+                                                                 Connector
+                  MINI HDMI      Camera                 Display
+                 Connector x2  Connector              Connector
+
+Hardware interface diagram of RPi 4B is shown below:
+
+      GPIO
+   Connector
+
+  Display
+Connector
+
+  Power                                                                USB
+Connector                                                        Connector x4
+
+                 Micro HDMI     Camera      Audio
+                 Connector x2  Connector  Connector
+
+                                                                 support@adeept.com
+8
+
+Hardware interface diagram of RPi 3B+/3B/2B/1B+:                    USB
+                                                                Connector
+                GPIO
+            Connector
+
+              Display
+            Connector
+
+     Power                                                       Ethernet
+   Connector                                                    Connector
+
+                HDMI      Camera                       Audio
+              Connector  Connector                   Connector
+
+Hardware interface diagram of RPi 3A+/A+
+
+      GPIO
+   Connector
+
+     Display                                                        USB
+   Connector                                                    Connector
+
+     Power
+   Connector
+
+                HDMI                       Camera      Audio
+              Connector                   Connector  Connector
+
+Hardware interface diagram of RPi Zero/Zero W                              Camera
+                                                                          Connector
+      GPIO
+   Connector
+
+                HDMI                          USB      Power
+              Connector                   Connector  Connector
+
+                                                                     support@adeept.com
+9
+
+Product              Recommended Maximum total USB         Typical bare-board
+                                                           active current
+                     PSU current  peripheral current draw  consumption
+                                                           200mA
+                     capacity                              500mA
+                                                           180mA
+Raspberry Pi 1 Model A 700mA      500mA                    330mA
+                                                           350mA
+Raspberry Pi 1 Model B 1.2A       500mA                    400mA
+                                                           350mA
+Raspberry Pi 1 Model A+ 700mA     500mA
+                                                           500mA
+Raspberry Pi 1 Model B+ 1.8A      1.2A                     600mA
+                                                           800mA
+Raspberry Pi 2 Model B 1.8A       1.2A
+                                                           800mA
+Raspberry Pi 3 Model B 2.5A       1.2A                     100mA
+
+Raspberry Pi 3 Model A+ 2.5A      Limited by PSU, board,   150mA
+                                  and connector ratings
+                                  only.                    350mA
+
+Raspberry Pi 3 Model B+ 2.5A      1.2A
+
+Raspberry Pi 4 Model B 3.0A       1.2A
+
+Raspberry Pi 5       5.0A         1.6A (600mA if using a
+                                  3A power supply)
+
+Raspberry Pi 400     3.0A         1.2A
+
+Raspberry Pi Zero    1.2A         Limited by PSU, board,
+                                  and connector ratings
+                                  only
+
+Raspberry Pi Zero W  1.2A         Limited by PSU, board,
+                                  and connector ratings
+                                  only.
+
+Raspberry Pi Zero 2 W 2A          Limited by PSU, board,
+                                  and connector ratings
+                                  only.
+
+                                                           support@adeept.com
+     10
+Let's take a look at the structure of the Raspberry Pi 5 motherboard as shown below: (We
+recommend using Raspberry Pi 4, 3B+, 3B)
+
+The Raspberry Pi motherboard mainly includes the following parts/ports:
+      1. GPIO 40-PIN GPIO
+
+The General-Purpose Input Output (GPIO) is designed as a slot with two rows of pins on the
+board. It can be used to connect various peripheral electronic devices and sensors to control or
+monitor them through input/output level signals. For example, you can use GPIO to control the
+speed of a DC motor or read the distance measured of an ultrasonic sensor. These functions of
+GPIO differ the Raspberry Pi from common computer motherboards because it gives developers
+the freedom to operate manually. We will further introduce GPIO in the subsequent chapters and
+use them extensively.
+
+      2. Gigabit Ethernet port
+The Ethernet interface allows the Raspberry Pi to connect to the computer network in a wired
+manner, which enables easy access to the Internet or logging in to the Raspberry Pi remotely.
+The Raspberry Pi's Ethernet interface is implemented by using a USB bus through which data is
+transferred. Most models of Raspberry Pi include an Ethernet interface.
+
+      3. Micro HDMI port
+
+                                                                                                              support@adeept.com
+     11
+
+High-definition multimedia interface (HDMI) is a fully digital video and sound transmission
+interface used to transmit uncompressed audio and video signals. By connecting it to a display
+(or TV) equipped with an HDMI interface, you can display media data of the Raspberry Pi. The
+HDMI interface can transmit video and audio signals at the same time, meaning you don't need
+to connect speakers to the audio interface of the Raspberry Pi ­ unless you really want to play
+audio through the audio interface, then you may need to modify the operating system
+configuration accordingly.
+
+      4. USB2.0/3.0 port
+
+The Universal Serial Bus (USB) interface is the most common interface on a computer. You can
+use it to connect devices such as keyboards, mice, USB flash drives, and wireless network cards.
+When the number of USB ports is not enough, we can also extend by a USB hub.
+
+      5. Audio port
+
+Audio interface (3.5mm headphone jack). When HDMI connection is not used, you can connect
+speakers or headphones via the standard 3.5mm headphone jack to play audio. At the same time,
+the interface also integrates a composite video interface with a composite audio-visual output
+function, which is generally used to connect old models of TV, which is rarely used now.
+
+      6. MIPI CSI camera port
+
+The CSI interface can be used to connect the CSI camera to the Raspberry Pi via a ribbon cable
+for easy video recording and image capture. Compared with the USB camera, this camera
+module has better performance.
+
+      7. USB-C 5V/3A power supply port
+
+The Micro USB power supply interface is one of the most used supply methods of the Raspberry
+Pi. The rated voltage is 5V. The standard current requirements of different Raspberry Pi models
+are slightly different. For example: the 1B type only needs 700mA, while the 3B+ type requires
+2.5A. The chargers of many Android mobile phones can provide flawless power to the Raspberry
+Pi. The current required for Raspberry Pi also depends on the external device connected. It is
+recommended to do the calculation before connecting. Choose a power supply with suitable
+current (power) for the Raspberry Pi. When the external device demands a large power, an extra
+power supply should be adopted.
+
+      8. Micro SD card slot
+
+                                                                                                              support@adeept.com
+     12
+
+The SD card slot is located on the back of the Raspberry Pi motherboard. The SD/MicroSD card is
+an essential storage of the Raspberry Pi and usually used for operating system installation and
+data storage. Use an SD card above 2GB. For better experience, it is recommended to equip your
+Raspberry Pi with a large-capacity (above 16G), high-speed (Class10 or above) SD card.
+
+      9. Bluetooth port
+
+The Bluetooth function allows the Raspberry Pi to connect with Bluetooth-enabled devices (such
+as a mouse, keyboard, and gaming console).
+
+      10. PoE HAT port
+
+Active Ethernet (Power Over Ethernet, PoE) refers to a technology that uses Ethernet for power
+transmission. Besides the basic Micro USB and GPIO power supply, the Raspberry Pi 3B+ type
+adds a new method of power supply over Ethernet. User can connect a network cable to supply
+power to the Raspberry Pi without the need of configuring an additional power supply, which is
+convenient for certain application scenarios.
+
+      11. MIPI DSI display port
+
+You can connect the LCD display to the Raspberry Pi, which is generally used for embedded
+product development. Under normal circumstances, the HDMI interface can already meet the
+demand.
+
+1.3 Operating System
+
+The Raspberry Pi supports a variety of operating systems, mainly based on Linux and Windows,
+and most of them can be found on the official website of the Raspberry Pi Foundation
+(www.raspberrypi.org). Two representative operating systems will be introduced here.
+
+      1. Raspbian
+
+Raspbian is the official operating system of the Raspberry Pi Foundation. It is customized based
+on Debian GNU/Linux and can run on all versions of the Raspberry Pi motherboard. According to
+the experience, Raspbian and Raspberry Pi combine all the best: stable operation, powerful
+function, easy to use, being able to meet various application needs, etc. Therefore, it is strongly
+recommended to use Raspbian as the preferred operating system for Raspberry Pi. In the
+following chapters, we will further introduce the use of Raspbian in detail and develop various
+applications on it.
+
+                                                                                                              support@adeept.com
+     13
+
+      2. Windows 10 IoT Core
+
+Windows 10 IoT Core is an operating system specifically created by Microsoft for the Internet of
+Things ecosystem. Windows 10 IoT Core is the core version of the Windows 10 IoT operating
+system. It has relatively simple functions and can run on type 2B or above models of Raspberry
+Pi. The installation and use of Windows 10 IoT Core will not be described in detail here. For more
+information, visit Microsoft's website.
+
+Apart from the two systems above, there are several more that support the Raspberry Pi,
+including Ubuntu MATE, OSMC, LibreELEC, PiNet, RISC OS, etc. As for which one to choose, it
+depends on what you want to use Raspberry for. If you want to use it as a computer or for
+electronic project development, then Raspbian is a very good choice. If you plan to use it as a
+media center, you can consider using OSMC or LibreELEC.
+
+1.4 Programming Language
+
+For the Raspberry Pi, there are many programming languages available. In fact, any language
+that can be compiled for the ARM architecture (such as the C language) can be used for the
+Raspberry Pi. The most popular language should be Python. In fact, the Pi in the name of the
+Raspberry Pi was inspired by the word Python.
+
+Python is an interpretive, object-oriented, and dynamic data type high-level programming
+language with powerful functions, good compatibility, and high reliability. Python programs are
+easy to write and read. At present, there are two major versions of Python: Python 2 and Python
+3. Both versions are updated and well maintained, but people still have disputes about which to
+use. You can visit Python's official website (www.python.org) to learn more about them. In the
+following tutorials we will mainly use Python 3 for development introduction. In addition,
+because of the Raspberry Pi's splendid compatibility, the program we wrote on the 3B+ model
+can be run on the Zero W model with little modification.
+
+1.5 Demonstration
+
+GPIO (General Purpose I/O Ports) are general-purpose input/output ports. In layman's terms,
+they are some pins with two rows of pins. They can be used to output high and low levels or to
+read the state of the pins ­ whether it is high or low. User can communicate with the hardware
+
+                                                                                                              support@adeept.com
+     14
+through the GPIO port (such as UART), control the hardware (such as LED, buzzer, etc.), read the
+working status signal of the hardware (such as interrupt signal), etc.
+
+                                                                                                              support@adeept.com
+    15
+
+Introduction of GPIO pins
+
+                                                                                                             support@adeept.com
+     16
+
+About the Problem of Low Battery Restart of Raspberry Pi
+
+When using 18650 battery for low voltage power supply:
+Raspberry Pi 3B, 3B+, and 4 may restart the Raspberry Pi.
+The Raspberry Pi 5 will shut down and remain in the state of waiting to be turned on. At this time,
+the Raspberry Pi indicator light will continue to light up in red. You need to briefly press the
+button next to the indicator light to reboot the Raspberry Pi 5.
+
+                                                                                                              support@adeept.com
+

@@ -1,0 +1,84 @@
+     1
+
+  Lesson 23 Introducing the Warning Light
+
+In this lesson, we will learn how to use warning light function.
+
+23.1 Function Overview
+
+This tutorial is about how to use multi-threading to achieve some effects related to WS2812 LED
+lights. Multi-threading is common in robot projects, since robots have high requirements for
+real-time response. For each task performing, try not to block the main thread communication.
+Multi-threading is similar to executing multiple different programs or tasks at the same time.
+Multi-threaded operation has the following advantages:
+
+      1. Using threads to put time-consuming tasks in the background for processing.
+      2. Improving the efficiency of the program. In the subsequent real-time video and OpenCV
+      processing video frames, multi-threading is used to greatly increase the frame rate.
+      3. It's more convenient to call an encapsulated multi-threaded task, similar to the
+non-blocking control method ­ in other words, the control of the servo is encapsulated by
+multi-threading.
+
+23.2 Running the Warning Light Program
+
+1. Start the Smart_Car. It may take about 30-50s to boot.
+
+                                                                                                               support@adeept.com
+     2
+2. After Smart_Car is turned on, open the Chrome browser on your mobile or computer, enter the
+IP address of your Raspberry Pi and access port ":5000" into the IP address bar, like this:
+192.168.3.130:5000. The web controller will then be displayed on the browser.
+
+3. Click "POLICE LIGHT", and Smart_Car will flash lights of different colors.
+
+4. Click "POLICE LIGHT" again to stop the function.
+
+23.3 Main Code
+
+For the complete code, please refer to the file RobotLight.py.
+
+01 def policeProcessing(self):
+
+02  while self.lightMode == 'police':
+
+03  for i in range(0,3):
+
+                                                                               support@adeept.com
+3
+
+   04  self.set_all_led_color_data(0,0,255)
+
+   05  self.show()
+
+   06  time.sleep(0.05)
+
+   07  self.set_all_led_color_data(0,0,0)
+
+   08  self.show()
+
+   09  time.sleep(0.05)
+
+   10  if self.lightMode != 'police':
+
+   11  break
+
+   12  time.sleep(0.1)
+
+   13  for i in range(0,3):
+
+   14  self.set_all_led_color_data(255,0,0)
+
+   15  self.show()
+
+   16  time.sleep(0.05)
+
+   17  self.set_all_led_color_data(0,0,0)
+
+   18  self.show()
+
+   19  time.sleep(0.05)
+
+   20  time.sleep(0.1)
+
+                                             support@adeept.com
+

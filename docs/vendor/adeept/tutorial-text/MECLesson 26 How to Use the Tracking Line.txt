@@ -1,0 +1,91 @@
+    1
+
+   Lesson 26 How to Use the Tracking Line
+
+26.1 Introduction to Tracking Line
+
+The "road"-the black line can be judged according to the reflected light received on the white
+paper "road" with black lines because of the different reflection coefficients of light between black
+lines and white paper. A more common detection method-infrared detection method is adopted
+in the tracking module.
+Infrared detection is the method that makes use of infrared rays with reflection features on
+different physical surfaces in different colors. When the trolley is running, it continuously emits
+infrared light to the ground. That the infrared light comes across the white ground will cause
+diffuse reflection, and the reflected light is received by the receiving tube on the trolley; when it
+coming across a black line, it will be absorbed by the infrared light, and the trolley receiving tube
+fails to receive the signal.
+
+26.2 Preparation
+
+      1.Assemble the completed Smart_Car. The tracking module is fixed under the center hole of
+the front wheel of the Smart_Car chassis by a 15mm nylon column with the M3*4 screws. Note:
+please disassemble the tracking module to avoid any damage to the tracking module, when not
+using the tracking function or driving on the uneven ground. (The tracking module is about
+7-10mm away from the ground)
+
+                                                                                                               support@adeept.com
+    2
+      2.Prepare a tracking track. Because of the steering limitation of the front-wheel servo, the
+curve radius of the track should not be too small.
+
+26.3 Turn on the Tracking Line
+
+1. Start up Smart_Car for about 1 minute.
+2. When Smart_Car is started up, enter the IP address of your Raspberry Pi on the Google browser
+of the mobile phone or computer, and access Port 5000, for example: 192.168.3.130:5000. Then
+the web controller will be displayed on the browser.
+
+                                                                                                               support@adeept.com
+3
+
+3. Place the car on the completed tracking track.
+
+4. Click "TRACK LINE", and Smart_Car will drive along the black line.
+
+5. Click "TRACK LINE" for a second time, if you want to terminate the tracking function.
+
+6. The height of the tracking line module and the ground will have effects on the accuracy of the
+detection line of the tracking module. If the tracking function fails, the tracking module should be
+adjusted.
+
+26.4 Main Code
+
+Please see the complete code in Funcitons.py.
+
+        01 def trackLightProcessing(self):
+
+                                                                       support@adeept.com
+4            global last_status
+
+   02        adc_value = adc.analogRead(1)
+   03        if last_status == 0:
+   04
+   05               pass
+   06        elif adc_value < 128 - 50 and last_status < 128 - 50:
+   07
+   08               return
+   09        elif adc_value > 128 + 50 and last_status > 128 + 50:
+   10
+   11               return
+   12        elif adc_value > 128 - 50 and adc_value < 128 + 50 and last_status > 128 - 50 and
+   13  last_status < 128 + 50:
+   14
+   15               return
+   16        last_status = adc_value
+   17
+   18        print(f"Light Tracking Value: {adc_value}")
+   19        if adc_value < 128 - 50:
+   20
+   21               move.move(30,1,"rotate-left")
+   22        elif adc_value > 128 + 50:
+
+                    move.move(30,1,"rotate-right")
+             else:
+
+                    move.move(30,1,"mid")
+             time.sleep(0.1)
+
+1.
+
+       support@adeept.com
+

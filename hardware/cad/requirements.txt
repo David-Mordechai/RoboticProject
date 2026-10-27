@@ -1,0 +1,3 @@
+cadquery
+trimesh
+matplotlib

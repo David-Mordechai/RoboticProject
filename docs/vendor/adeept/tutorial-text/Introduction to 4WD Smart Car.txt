@@ -1,0 +1,125 @@
+     1
+
+         Introduction to 4WD Smart Car
+
+1. About 4WD Smart Car
+
+The 4WD Smart Car, as an open-source intelligent robot product, comes in two versions:
+Mecanum wheel and Ordinary wheel. It is specially designed for enthusiasts and students in the
+fields of artificial intelligence and robotics. It is also an open-source robot development platform
+based on the Raspberry Pi, with many features:
+ Easy Assembly: It adopts a modular structure design and is equipped with an open hardware
+
+      list and detailed assembly tutorials, allowing for easy completion of assembly.
+ Easy Learning: It provides complete and detailed development tutorials on algorithms and
+
+      applications, along with sample code for assistance, facilitating learning.
+ Rich in Functions: It not only features core functions such as automatic obstacle avoidance,
+
+      color recognition, moving object detection, video line tracking, 3-channel line tracking, light
+      tracking, and web-based remote control, but also is equipped with a matrix screen and an
+      OLED screen for real-time display of status information.
+ Robust Structure: It adopts an acrylic structure, which is strong and durable and can adapt to
+      various usage scenarios.
+ Highly Extensible: Its structure is extensible and supports do - it - yourself (DIY) by users,
+      meeting personalized needs.
+ Convenient Remote Control: It can be remotely controlled via mobile phones, tablets,
+      computers, on Windows, Linux, and Mac OS systems, using the Google Chrome browser.
+
+                                                                                                              support@adeept.com
+     2
+
+ Compatible with Multiple Versions: It supports different versions of the Raspberry Pi, such
+      as Raspberry Pi 3B, Raspberry Pi 3B+, Raspberry Pi 4, and Raspberry Pi 5.
+
+ Programming Support: It supports the Python language, making it convenient for
+
+      developers to write programs and expand functions.
+
+2. Safety and Precautions
+
+Please follow the following safety precautions when using or storing this product:
+ Keep this product out of the reach of children under 6 years old.
+ This product should be used only when there is adult supervision present as young children
+
+      lack necessary judgment regarding safety and the consequences of product misuse.
+ This product contains small parts and parts, which are sharp. This product contains electrically
+
+      conductive parts. Use caution with electrically conductive parts near or around power
+      supplies, batteries and powered (live) circuits.
+ When the product is turned ON, activated or tested, some parts will move or rotate. To avoid
+      injuries to hands and fingers, keep them away from any moving parts!
+ It is possible that an improperly connected or shorted circuit may cause overheating. Should
+      this happen, immediately disconnect the power supply or remove the batteries and do not
+      touch anything until it cools down! When everything is safe and cool, review the product
+      tutorial to identify the cause.
+
+                                                                                                              support@adeept.com
+     3
+
+ Only operate the product in accordance with the instructions and guidelines of this tutorial,
+      otherwise parts may be damaged or you could be injured.
+
+ Store the product in a cool dry place and avoid exposing the product to direct sunlight.
+
+ After use, always turn the power OFF and remove or unplug the batteries before storing.
+
+3. About The Tutorials
+
+This documentation is for software installation and operation guide for the Python robot product.
+It describes every detail of the whole process of fulfilling the robot project by Python and
+Raspberry Pi from scratch as well as some precautions. Hope you can get started with the
+Raspberry Pi robot on Python and make more creations with this documentation.
+
+4. Resources Links
+
+[RobotName]: Adeept 4WD Smart Car
+[Item Code]: ADR036
+[Official Raspberry Pi website]: https://www.raspberrypi.org/downloads/
+[Official website]: https://www.adeept.com/
+[GitHub]: https://github.com/adeept/Adeept_4WD_Smart_Car_for_RPi
+
+5. Getting Support or Providing Advice
+
+Adeept provides free and responsive product and technical support, including but not limited to:
+ Product quality issues
+ Product use and build issues
+
+                                                                                                              support@adeept.com
+     4
+
+ Questions regarding the technology employed in our products for learning and education
+ Your input and opinions are always welcome
+
+    We also encourage your ideas and suggestions for new products and product improvements
+For any of the above, you may send us an email to:
+Technical support: support@adeept.com
+Customer Service: service@adeept.com
+
+6. About Adeept
+
+Adeept was founded in 2015 and is a company dedicated to open source hardware and STEM
+education services. The Adeept technical team continuously develops new technologies, uses
+excellent products as technology and service carriers, and provides comprehensive tutorials and
+after-sales technical support to help users combine learning with entertainment. The main
+products include various learning kits and robots for Arduino, Raspberry Pi, ESP32 and BBC
+micro:bit.
+Adeept is committed to assist customers in their education of robotics, programming and
+electronic circuits so that they may transform their creative ideas into prototypes and new and
+innovative products. To this end, our services include but are not limited to:
+ Educational and Entertaining Project Kits for Robots, Smart Cars and Drones
+ Educational Kits to Learn Robotic Software Systems for Arduino, Raspberry Pi and micro: bit
+ Electronic Component Assortments, Electronic Modules and Specialized Tools
+
+ Product Development and Customization Services
+
+                                                                                                              support@adeept.com
+     5
+
+7. Copyright
+
+Adeept brand and logo are copyright of Shenzhen Adeept Technology Co., Ltd. and cannot be
+used without written permission.
+
+                                                                                                              support@adeept.com
+

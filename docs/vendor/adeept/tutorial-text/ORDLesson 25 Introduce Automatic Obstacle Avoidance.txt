@@ -1,0 +1,110 @@
+     1
+
+  Lesson 25 Introduce Automatic Obstacle
+                         Avoidance
+
+In this lesson, we will learn how to use Smart_Car to achieve automatic obstacle avoidance.
+
+25.1 Introduction to Automatic Obstacle Avoidance
+
+Since the camera used by our Raspberry Pi robot is a monocular camera and cannot collect depth
+information, many of our robot products use ultrasonic ranging modules to obtain depth
+information and detect whether there are obstacles in a certain direction to get the distance of
+the obstacle.
+The principle of distance detection by ultrasonic ranging sensor: the method of detecting distance
+by ultrasonic is called echo detection method, that is, the ultrasonic transmitter emits ultrasonic
+waves in a certain direction, and the timer starts timing at the same time as the launch time. The
+ultrasonic waves propagate in the air and encounter obstacles on the way. When the object
+surface (object) is blocked, it will be reflected back immediately, and the ultrasonic receiver will
+immediately stop timing when the reflected ultrasonic wave is received. The propagation speed of
+ultrasonic waves in the air is 340m/s. According to the time t recorded by the timer, the distance s
+from the launch point to the obstacle surface can be calculated, namely: s=340t/2. Using this
+principle of ultrasound, the ultrasonic ranging module is widely used in practical applications,
+such as car reversing radar, unmanned aerial vehicle, and smart car.
+
+                                                                                                                 support@adeept.com
+     2
+
+25.2 Turning on Automatic Obstacle Avoidance
+
+Running the Automatic Obstacle Avoidance program
+1. Turn on Smart_Car, the boot time is about 30s-60s.
+2. After Smart_Car is turned on, enter the IP address of your Raspberry Pi with the Google browser
+of your mobile phone or computer, and access port 5000, for example: 192.168.3.130:5000 . The
+web controller will then be displayed on the browser.
+
+                                                                                                                 support@adeept.com
+     3
+
+3. Place the car on the prepared patrol track.
+4. After clicking "AUTO MATIC", the robot will automatically avoid obstacles when encountering
+obstacles.
+5. When you want to terminate the Automatic Obstacle Avoidance function, you can click "AUTO
+MATIC" again.
+
+25.3 Main Code
+
+For the complete code, please refer to the file Functions.py.
+                                                                                                                 support@adeept.com
+4
+
+01 def automaticProcessing(self):
+
+02  scGear.moveAngle(0, 0)
+
+03  dist = self.distRedress()
+
+04  time.sleep(0.2)
+
+05  if dist >= 40:
+
+06  scGear.moveAngle(0, 0)
+
+07  time.sleep(0.2)
+
+08  move.move(60, 1, "mid")
+
+09  elif dist > 20 and dist < 40:
+
+10  scGear.moveAngle(0, 45)
+
+11  move.motorStop()
+
+12  time.sleep(0.3)
+
+13  distLeft = self.distRedress()
+
+14  self.scanList[0] = distLeft
+
+15  scGear.moveAngle(0, -45)
+
+16  time.sleep(0.3)
+
+17  distRight = self.distRedress()
+
+18  self.scanList[1] = distRight
+
+19  print(self.scanList)
+
+20  scGear.moveAngle(0, 0)
+
+21  if self.scanList[0] >= self.scanList[1]:
+
+22         move.move(45,1,"rotate-left")
+
+23         time.sleep(0.2)
+
+24  else:
+
+25         move.move(45, 1, "rotate-right")
+
+26         time.sleep(0.2)
+
+27  else:
+
+28  move.move(60, -1, "mid")
+
+29  time.sleep(0.2)
+
+                                              support@adeept.com
+
