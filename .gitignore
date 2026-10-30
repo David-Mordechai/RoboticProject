@@ -2,11 +2,16 @@
 .venv/
 __pycache__/
 
-# Third-party tool clones (re-created by scripts/setup-dev-windows.ps1)
-hardware/tools-freecad-mcp/
-
 # Vendor code/docs without a redistribution license (keep local, don't publish)
-docs/vendor/adeept/code-github/
+docs/vendor/hiwonder/code/
 
-# Large re-downloadable vendor file (52 MB): https://datasheets.raspberrypi.com/rpi5/raspberry-pi-5-product-brief.pdf
-docs/vendor/raspberrypi/raspberry-pi-5-product-brief.pdf
+
+# Local machine profile for docker compose (copy of docker/env/*.env)
+.env
+
+# Training outputs: checkpoints, logs, videos
+runs/
+logs/
+
+# One-off diagnostic scripts
+lab/scratch/

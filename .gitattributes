@@ -1,0 +1,3 @@
+# LF everywhere: files are used inside Linux containers (Docker Desktop on Windows, GB10).
+* text=auto eol=lf
+*.ps1 text eol=crlf

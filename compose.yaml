@@ -1,0 +1,62 @@
+# Virtual lab (mjlab + MuJoCo Warp + rsl_rl), Microduck-style. Pick the machine profile once:
+#   cp docker/env/pc.env .env          (or gb10.env)
+#   docker compose build
+#   docker compose run --rm lab list-envs
+#   docker compose run --rm lab train Robotlab-Follow-MentorPiA1 --env.scene.num-envs 1024
+#   docker compose up -d viewer        -> http://localhost:8080  (mjlab viser viewer, latest checkpoint)
+#   docker compose up -d tensorboard   -> http://localhost:6006
+name: robotlab
+
+x-lab: &lab
+  image: robotlab/lab:${TORCH_VARIANT:?set TORCH_VARIANT, see docker/env/}
+  build:
+    context: .
+    dockerfile: docker/lab.Dockerfile
+    args:
+      TORCH_VARIANT: ${TORCH_VARIANT}
+      USER_UID: ${USER_UID:-1000}
+      USER_GID: ${USER_GID:-1000}
+  volumes:
+    - .:/workspace
+    - warp-cache:/home/lab/.cache/warp   # compiled GPU kernels, shared by all services
+  working_dir: /workspace          # mjlab writes logs/rsl_rl/<experiment>/<run>/ here (git-ignored)
+  shm_size: ${SHM_SIZE:-4gb}
+  environment:
+    LAB_PROFILE: ${LAB_PROFILE:-pc}
+    LAB_NUM_ENVS: ${LAB_NUM_ENVS:-1024}
+  deploy:
+    resources:
+      reservations:
+        devices:
+          - driver: nvidia
+            count: all
+            capabilities: [gpu]
+
+services:
+  lab:
+    <<: *lab
+    stdin_open: true
+    tty: true
+
+  # Browser viewer: plays a task with mjlab's viser viewer. Pick task/checkpoint with
+  # VIEW_TASK / VIEW_ARGS, e.g. VIEW_ARGS="--checkpoint-file logs/rsl_rl/follow/<run>/model_300.pt".
+  # Newer checkpoints of the same run can be hot-swapped from the viewer UI while training continues.
+  viewer:
+    <<: *lab
+    command: >-
+      bash -c 'play $${VIEW_TASK:-Robotlab-Follow-MentorPiA1} --viewer viser --num-envs $${VIEW_NUM_ENVS:-16} $${VIEW_ARGS:---agent random}'
+    environment:
+      VIEW_TASK: ${VIEW_TASK:-Robotlab-Follow-MentorPiA1}
+      VIEW_ARGS: ${VIEW_ARGS:-}
+      VIEW_NUM_ENVS: ${VIEW_NUM_ENVS:-16}
+    ports:
+      - "127.0.0.1:8080:8080"
+
+  tensorboard:
+    <<: *lab
+    command: tensorboard --logdir /workspace/logs --host 0.0.0.0 --port 6006
+    ports:
+      - "127.0.0.1:6006:6006"
+
+volumes:
+  warp-cache:

@@ -1,0 +1,5 @@
+# Build context = only what the image needs; the repo itself is bind-mounted at runtime.
+*
+!lab/pyproject.toml
+!lab/uv.lock
+!lab/src

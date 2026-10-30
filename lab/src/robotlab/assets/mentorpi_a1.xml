@@ -1,0 +1,65 @@
+<!--
+  Hiwonder MentorPi A1 (Ackermann), learning car. Floating base, two steered front wheels
+  (parallel steering, as on the real car: one servo, same angle both sides), two driven rear wheels.
+  Geometry from docs/research/01: footprint 213 x 159 mm, wheel D65 x 25 mm, wheelbase 0.145 m,
+  track 0.133 m, mass ~1.2 kg. ESTIMATES until measured on the real cars.
+  Collision groups: wheels (1) touch only the floor; chassis (2) touches other cars, walls and obstacles.
+-->
+<mujoco model="mentorpi_a1">
+  <default>
+    <default class="wheel">
+      <geom type="cylinder" size="0.0325 0.0125" euler="90 0 0" contype="1" conaffinity="1"
+            condim="3" friction="1.0 0.01 0.001" mass="0.04" rgba="0.1 0.1 0.1 1"/>
+    </default>
+    <default class="visual">
+      <geom contype="0" conaffinity="0" mass="0"/>
+    </default>
+  </default>
+
+  <worldbody>
+    <body name="chassis" pos="0 0 0.0325">
+      <freejoint name="root"/>
+      <geom name="chassis" type="box" size="0.1065 0.0795 0.02" pos="0 0 0.03" mass="1.0"
+            contype="2" conaffinity="2" rgba="0.95 0.5 0.1 1"/>
+      <geom name="deck" class="visual" type="box" size="0.08 0.06 0.004" pos="-0.01 0 0.06" rgba="0.2 0.2 0.2 1"/>
+      <geom name="lidar" class="visual" type="cylinder" size="0.019 0.016" pos="-0.05 0 0.08" rgba="0.15 0.15 0.15 1"/>
+      <!-- 2D LiDAR scan plane (LD19/MS200 optical centre, ~0.12 m above the floor). -->
+      <site name="lidar" pos="-0.05 0 0.085" size="0.005"/>
+      <geom name="camera" class="visual" type="box" size="0.012 0.045 0.0125" pos="0.095 0 0.065" rgba="0.1 0.1 0.1 1"/>
+
+      <body name="knuckle_fl" pos="0.0725 0.0665 0">
+        <joint name="steer_fl" type="hinge" axis="0 0 1" range="-0.7 0.7" damping="0.01" armature="0.0005"/>
+        <geom class="visual" type="sphere" size="0.005" mass="0.01"/>
+        <body name="wheel_fl">
+          <joint name="wheel_fl" type="hinge" axis="0 1 0" damping="0.0005"/>
+          <geom class="wheel"/>
+        </body>
+      </body>
+      <body name="knuckle_fr" pos="0.0725 -0.0665 0">
+        <joint name="steer_fr" type="hinge" axis="0 0 1" range="-0.7 0.7" damping="0.01" armature="0.0005"/>
+        <geom class="visual" type="sphere" size="0.005" mass="0.01"/>
+        <body name="wheel_fr">
+          <joint name="wheel_fr" type="hinge" axis="0 1 0" damping="0.0005"/>
+          <geom class="wheel"/>
+        </body>
+      </body>
+      <body name="wheel_rl" pos="-0.0725 0.0665 0">
+        <joint name="wheel_rl" type="hinge" axis="0 1 0" damping="0.0005"/>
+        <geom class="wheel"/>
+      </body>
+      <body name="wheel_rr" pos="-0.0725 -0.0665 0">
+        <joint name="wheel_rr" type="hinge" axis="0 1 0" damping="0.0005"/>
+        <geom class="wheel"/>
+      </body>
+    </body>
+  </worldbody>
+
+  <actuator>
+    <!-- LD-1501MG steering servo: position control, ±35° used (2024 build: 29°, 2025: 40°). -->
+    <position name="steer_fl" joint="steer_fl" kp="10" dampratio="1" ctrlrange="-0.61 0.61" forcerange="-2 2"/>
+    <position name="steer_fr" joint="steer_fr" kp="10" dampratio="1" ctrlrange="-0.61 0.61" forcerange="-2 2"/>
+    <!-- Rear 310 encoder motors: the STM32 runs a speed loop, modelled as a velocity servo. -->
+    <velocity name="wheel_rl" joint="wheel_rl" kv="0.05" ctrlrange="-30 30" forcerange="-0.3 0.3"/>
+    <velocity name="wheel_rr" joint="wheel_rr" kv="0.05" ctrlrange="-30 30" forcerange="-0.3 0.3"/>
+  </actuator>
+</mujoco>
