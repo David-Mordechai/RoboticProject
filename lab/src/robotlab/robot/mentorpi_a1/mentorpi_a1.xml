@@ -4,6 +4,10 @@
   Geometry from docs/research/01: footprint 213 x 159 mm, wheel D65 x 25 mm, wheelbase 0.145 m,
   track 0.133 m, mass ~1.2 kg. ESTIMATES until measured on the real cars.
   Collision groups: wheels (1) touch only the floor; chassis (2) touches other cars, walls and obstacles.
+  Angles in this file are in DEGREES (MJCF default: joint ranges, euler). Actuator ctrlrange is not
+  converted by MuJoCo and stays in radians.
+  Steering per Hiwonder (manual 9.2 + 2025 upgrade overview): both front wheels parallel, max 29 deg
+  (2024 build) or 40 deg (2025 build); joint range allows the 40 deg mechanical maximum.
 -->
 <mujoco model="mentorpi_a1">
   <default>
@@ -22,13 +26,14 @@
       <geom name="chassis" type="box" size="0.1065 0.0795 0.02" pos="0 0 0.03" mass="1.0"
             contype="2" conaffinity="2" rgba="0.95 0.5 0.1 1"/>
       <geom name="deck" class="visual" type="box" size="0.08 0.06 0.004" pos="-0.01 0 0.06" rgba="0.2 0.2 0.2 1"/>
-      <geom name="lidar" class="visual" type="cylinder" size="0.019 0.016" pos="-0.05 0 0.08" rgba="0.15 0.15 0.15 1"/>
-      <!-- 2D LiDAR scan plane (LD19/MS200 optical centre, ~0.12 m above the floor). -->
-      <site name="lidar" pos="-0.05 0 0.085" size="0.005"/>
+      <geom name="lidar" class="visual" type="cylinder" size="0.019 0.016" pos="-0.05 0 0.1035" rgba="0.15 0.15 0.15 1"/>
+      <!-- 2D LiDAR scan plane: the sensor sits on the top deck (122 mm, Hiwonder drawing); optical centre
+           ~0.14 m above the floor is an ESTIMATE (deck + sensor half height) until measured. -->
+      <site name="lidar" pos="-0.05 0 0.1075" size="0.005"/>
       <geom name="camera" class="visual" type="box" size="0.012 0.045 0.0125" pos="0.095 0 0.065" rgba="0.1 0.1 0.1 1"/>
 
       <body name="knuckle_fl" pos="0.0725 0.0665 0">
-        <joint name="steer_fl" type="hinge" axis="0 0 1" range="-0.7 0.7" damping="0.01" armature="0.0005"/>
+        <joint name="steer_fl" type="hinge" axis="0 0 1" range="-40 40" damping="0.01" armature="0.0005"/>
         <geom class="visual" type="sphere" size="0.005" mass="0.01"/>
         <body name="wheel_fl">
           <joint name="wheel_fl" type="hinge" axis="0 1 0" damping="0.0005"/>
@@ -36,7 +41,7 @@
         </body>
       </body>
       <body name="knuckle_fr" pos="0.0725 -0.0665 0">
-        <joint name="steer_fr" type="hinge" axis="0 0 1" range="-0.7 0.7" damping="0.01" armature="0.0005"/>
+        <joint name="steer_fr" type="hinge" axis="0 0 1" range="-40 40" damping="0.01" armature="0.0005"/>
         <geom class="visual" type="sphere" size="0.005" mass="0.01"/>
         <body name="wheel_fr">
           <joint name="wheel_fr" type="hinge" axis="0 1 0" damping="0.0005"/>
@@ -55,10 +60,13 @@
   </worldbody>
 
   <actuator>
-    <!-- LD-1501MG steering servo: position control, ±35° used (2024 build: 29°, 2025: 40°). -->
-    <position name="steer_fl" joint="steer_fl" kp="10" dampratio="1" ctrlrange="-0.61 0.61" forcerange="-2 2"/>
-    <position name="steer_fr" joint="steer_fr" kp="10" dampratio="1" ctrlrange="-0.61 0.61" forcerange="-2 2"/>
-    <!-- Rear 310 encoder motors: the STM32 runs a speed loop, modelled as a velocity servo. -->
+    <!-- LD-1501MG steering servo: position control; ctrlrange in radians = ±40 deg. The action term
+         limits the commanded angle per car (29-37 deg, see common.py). -->
+    <position name="steer_fl" joint="steer_fl" kp="10" dampratio="1" ctrlrange="-0.698 0.698" forcerange="-2 2"/>
+    <position name="steer_fr" joint="steer_fr" kp="10" dampratio="1" ctrlrange="-0.698 0.698" forcerange="-2 2"/>
+    <!-- Rear 310 encoder motors, driven independently: the STM32 runs a speed loop per motor, modelled
+         as velocity servos; left/right targets differ in turns (Hiwonder's formula, common.py). -->
+    <!-- forcerange (0.3 N m at the wheel) is an ESTIMATE: motor torque is not published for the A1. -->
     <velocity name="wheel_rl" joint="wheel_rl" kv="0.05" ctrlrange="-30 30" forcerange="-0.3 0.3"/>
     <velocity name="wheel_rr" joint="wheel_rr" kv="0.05" ctrlrange="-30 30" forcerange="-0.3 0.3"/>
   </actuator>

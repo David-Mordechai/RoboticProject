@@ -34,11 +34,11 @@ from mjlab.terrains.terrain_generator import TerrainGeneratorCfg
 from mjlab.utils.noise import UniformNoiseCfg
 from mjlab.viewer import ViewerConfig
 
-from robotlab.tasks.common import (
-  STEER_MAX, WHEELBASE, AckermannActionCfg, car_cfg, car_motion, car_pose, leader_cfg, place_car, to_frame,
-  wrap, write_leader_pose,
+from robotlab.robot.mentorpi_a1_constants import STEER_2024, STEER_CODE, STEER_MAX, WHEELBASE, car_cfg, leader_cfg
+from robotlab.tasks.mdp import (
+  LidarPatternCfg, AckermannActionCfg, car_motion, car_pose, place_car, to_frame, wrap, write_leader_pose,
 )
-from robotlab.tasks.office.office_terrain import NODES, PATCH_SIZE, LayoutTensors, OfficeTerrainCfg, layout_tensors
+from robotlab.tasks.office_terrain import NODES, PATCH_SIZE, LayoutTensors, OfficeTerrainCfg, layout_tensors
 
 if TYPE_CHECKING:
   from mjlab.envs import ManagerBasedRlEnv
@@ -48,26 +48,15 @@ LEADER_SPEED = (0.25, 0.45)      # m/s, drawn per episode
 LIDAR_RAYS = 36                  # every 10 deg (the LD19 gives ~450 points per turn; downsampled)
 LIDAR_RANGE = 3.0                # m, clipped
 TRAIL_LEN = 64                   # policy steps of leader history kept (>= GAP / (min speed * dt))
-TURN_EXIT = 0.35                 # m past the intersection centre: first point of every segment (tight turns)
-SWITCH_DIST = (0.2, 0.35, 0.35, 0.2)   # m, per stage: move on to the next route point within this distance
+# Route geometry is sized for the leader's 0.32 m turning circle (LEADER_STEER): it starts turning 0.45 m
+# before an intersection centre and aims 0.55 m past it, so no route point ever falls inside its circle.
+TURN_EXIT = 0.55                 # m past the intersection centre: first point of every segment
+SWITCH_DIST = (0.25, 0.35, 0.35, 0.45)   # m, per stage: move on to the next route point within this distance
 OFFICE_ROWS = OFFICE_COLS = 4    # 16 different office floors per scene
+LEADER_STEER = math.radians(25.0)  # turns at 0.32 m: wider than a 29 deg car can (0.30 m measured), so always followable
 
 _DIR_VEC = ((1.0, 0.0), (-1.0, 0.0), (0.0, 1.0), (0.0, -1.0))
 _DIR_YAW = (0.0, math.pi, math.pi / 2, -math.pi / 2)
-
-
-# LiDAR: horizontal rays all around the scan centre (mjlab's patterns are all parallel rays).
-
-
-@dataclass
-class LidarPatternCfg:
-  num_rays: int = LIDAR_RAYS
-
-  def generate_rays(self, mj_model: mujoco.MjModel | None, device: str) -> tuple[torch.Tensor, torch.Tensor]:
-    del mj_model
-    a = torch.arange(self.num_rays, device=device, dtype=torch.float32) * (2 * math.pi / self.num_rays)
-    dirs = torch.stack([torch.cos(a), torch.sin(a), torch.zeros_like(a)], -1)
-    return torch.zeros(self.num_rays, 3, device=device), dirs
 
 
 # Leader: route state per env, advanced once per policy step.
@@ -134,7 +123,7 @@ def advance_leader(env: ManagerBasedRlEnv) -> None:
   d = _route_target(s) - s.xy
   alpha = wrap(torch.atan2(d[:, 1], d[:, 0]) - s.yaw)
   look = torch.linalg.norm(d, dim=-1).clamp(min=0.3)
-  s.steer = torch.atan(2 * WHEELBASE * torch.sin(alpha) / look).clamp(-0.9 * STEER_MAX, 0.9 * STEER_MAX)
+  s.steer = torch.atan(2 * WHEELBASE * torch.sin(alpha) / look).clamp(-LEADER_STEER, LEADER_STEER)
   s.yaw = wrap(s.yaw + s.speed / WHEELBASE * torch.tan(s.steer) * dt)
   s.xy = s.xy + (s.speed * dt)[:, None] * torch.stack([torch.cos(s.yaw), torch.sin(s.yaw)], -1)
 
@@ -264,7 +253,7 @@ def lost_trail(env: ManagerBasedRlEnv, max_distance: float) -> torch.Tensor:
 # Config.
 
 
-def office_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
+def make_mentorpi_office_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
   noise = UniformNoiseCfg(n_min=-0.02, n_max=0.02)
   actor_terms = {
     "trail_error": ObservationTermCfg(func=trail_error, noise=noise),
@@ -276,7 +265,7 @@ def office_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
   lidar = RayCastSensorCfg(
     name="lidar",
     frame=ObjRef(type="site", name="lidar", entity="car"),
-    pattern=LidarPatternCfg(),
+    pattern=LidarPatternCfg(num_rays=LIDAR_RAYS),
     ray_alignment="yaw",
     max_distance=LIDAR_RANGE,
     debug_vis=play,
@@ -307,7 +296,8 @@ def office_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
       "actor": ObservationGroupCfg(actor_terms, enable_corruption=True),
       "critic": ObservationGroupCfg({**actor_terms}),
     },
-    actions={"drive": AckermannActionCfg(entity_name="car", leader_step=advance_leader, v_reverse=0.3)},
+    actions={"drive": AckermannActionCfg(entity_name="car", leader_step=advance_leader, v_reverse=0.3,
+                                         steer_max_range=(STEER_2024, STEER_CODE))},
     events={
       "reset_joints": EventTermCfg(
         func=reset_joints_by_offset, mode="reset",
@@ -346,21 +336,20 @@ def office_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
   return cfg
 
 
-def office_ppo_runner_cfg() -> RslRlOnPolicyRunnerCfg:
-  return RslRlOnPolicyRunnerCfg(
-    actor=RslRlModelCfg(
-      hidden_dims=(256, 128), activation="elu", obs_normalization=True,
-      distribution_cfg={"class_name": "GaussianDistribution", "init_std": 0.6, "std_type": "scalar"},
-    ),
-    critic=RslRlModelCfg(hidden_dims=(256, 128), activation="elu", obs_normalization=True),
-    algorithm=RslRlPpoAlgorithmCfg(
-      value_loss_coef=1.0, use_clipped_value_loss=True, clip_param=0.2, entropy_coef=0.005,
-      num_learning_epochs=5, num_mini_batches=4, learning_rate=1.0e-3, schedule="adaptive",
-      gamma=0.99, lam=0.95, desired_kl=0.01, max_grad_norm=1.0,
-    ),
-    experiment_name="office",
-    logger="tensorboard",
-    save_interval=50,
-    num_steps_per_env=32,
-    max_iterations=600,
-  )
+MentorPiOfficeRlCfg = RslRlOnPolicyRunnerCfg(
+  actor=RslRlModelCfg(
+    hidden_dims=(256, 128), activation="elu", obs_normalization=True,
+    distribution_cfg={"class_name": "GaussianDistribution", "init_std": 0.6, "std_type": "scalar"},
+  ),
+  critic=RslRlModelCfg(hidden_dims=(256, 128), activation="elu", obs_normalization=True),
+  algorithm=RslRlPpoAlgorithmCfg(
+    value_loss_coef=1.0, use_clipped_value_loss=True, clip_param=0.2, entropy_coef=0.005,
+    num_learning_epochs=5, num_mini_batches=4, learning_rate=1.0e-3, schedule="adaptive",
+    gamma=0.99, lam=0.95, desired_kl=0.01, max_grad_norm=1.0,
+  ),
+  experiment_name="office",
+  logger="tensorboard",
+  save_interval=50,
+  num_steps_per_env=32,
+  max_iterations=600,
+)

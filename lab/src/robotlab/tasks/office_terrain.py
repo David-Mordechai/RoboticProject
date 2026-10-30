@@ -193,7 +193,7 @@ class OfficeTerrainCfg(SubTerrainCfg):
             add(mujoco.mjtGeom.mjGEOM_CYLINDER, (c[0], c[1], hz), (r, hz, 0), rgba)
             if kind == "plant":                 # within the pot footprint and above the LiDAR plane
               add(mujoco.mjtGeom.mjGEOM_SPHERE, (c[0], c[1], 2 * hz + 0.9 * r), (r, 0, 0), _FOLIAGE_RGBA, solid=False)
-          s1, s2, off = s_c - h_a - 0.3, s_c + h_a + 0.3, -side * h_l   # centre of the free lane
+          s1, s2, off = s_c - h_a - 0.4, s_c + h_a + 0.4, -side * h_l   # centre of the free lane, with run-up
         else:
           s1, s2, off = pitch * 0.35, pitch * 0.65, 0.0
         p1 = node_xy[a] + axis * s1 + lat * off

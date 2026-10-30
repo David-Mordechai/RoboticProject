@@ -27,9 +27,9 @@ from mjlab.terrains import TerrainEntityCfg
 from mjlab.utils.noise import UniformNoiseCfg
 from mjlab.viewer import ViewerConfig
 
-from robotlab.tasks.common import (
-  STEER_MAX, WHEELBASE, AckermannActionCfg, car_cfg, car_motion, car_pose, leader_cfg, place_car, wrap,
-  write_leader_pose,
+from robotlab.robot.mentorpi_a1_constants import STEER_MAX, WHEELBASE, car_cfg, leader_cfg
+from robotlab.tasks.mdp import (
+  AckermannActionCfg, car_motion, car_pose, place_car, wrap, write_leader_pose,
 )
 
 if TYPE_CHECKING:
@@ -152,7 +152,7 @@ def lost_slot(env: ManagerBasedRlEnv, max_distance: float) -> torch.Tensor:
 # Config.
 
 
-def follow_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
+def make_mentorpi_follow_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
   actor_terms = {
     "slot_error": ObservationTermCfg(func=slot_error, noise=UniformNoiseCfg(n_min=-0.02, n_max=0.02)),
     "car_motion": ObservationTermCfg(func=car_motion, noise=UniformNoiseCfg(n_min=-0.02, n_max=0.02)),
@@ -204,21 +204,20 @@ def follow_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
   return cfg
 
 
-def follow_ppo_runner_cfg() -> RslRlOnPolicyRunnerCfg:
-  return RslRlOnPolicyRunnerCfg(
-    actor=RslRlModelCfg(
-      hidden_dims=(128, 128), activation="elu", obs_normalization=True,
-      distribution_cfg={"class_name": "GaussianDistribution", "init_std": 0.6, "std_type": "scalar"},
-    ),
-    critic=RslRlModelCfg(hidden_dims=(128, 128), activation="elu", obs_normalization=True),
-    algorithm=RslRlPpoAlgorithmCfg(
-      value_loss_coef=1.0, use_clipped_value_loss=True, clip_param=0.2, entropy_coef=0.005,
-      num_learning_epochs=5, num_mini_batches=4, learning_rate=1.0e-3, schedule="adaptive",
-      gamma=0.99, lam=0.95, desired_kl=0.01, max_grad_norm=1.0,
-    ),
-    experiment_name="follow",
-    logger="tensorboard",
-    save_interval=25,
-    num_steps_per_env=32,
-    max_iterations=300,
-  )
+MentorPiFollowRlCfg = RslRlOnPolicyRunnerCfg(
+  actor=RslRlModelCfg(
+    hidden_dims=(128, 128), activation="elu", obs_normalization=True,
+    distribution_cfg={"class_name": "GaussianDistribution", "init_std": 0.6, "std_type": "scalar"},
+  ),
+  critic=RslRlModelCfg(hidden_dims=(128, 128), activation="elu", obs_normalization=True),
+  algorithm=RslRlPpoAlgorithmCfg(
+    value_loss_coef=1.0, use_clipped_value_loss=True, clip_param=0.2, entropy_coef=0.005,
+    num_learning_epochs=5, num_mini_batches=4, learning_rate=1.0e-3, schedule="adaptive",
+    gamma=0.99, lam=0.95, desired_kl=0.01, max_grad_norm=1.0,
+  ),
+  experiment_name="follow",
+  logger="tensorboard",
+  save_interval=25,
+  num_steps_per_env=32,
+  max_iterations=300,
+)

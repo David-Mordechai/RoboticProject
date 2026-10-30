@@ -17,7 +17,7 @@ from mjlab.rl import MjlabOnPolicyRunner, RslRlVecEnvWrapper
 from mjlab.tasks.registry import load_env_cfg, load_rl_cfg
 
 import robotlab.tasks  # noqa: F401
-from robotlab.tasks.office.office_env_cfg import office_leader, too_close, trail_distance
+from robotlab.tasks.mentorpi_office_env_cfg import office_leader, too_close, trail_distance
 
 TASK = "Robotlab-Office-MentorPiA1"
 p = argparse.ArgumentParser()

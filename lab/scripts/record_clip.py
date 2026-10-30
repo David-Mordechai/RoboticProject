@@ -28,7 +28,7 @@ from mjlab.rl import MjlabOnPolicyRunner, RslRlVecEnvWrapper
 from mjlab.tasks.registry import load_env_cfg, load_rl_cfg
 
 import robotlab.tasks  # noqa: F401  (registers the tasks)
-from robotlab.tasks.common import car_pose
+from robotlab.tasks.mdp import car_pose
 
 _FONT = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 _FONT_SMALL = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
@@ -123,7 +123,7 @@ def frame_meta(done: bool) -> dict:
   pts = {"car": np.r_[car_xy[0].cpu().numpy(), 0.06] + origin * [1, 1, 0]}
   m: dict = {"done": done}
   if hasattr(env, "_robotlab_office"):
-    from robotlab.tasks.office.office_env_cfg import trail_target
+    from robotlab.tasks.mentorpi_office_env_cfg import trail_target
     s = env._robotlab_office
     pts["leader"] = np.r_[s.xy[0].cpu().numpy(), 0.06] + origin * [1, 1, 0]
     pts["target"] = np.r_[trail_target(env)[0][0].cpu().numpy(), 0.0] + origin * [1, 1, 0]

@@ -40,6 +40,9 @@ OUT = Path("runs/video")
 SHOTS, SEGS = OUT / "shots", OUT / "segments"
 MICRODUCK = OUT / "source/microduck_hero.mov"
 MICRODUCK_CUT = (0.0, 15.0)
+# "Inspired" by Kevin MacLeod (incompetech.com), CC BY 4.0: credited on the end card.
+MUSIC = OUT / "source/inspired_kevin_macleod.mp3"
+MUSIC_CREDIT = 'Music: "Inspired" by Kevin MacLeod (incompetech.com), licensed under CC BY 4.0'
 
 ORANGE, BLUE, CYAN = (255, 140, 40), (70, 140, 255), (60, 225, 235)
 RED, GREEN, YELLOW = (255, 70, 70), (80, 220, 120), (255, 210, 60)
@@ -247,7 +250,7 @@ def burst(L: Layer, p, age: float, label: str, c=RED) -> None:
     L.d.line((x + r0 * math.cos(ang), y + r0 * math.sin(ang), x + r1 * math.cos(ang), y + r1 * math.sin(ang)),
              fill=col(c, a), width=7)
   s = back(age / 0.3)
-  f = font(int(58 * max(s, 0.01)))
+  f = font(max(8, int(58 * s)))                      # pop-in starts small, never size 0
   text(L, (x, y - 150), label, f, c, a, anchor="mm")
 
 
@@ -376,7 +379,7 @@ def s_hook(sh: Shot, dur=5.5):
   for t, im in frames_of(sh, dur):
     L = Layer()
     a = ease((t - 0.3) / 0.8)
-    L.im.alpha_composite(Image.new("RGBA", (W, H), (0, 0, 0, int(100 * a))))
+    L.im.alpha_composite(Image.new("RGBA", (W, H), (0, 0, 0, int(150 * a))))
     text(L, (W / 2, H / 2 - 50 + 30 * (1 - a)), "This little car taught itself to drive", font(86), WHITE, a, "mm")
     b = ease((t - 1.3) / 0.8)
     text(L, (W / 2, H / 2 + 55), "Nobody programmed how. It learned by practising.", font(42, False), ORANGE, b, "mm")
@@ -462,7 +465,7 @@ def s_learning(dur=10.0):
       active = int(cyc) % 3 == k and t > 1.2
       r = 125 * a * (1.08 if active else 1.0)
       L.d.ellipse((x - r, y - r, x + r, y + r), fill=col(INK, 0.95), outline=col(c, 1), width=10 if active else 5)
-      text(L, (x, y - 18), name, font(50), c, min(a, 1), "mm", shadow=False)
+      text(L, (x, y - 18), name, font(42), c, min(a, 1), "mm", shadow=False)
       L.d.text((x, y + 38), sub, font=font(28, False), fill=col(WHITE, min(a, 1)), anchor="mm")
     for k in range(3):                                  # arrows draw on in sequence
       (x0, y0), (x1, y1) = nodes[k][2], nodes[(k + 1) % 3][2]
@@ -486,14 +489,15 @@ def s_learning(dur=10.0):
       px, py = x0 + (x1 - x0) * fr, y0 + (y1 - y0) * fr
       L.d.ellipse((px - 14, py - 14, px + 14, py + 14), fill=col(ORANGE, 1))
     rules = [(GREEN, "+ points", "for staying right behind the leader"),
-             (RED, "− points", "for touching a wall, an obstacle or the leader")]
+             (RED, "− points", "for touching anything, or losing the leader")]
     for k, (c, a_, b_) in enumerate(rules):
       a = ease((t - 2.6 - 0.5 * k) / 0.5)
-      y = 930 + 60 * k
-      L.d.text((W / 2 - 520, y), a_, font=font(40), fill=col(c, a))
-      L.d.text((W / 2 - 330, y + 4), b_, font=font(36, False), fill=col(WHITE, a))
+      y = 905 + 58 * k
+      x = W / 2 - 560
+      L.d.text((x, y), a_, font=font(40), fill=col(c, a))
+      L.d.text((x + L.d.textlength(a_, font=font(40)) + 24, y + 4), b_, font=font(36, False), fill=col(WHITE, a))
     a = ease((t - 4.0) / 0.6)
-    L.d.text((W - 60, H - 34), "reinforcement learning (PPO) · reward = path tracking + heading − collisions − jerky steering",
+    L.d.text((W - 60, H - 34), "reinforcement learning (PPO) · reward = path tracking (fine + coarse) + heading − collisions − losing the leader − jerky steering",
              font=font(24, False), fill=col(MUTED, a), anchor="rs")
     yield L.onto(backdrop(t + 3))
 
@@ -521,6 +525,11 @@ def s_scale(cv: Curve, envs: int, iters: int, steps: int, step_dt: float, dur=8.
                             f"{iters} iterations × {steps} steps", font=font(26, False),
              fill=col(MUTED, ease((t - 3.5) / 0.6)), anchor="mm")
     yield L.onto(backdrop(t + 6))
+
+
+def STAGE_ITERS(last: int) -> list[int]:
+  """Checkpoints shown in "watch it learn": untrained, two early ones, final."""
+  return [0, 50, 100, last]
 
 
 @dataclass
@@ -609,12 +618,17 @@ def s_notice(chase: Shot, overview: Shot, d1=10.0, d2=7.0, near=0.35):
     headline(L, t, 5.1, d1 - 0.1, "…takes the turns and stays off the walls",
              "red ring: the closest thing its LiDAR sees", RED)
     yield L.onto(grade(im))
+  z = 1.6                                              # zoom into the centre so the cars read
+  def zoom(p):
+    return None if p is None else ((p[0] - W / 2) * z + W / 2, (p[1] - H / 2) * z + H / 2)
   for t, im in frames_of(overview, d2):
     m = overview.at(t)
+    cw, ch = W / z, H / z
+    im = im.crop((int((W - cw) / 2), int((H - ch) / 2), int((W + cw) / 2), int((H + ch) / 2))).resize((W, H), Image.LANCZOS)
     L = Layer()
     pill(L, t, d2, "BIRD'S-EYE VIEW", BLUE)
-    ring(L, m.get("leader"), t, BLUE, window(t, 0.3, d2), 30)
-    ring(L, m.get("car"), t, ORANGE, window(t, 0.3, d2), 30)
+    ring(L, zoom(m.get("leader")), t, BLUE, window(t, 0.3, d2), 42)
+    ring(L, zoom(m.get("car")), t, ORANGE, window(t, 0.3, d2), 42)
     headline(L, t, 0.4, d2 - 0.1, "The leader picks random turns; the learner has to react",
              "no map, no fixed route: the same network handles every corner", BLUE)
     yield L.onto(grade(im))
@@ -636,9 +650,10 @@ def s_next(dur=8.0):
       L.d.text((205 + 30 * (1 - b), y + 66), small, font=font(28, False), fill=col(MUTED, b))
     c = ease((t - 2.4) / 0.8)
     credits = ["Microduck footage: Pollen Robotics / Hugging Face  ·  github.com/pollen-robotics/microduck_rl",
+               MUSIC_CREDIT,
                "Built with open source: MuJoCo · MuJoCo Warp · mjlab · rsl_rl · PyTorch · ffmpeg"]
     for k, line in enumerate(credits):
-      L.d.text((160, H - 190 + 50 * k), line, font=font(28, False), fill=col(MUTED, c))
+      L.d.text((160, H - 225 + 46 * k), line, font=font(28, False), fill=col(MUTED, c))
     L.im.alpha_composite(Image.new("RGBA", (W, H), (0, 0, 0, int(255 * (1 - ease((dur - t) / 0.9))))))
     yield L.onto(backdrop(t + 10))
 
@@ -655,7 +670,7 @@ def render_shots(run: Path, last: int) -> None:
   rec("hook", last, 6, 11, 2.4, 28)
   rec("challenge", last, 8.5, 5, 4.2, 50)
   rec("senses", last, 7.5, 13, 3.2, 72)
-  for it in (0, 100, 300, last):
+  for it in STAGE_ITERS(last):
     rec(f"iter_{it}", it, 8.5, 3, 3.6, 50)
   rec("notice", last, 10.5, 21, 3.0, 45)
   rec("overview", last, 7.5, 8, 8.0, 82, chase=False)
@@ -672,14 +687,58 @@ def assemble(segs: list[tuple[Path, float]], transitions: list[tuple[str, float]
     starts.append(off)
     fc.append(f"{label}[{k}:v]xfade=transition={kind}:duration={td}:offset={off:.3f}[v{k}]")
     label, t_end = f"[v{k}]", off + d
+  # Audio: music bed over the whole film (fade in, fade out over the end card), Microduck's own sound
+  # quietly underneath its segment, then loudness-normalized to YouTube's -14 LUFS.
+  inputs += ["-i", str(MUSIC)]
   delay = int(starts[md_index] * 1000)
-  fc.append(f"[{len(segs)}:a]afade=t=in:d=0.6,afade=t=out:st={segs[md_index][1] - 1.2:.2f}:d=1.2,"
-            f"adelay={delay}|{delay},apad=whole_dur={t_end:.3f},loudnorm=I=-14:TP=-1.5:LRA=11[a]")
+  fc.append(f"[{len(segs)}:a]afade=t=in:d=0.6,afade=t=out:st={segs[md_index][1] - 1.2:.2f}:d=1.2,volume=0.35,"
+            f"adelay={delay}|{delay},apad=whole_dur={t_end:.3f}[md]")
+  fc.append(f"[{len(segs) + 1}:a]atrim=0:{t_end:.3f},asetpts=PTS-STARTPTS,afade=t=in:d=1.5,"
+            f"afade=t=out:st={t_end - 3.5:.3f}:d=3.5,volume=0.8[mu]")
+  fc.append("[mu][md]amix=inputs=2:duration=first:normalize=0,loudnorm=I=-14:TP=-1.5:LRA=11[a]")
   subprocess.run(["ffmpeg", "-y", "-loglevel", "error", *inputs, "-filter_complex", ";".join(fc),
                   "-map", label, "-map", "[a]", "-c:v", "libx264", "-preset", "slow", "-crf", "18",
                   "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k", "-ar", "48000",
                   "-movflags", "+faststart", "-t", f"{t_end:.3f}", str(out)], check=True)
   print(f"wrote {out} ({t_end:.1f} s)")
+
+
+def ssim(ref: Path, test: Path) -> float:
+  r = subprocess.run(["ffmpeg", "-hide_banner", "-i", str(test), "-i", str(ref), "-lavfi", "ssim", "-f", "null", "-"],
+                     capture_output=True, text=True)
+  return float(r.stderr.rsplit("All:", 1)[1].split()[0])
+
+
+def deliver(master: Path, out: Path, min_ssim: float = 0.99) -> None:
+  """Smallest H.264 file that is visually indistinguishable from the master (SSIM >= min_ssim).
+
+  H.264 (not H.265) so it plays everywhere without extra codecs; tune=animation suits flat motion
+  graphics and clean renders; aq-mode 3 keeps smooth dark gradients (the vignette) free of the block
+  banding that whole-frame SSIM does not catch; 128 kb/s AAC. Binary search over CRF: 2-3 encodes.
+  """
+  def encode(crf: int) -> tuple[Path, float]:
+    trial = out.with_name(f"{out.stem}_crf{crf}.mp4")
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(master), "-c:v", "libx264", "-preset", "slow",
+                    "-tune", "animation", "-aq-mode", "3", "-crf", str(crf), "-pix_fmt", "yuv420p", "-profile:v", "high",
+                    "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart", str(trial)], check=True)
+    q = ssim(master, trial)
+    print(f"  crf {crf}: {trial.stat().st_size / 1e6:5.1f} MB, SSIM {q:.4f}", flush=True)
+    return trial, q
+
+  lo, hi, best = 18, 32, None                           # find the largest CRF that still passes
+  while lo <= hi:
+    crf = (lo + hi) // 2
+    trial, q = encode(crf)
+    if q >= min_ssim:
+      if best is not None:
+        best.unlink()
+      best, lo = trial, crf + 2                         # 2-step resolution is plenty
+    else:
+      trial.unlink()
+      hi = crf - 2
+  assert best is not None, "no CRF reached the quality bar"
+  best.replace(out)
+  print(f"delivered {out} ({out.stat().st_size / 1e6:.1f} MB; master {master.stat().st_size / 1e6:.1f} MB)")
 
 
 def main() -> None:
@@ -693,7 +752,7 @@ def main() -> None:
   if not args.skip_render:
     render_shots(args.run, last)
   cv = make_curve(args.run)
-  total = int(cv.its.max()) + 1
+  total = last                                         # rounds trained = the last checkpoint's iteration
   # Read the few numbers we need straight from the run's params (mjlab's YAML carries python tags).
   import re
   def param(file: str, key: str) -> float:
@@ -701,12 +760,12 @@ def main() -> None:
   envs, steps = int(param("env.yaml", "num_envs")), int(param("agent.yaml", "num_steps_per_env"))
   step_dt = param("env.yaml", "timestep") * param("env.yaml", "decimation")
 
-  stages = [
-    Stage(shot("iter_0"), 0, "Attempt #1: it has no idea what to do", "round 0 · random neural network"),
-    Stage(shot("iter_100"), 100, "After 100 rounds: it starts to follow", "iteration 100"),
-    Stage(shot("iter_300"), 300, "After 300 rounds: smoother, fewer mistakes", "iteration 300"),
-    Stage(shot(f"iter_{last}"), last, f"After {total} rounds: it has learned the basics", f"iteration {last}"),
-  ]
+  stages = [Stage(shot(f"iter_{it}"), it, big, small) for it, (big, small) in zip(STAGE_ITERS(last), (
+    ("Attempt #1: it has no idea what to do", "round 0 · random neural network"),
+    ("After 50 rounds: it starts to follow", "iteration 50"),
+    ("After 100 rounds: it takes the turns", "iteration 100"),
+    (f"After {last} rounds: it has learned the skill", "evaluation: 100% of 512 one-minute test drives, 0 crashes"),
+  ))]
   only = set(filter(None, args.only.split(",")))
   def seg(name: str, gen: Callable[[], Iterator[Image.Image]]) -> tuple[Path, float]:
     path = SEGS / f"{name}.mp4"
@@ -727,7 +786,7 @@ def main() -> None:
     seg("06_learning", lambda: s_learning()),
     seg("07_scale", lambda: s_scale(cv, envs, total, steps, step_dt)),
   ]
-  froms = [0, 0, 100, 300]
+  froms = [0] + STAGE_ITERS(last)[:-1]
   for k, st in enumerate(stages):
     segs.append(seg(f"08_stage_{k}", lambda st=st, k=k: s_stage(st, froms[k], cv, total, 6.5, k == 0)))
   segs.append(seg("09_split", lambda: s_split(stages[0].shot, stages[-1].shot, total)))
@@ -736,7 +795,9 @@ def main() -> None:
   transitions = [("fadeblack", 0.6), ("slideleft", 0.5), ("wipeleft", 0.5), ("fade", 0.4), ("fade", 0.4),
                  ("slideleft", 0.5), ("wipeup", 0.5), ("fade", 0.3), ("fade", 0.3), ("fade", 0.3), ("wipeleft", 0.5),
                  ("fade", 0.4), ("fadeblack", 0.8)]
-  assemble(segs, transitions, 1, OUT / "davids_robot_cars_showcase.mp4")
+  master = OUT / "davids_robot_cars_showcase_master.mp4"
+  assemble(segs, transitions, 1, master)
+  deliver(master, OUT / "davids_robot_cars_showcase.mp4")
 
 
 if __name__ == "__main__":

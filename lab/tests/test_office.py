@@ -11,8 +11,8 @@ def test_leader_route_is_clear():
   from mjlab.tasks.registry import load_env_cfg
 
   import robotlab.tasks  # noqa: F401
-  from robotlab.tasks.common import place_car
-  from robotlab.tasks.office.office_env_cfg import bumped, office_leader
+  from robotlab.tasks.mdp import place_car
+  from robotlab.tasks.mentorpi_office_env_cfg import bumped, office_leader
 
   cfg = load_env_cfg("Robotlab-Office-MentorPiA1")
   cfg.scene.num_envs = 128
