@@ -18,6 +18,7 @@ Rules for using values:
 - **Check the model against the spec.** After building or changing a sim model, measure its behaviour in sim and compare it with the spec before training on it. For example, compare the turning radius with Hiwonder's R = H / tan θ.
 
 - **The plan:** `docs/project-plan.md`. Read it first; it holds decisions, safety rules, phases and open items.
+- **Next steps:** `docs/open-issues.md`, in priority order. Start new work from there.
 - Virtual lab (sim + training) setup plan, written to start before the GB10 arrives: `docs/virtual-lab-plan.md`.
 - Lab runs **only in Docker** (same image on this PC and the GB10): `docs/docker-env.md`. Quick start: `cp docker/env/pc.env .env && docker compose build && docker compose run --rm lab pytest`. Don't install Python deps on the host; change `lab/pyproject.toml`, re-lock inside Linux, rebuild.
 - Hardware and software research, and the findings that affect the plan: `docs/research/00-overview.md`, then `01-mentorpi-a1-hardware.md` and `02-mentorpi-a1-software.md`.
