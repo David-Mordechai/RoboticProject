@@ -156,6 +156,34 @@ def chase_camera(done: bool) -> None:
   env._offline_renderer._cam.azimuth = math.degrees(cam_yaw)
 
 
+def nav_overlay(frame: np.ndarray) -> np.ndarray:
+  """Navigate task: the planned route ahead (yellow line; LiDAR hit markers are cyan) and a status line, drawn on the frame of env 0."""
+  if not hasattr(env, "_robotlab_nav"):
+    return frame
+  from robotlab.tasks import mentorpi_navigate_env_cfg as T
+  nv = env._robotlab_nav
+  origin = env.scene.env_origins[0].cpu().numpy()
+  ahead = torch.linspace(0.0, 8.0, 48, device=env.device)
+  route = T._points_at(nv, nv.s[:, None] + ahead[None])[0].cpu().numpy()
+  px = project(np.c_[route, np.full(len(route), 0.01)] + origin * [1, 1, 0])
+  img = Image.fromarray(frame).convert("RGBA")
+  layer = Image.new("RGBA", img.size, (0, 0, 0, 0))
+  d = ImageDraw.Draw(layer)
+  line = [tuple(p) for p in px if p is not None]
+  if len(line) > 1:
+    d.line(line, fill=(255, 210, 0, 230), width=max(4, args.height // 150))
+  v = float(env.scene["car"].data.root_link_lin_vel_b[0, 0])
+  clear = float(T.person_clearance(env)[0])
+  status = (f"goals reached: {int(nv.goals_reached[0])}    speed: {v:.2f} m/s    "
+            f"nearest person: {'-' if clear > 50 else f'{clear:.2f} m'}")
+  pad = args.height // 36
+  w = d.textlength(status, font=font_small) + 2 * pad
+  y0 = args.height - pad - font_small.size - 2 * pad
+  d.rounded_rectangle((pad, y0, pad + w, args.height - pad), radius=pad // 2, fill=(0, 0, 0, 150))
+  d.text((2 * pad, y0 + pad - 2), status, font=font_small, fill=(255, 255, 255, 255))
+  return np.asarray(Image.alpha_composite(img, layer).convert("RGB"))
+
+
 cam_yaw: float | None = None
 meta: list[dict] = []
 obs = venv.get_observations()
@@ -166,6 +194,7 @@ with torch.inference_mode():
       chase_camera(bool(dones[0]))
     frame = env.render()
     meta.append(frame_meta(bool(dones[0])))
+    frame = nav_overlay(frame)
     ffmpeg.stdin.write(caption(frame))
 ffmpeg.stdin.close()
 ffmpeg.wait()

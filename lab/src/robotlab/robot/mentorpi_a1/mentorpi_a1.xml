@@ -34,6 +34,10 @@
            ~0.14 m above the floor is an ESTIMATE (deck + sensor half height) until measured. -->
       <site name="lidar" pos="-0.05 0 0.1075" size="0.005"/>
       <geom name="camera" class="visual" type="box" size="0.012 0.045 0.0125" pos="0.095 0 0.065" rgba="0.1 0.1 0.1 1"/>
+      <!-- HP60C depth camera optical centre: Hiwonder URDF ack.xacro cam_Joint puts depth_cam at x = +0.064 m, ~0.12 m
+           above the floor, no tilt (research/03 §1.2). ESTIMATE until measured (that URDF's wheel offsets don't match
+           the 65 mm wheel either). Site z is relative to the chassis body (origin 0.0325 m above the floor). -->
+      <site name="depth_cam" pos="0.064 0 0.0875" size="0.005"/>
 
       <body name="knuckle_fl" pos="0.0725 0.0665 0">
         <joint name="steer_fl" type="hinge" axis="0 0 1" range="-40 40" damping="0.01" armature="0.0005"/>

@@ -52,11 +52,16 @@ _CLUTTER = (
 )
 
 
+OCC_RES = 0.05                   # m per occupancy cell (ground truth for "is there room here", used by rewards)
+OCC_N = int(round(PATCH_SIZE / OCC_RES))
+
+
 @dataclass
 class OfficeLayout:
   node_xy: np.ndarray            # [N, 2] node centres, patch frame
   nbr: np.ndarray                # [N, 4] neighbour node per direction, -1 = wall
   route: np.ndarray              # [N, 4, 2, 2] two route points from node n in direction d
+  occ: np.ndarray                # [OCC_N, OCC_N] bool, walls and clutter footprints, index [ix, iy]
 
 
 # Layouts in generation order (row-major over the terrain grid), read back by the task.
@@ -148,6 +153,13 @@ class OfficeTerrainCfg(SubTerrainCfg):
         if adj[a, d]:
           hall[2 * ix + 1 + dx, 2 * iy + 1 + dy] = True
 
+    occ = np.zeros((OCC_N, OCC_N), bool)
+    cell = (np.arange(OCC_N) + 0.5) * OCC_RES                  # cell centres
+    def fill_box(x0, x1, y0, y1):
+      occ[np.ix_((cell >= x0) & (cell <= x1), (cell >= y0) & (cell <= y1))] = True
+    def fill_disc(cx, cy, r):
+      occ[(cell[:, None] - cx) ** 2 + (cell[None, :] - cy) ** 2 <= r * r] = True
+
     # Walls: merge runs of solid cells along x into one box per run.
     for j in range(m):
       i = 0
@@ -161,6 +173,7 @@ class OfficeTerrainCfg(SubTerrainCfg):
         x0, x1 = _CELL_LO[i], _CELL_LO[k] + _CELLS[k]
         y0, y1 = _CELL_LO[j], _CELL_LO[j] + _CELLS[j]
         box(((x0 + x1) / 2, (y0 + y1) / 2, WALL_HEIGHT / 2), ((x1 - x0) / 2, (y1 - y0) / 2, WALL_HEIGHT / 2), _WALL_RGBA)
+        fill_box(x0, x1, y0, y1)
         i = k + 1
 
     # Room roofs: a thin coloured cap on every interior room block.
@@ -196,8 +209,10 @@ class OfficeTerrainCfg(SubTerrainCfg):
           hz = rng.uniform(0.15, 0.35)            # half height; all reach above the LiDAR plane
           if shape == "box":
             box((c[0], c[1], hz), (half[0], half[1], hz), rgba)
+            fill_box(c[0] - half[0], c[0] + half[0], c[1] - half[1], c[1] + half[1])
           else:
             r = min(h_a, h_l)
+            fill_disc(c[0], c[1], r)
             add(mujoco.mjtGeom.mjGEOM_CYLINDER, (c[0], c[1], hz), (r, hz, 0), rgba)
             if kind == "plant":                 # within the pot footprint and above the LiDAR plane
               add(mujoco.mjtGeom.mjGEOM_SPHERE, (c[0], c[1], 2 * hz + 0.9 * r), (r, 0, 0), _FOLIAGE_RGBA, solid=False)
@@ -209,7 +224,7 @@ class OfficeTerrainCfg(SubTerrainCfg):
         route[a, d] = (p1, p2)
         route[b, d ^ 1] = (p2, p1)
 
-    LAYOUTS.append(OfficeLayout(node_xy, nbr, route))
+    LAYOUTS.append(OfficeLayout(node_xy, nbr, route, occ))
     return TerrainOutput(origin=np.zeros(3), geometries=geoms)
 
 
@@ -218,6 +233,7 @@ class LayoutTensors:
   node_xy: torch.Tensor          # [L, N, 2]
   nbr: torch.Tensor              # [L, N, 4]
   route: torch.Tensor            # [L, N, 4, 2, 2]
+  occ: torch.Tensor              # [L, OCC_N, OCC_N] bool
 
 
 def layout_tensors(num_patches: int, device: str) -> LayoutTensors:
@@ -226,4 +242,4 @@ def layout_tensors(num_patches: int, device: str) -> LayoutTensors:
     raise RuntimeError("Office layouts missing: the scene terrain must use OfficeTerrainCfg.")
   ls = LAYOUTS[-num_patches:]
   t = lambda f, dt: torch.tensor(np.stack([getattr(l, f) for l in ls]), dtype=dt, device=device)
-  return LayoutTensors(t("node_xy", torch.float32), t("nbr", torch.long), t("route", torch.float32))
+  return LayoutTensors(t("node_xy", torch.float32), t("nbr", torch.long), t("route", torch.float32), t("occ", torch.bool))

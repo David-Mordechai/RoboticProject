@@ -13,6 +13,8 @@ from mjlab.entity import EntityArticulationInfoCfg, EntityCfg
 _ROBOT_DIR = Path(__file__).resolve().parent / "mentorpi_a1"
 MENTORPI_A1_XML = _ROBOT_DIR / "mentorpi_a1.xml"
 LEADER_CAR_XML = _ROBOT_DIR / "leader_car.xml"
+PERSON_XML = Path(__file__).resolve().parent / "person.xml"
+GOAL_MARKER_XML = Path(__file__).resolve().parent / "goal_marker.xml"
 
 # Geometry and limits (docs/research/01-mentorpi-a1-hardware.md, docs/vendor/hiwonder/manuals/).
 WHEEL_RADIUS = 0.0325            # Ø65 mm (Hiwonder drawing); Hiwonder code uses 67 mm: conflict, measure
@@ -43,3 +45,11 @@ def car_cfg() -> EntityCfg:
 
 def leader_cfg() -> EntityCfg:
   return EntityCfg(spec_fn=lambda: mujoco.MjSpec.from_file(str(LEADER_CAR_XML)))
+
+
+def person_cfg() -> EntityCfg:
+  return EntityCfg(spec_fn=lambda: mujoco.MjSpec.from_file(str(PERSON_XML)))
+
+
+def goal_marker_cfg() -> EntityCfg:
+  return EntityCfg(spec_fn=lambda: mujoco.MjSpec.from_file(str(GOAL_MARKER_XML)))

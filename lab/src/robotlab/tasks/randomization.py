@@ -34,6 +34,8 @@ ENABLE_STEERING_SERVO = True
 ENABLE_LATENCY = True
 ENABLE_LIDAR_NOISE = True
 ENABLE_LEADER_NOISE = True
+ENABLE_SPEED_SCALE = True
+ENABLE_LOCALIZATION_NOISE = True      # navigation tasks: error of the own pose the path is expressed in
 
 # Tyre-floor friction coefficient. NO SOURCE: Hiwonder publishes no tyre data and our floors are unknown.
 # Wide on purpose; narrow after a tilt-plane slip test on the real floors.
@@ -70,6 +72,22 @@ LIDAR_BIAS_M = 0.045
 LIDAR_STD_RANGE_M = (0.005, 0.020)
 LIDAR_DROPOUT_RANGE = (0.0, 0.05)
 LIDAR_REFRESH_STEPS = 2          # 10 Hz scan / 20 Hz policy: each scan is seen for two policy steps
+# Scan rate per car for the navigation tasks: LD19 defaults to 10 Hz, Hiwonder's stock MS200 launch spins it at
+# 15 Hz (research/03 §1.1). At a 20 Hz policy a fresh scan arrives with probability rate / 20 per step.
+LIDAR_SCAN_HZ_RANGE = (10.0, 15.0)
+
+# Own speed reading (car_motion vx, vy): per-car scale error. Stock speed is the commanded one (open-loop,
+# research/03 §1.4); wheel diameter 65 vs 67 mm alone is ±3% (research/01 §3; research/03 §4.3, derived).
+SPEED_SCALE_RANGE = (0.97, 1.03)
+
+# Own pose in the shared map (navigation tasks: the planned path reaches the policy through it). NO SOURCE:
+# AMCL / slam_toolbox error on these cars is unmeasured (research/03 §3.4, G9). Estimates: a per-episode bias
+# plus a correction jump at the stock update cadence, 0.5 s (research/03 §4.3). Measure in Phase 2.
+LOC_BIAS_M = 0.05
+LOC_BIAS_YAW = math.radians(3.0)
+LOC_JUMP_M = 0.03                # std of each jump
+LOC_JUMP_YAW = math.radians(1.5)
+LOC_JUMP_STEPS = 10              # 0.5 s at 20 Hz
 
 # Leader relative pose. NO SOURCE: on the real cars it comes from localization + the network, still open
 # (open-issues #7, research/03). Estimates until #7 measures the real noise; then feed it back here.
@@ -196,6 +214,74 @@ class LeaderPoseNoiseCfg(_NoiseModelCfg, class_type=LeaderPoseNoiseModel):
   cmd_noise: float = 0.02
 
 
+class SpeedScaleNoiseModel(NoiseModel):
+  """Per-car scale error on the first two values of car_motion (forward and lateral speed)."""
+
+  def __init__(self, cfg: SpeedScaleNoiseCfg, num_envs: int, device: str):
+    self.cfg, self._dev = cfg, device
+    self._scale = torch.ones(num_envs, device=device)
+    self.reset()
+
+  def reset(self, env_ids: torch.Tensor | slice | None = None) -> None:
+    ids = slice(None) if env_ids is None else env_ids
+    lo, hi = self.cfg.scale_range
+    self._scale[ids] = lo + (hi - lo) * torch.rand_like(self._scale[ids])
+
+  def __call__(self, data: torch.Tensor) -> torch.Tensor:
+    out = data.clone()
+    out[:, :2] *= self._scale[:, None]
+    return out
+
+
+@dataclass(kw_only=True)
+class SpeedScaleNoiseCfg(_NoiseModelCfg, class_type=SpeedScaleNoiseModel):
+  scale_range: tuple[float, float] = SPEED_SCALE_RANGE
+
+
+# Raw-ray LiDAR noise for the navigation tasks. Unlike LidarNoiseModel (which works on the 36 values the policy
+# sees) this acts on every raw ray before the min-pooling into sectors, as the real scan would; the task calls
+# it from its observation term. State lives on the env.
+
+
+@dataclass
+class RayNoiseState:
+  bias: torch.Tensor      # [N] m
+  std: torch.Tensor       # [N] m
+  drop: torch.Tensor      # [N] probability per ray
+  fresh_p: torch.Tensor   # [N] probability that a new scan arrived this step
+  held: torch.Tensor      # [N, R] last scan, m (-1 = none yet)
+
+
+def ray_noise_state(env: ManagerBasedRlEnv, num_rays: int) -> RayNoiseState:
+  if not hasattr(env, "_robotlab_ray_noise"):
+    z = lambda: torch.zeros(env.num_envs, device=env.device)
+    env._robotlab_ray_noise = RayNoiseState(z(), z(), z(), z(), torch.full((env.num_envs, num_rays), -1.0, device=env.device))
+  return env._robotlab_ray_noise
+
+
+def reset_ray_noise(env: ManagerBasedRlEnv, env_ids: torch.Tensor, num_rays: int) -> None:
+  s, m = ray_noise_state(env, num_rays), len(env_ids)
+  u = lambda r: r[0] + (r[1] - r[0]) * torch.rand(m, device=env.device)
+  s.bias[env_ids] = u((-LIDAR_BIAS_M, LIDAR_BIAS_M))
+  s.std[env_ids] = u(LIDAR_STD_RANGE_M)
+  s.drop[env_ids] = u(LIDAR_DROPOUT_RANGE)
+  s.fresh_p[env_ids] = u(LIDAR_SCAN_HZ_RANGE) * env.step_dt
+  s.held[env_ids] = -1.0
+
+
+def noisy_rays(env: ManagerBasedRlEnv, dist: torch.Tensor, max_range: float) -> torch.Tensor:
+  """dist [N, R] in m, max_range where nothing was hit. Bias + per-ray noise + dropouts, then sample-and-hold
+  at the car's scan rate."""
+  s = ray_noise_state(env, dist.shape[1])
+  hit = dist < max_range
+  d = dist + s.bias[:, None] + s.std[:, None] * torch.randn_like(dist)
+  d = torch.where(hit, d.clamp(0.0, max_range), max_range)
+  d = torch.where(torch.rand_like(dist) < s.drop[:, None], max_range, d)
+  fresh = (torch.rand(env.num_envs, device=env.device) < s.fresh_p) | (s.held[:, 0] < 0)
+  s.held = torch.where(fresh[:, None], d, s.held)
+  return s.held.clone()
+
+
 # Config.
 
 
@@ -231,6 +317,8 @@ def apply_domain_randomization(cfg: ManagerBasedRlEnvCfg, lidar_range: float | N
     drive.latency_range_s = LATENCY_RANGE_S
 
   actor = cfg.observations["actor"].terms
+  if ENABLE_SPEED_SCALE and "car_motion" in actor:
+    actor["car_motion"].noise = SpeedScaleNoiseCfg()
   if ENABLE_LIDAR_NOISE and "lidar" in actor:
     assert lidar_range is not None, "lidar term needs lidar_range"
     actor["lidar"].noise = LidarNoiseCfg(max_range=lidar_range)

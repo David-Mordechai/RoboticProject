@@ -257,3 +257,23 @@ Checked 2026-10-31 against Hiwonder's code (`docs/vendor/hiwonder/code/`), the d
 - **"Hungry" is owner-only:** it's triggered only by low battery and addressed only to the recognized user.
 - **Safety (§6):** the safety rules still apply to every autonomous behaviour: watchdog, speed limits, kill switch and geofence.
 - **Network loss:** the brain runs on the GB10, so a car that loses the link must stop safely or drive home on its own. Define this together with the mesh work (§9).
+
+### 13.4 Training replan (2026-10-31): use the car's stock stack, train only the gaps
+The car ships the "go somewhere safely" skill: Nav2 with AMCL and LiDAR costmaps (`navigation/`), named-place
+navigation (`large_models/vllm_navigation.py`), LiDAR avoid/follow/guard (`app/lidar_controller.py`) and person
+following with YOLO + depth (`example/.../body_track.py`). We use these as they are. The RL navigation task
+(`Robotlab-Navigate-MentorPiA1`) duplicated Nav2 and is shelved; its walking-people simulation is reused.
+
+Hiwonder's two-car formation code (`multi/formation_update.py`, row/column/triangle) sends lateral velocity and
+assumes aligned start poses, so it doesn't fit Ackermann cars. Team driving is the gap. Architecture: **the leader
+runs stock Nav2; the follower runs our trained policy** and holds a formation slot relative to the leader.
+
+| Step | Skill |
+|---|---|
+| T1 | Formation follower: slot as an input (column, diagonal left/right, side-by-side), Nav2-like leader, walking people |
+| T2 | People seen through the stock YOLO + depth detections, with realistic noise and delay |
+| T3 | Formation switching on command (e.g. side-by-side to column when the hallway narrows) |
+| Later | Relay positioning for the mesh network (§9.2) |
+
+Measure on the real cars: how stock Nav2 drives an Ackermann A1 (car-like planner settings), which calibrates the sim
+leader, and the range and rate of the stock person detector, for T2.

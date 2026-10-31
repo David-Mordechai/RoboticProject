@@ -1,0 +1,38 @@
+<!--
+  Walking person for the office tasks: kinematic (mocap), moved by the task script. Only what the car can
+  touch or sense is solid:
+  - two legs (capsules) cut the 2D LiDAR plane (~0.14-0.16 m). Capsules, not cylinders: rounder like a real
+    leg, and MuJoCo Warp has an exact capsule-box collider, while cylinder-box goes through its convex CCD
+    (the source of the tyre NaN bug, see tasks/office_terrain.py);
+  - two feet (boxes) at floor level: the car's chassis (4-8 cm high) hits shoes before the LiDAR plane sees
+    anything, because the foot sticks out in front of the leg.
+  Sizes are ANSUR II means (US Army anthropometric survey 2012, public data, n = 4082 men + 1986 women),
+  randomized per person by the task over the 5th-95th percentile range:
+    leg radius 0.035 m: between ankle (mean C = 216-229 mm) and calf (373-392 mm) circumference, C / 2 pi
+    foot 0.26 x 0.10 x 0.068 m: foot length 246-271, foot breadth 93-102, lateral malleolus height 63-73 mm
+    leg spacing +-0.087 m: hip breadth (346-354 mm) / 4, ESTIMATE (legs under the hip joints, no source)
+    heel 0.07 m behind the leg axis: ESTIMATE (no source; ankle over the rear quarter of the foot)
+  Clothing and shoes are not in ANSUR (measured barefoot, minimal clothing): real legs read wider.
+  Legs don't swing (simplification). Torso and head are visual only (group 2: rendered; the navigate task's LiDAR casts on groups 0-1 only).
+  Collision group 2 (car chassis), like walls and obstacles.
+-->
+<mujoco model="person">
+  <default>
+    <default class="solid">
+      <geom contype="2" conaffinity="2" rgba="0.25 0.27 0.35 1"/>
+    </default>
+    <default class="visual">
+      <geom contype="0" conaffinity="0" group="2" rgba="0.80 0.62 0.48 1"/>
+    </default>
+  </default>
+  <worldbody>
+    <body name="person">
+      <geom name="leg_l" class="solid" type="capsule" size="0.035 0.4" pos="0 0.087 0.4"/>
+      <geom name="leg_r" class="solid" type="capsule" size="0.035 0.4" pos="0 -0.087 0.4"/>
+      <geom name="foot_l" class="solid" type="box" size="0.13 0.05 0.034" pos="0.06 0.087 0.034" rgba="0.1 0.1 0.1 1"/>
+      <geom name="foot_r" class="solid" type="box" size="0.13 0.05 0.034" pos="0.06 -0.087 0.034" rgba="0.1 0.1 0.1 1"/>
+      <geom class="visual" type="capsule" size="0.17" fromto="0 0 0.95 0 0 1.45" rgba="0.30 0.45 0.70 1"/>
+      <geom class="visual" type="sphere" size="0.11" pos="0 0 1.65"/>
+    </body>
+  </worldbody>
+</mujoco>

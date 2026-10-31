@@ -55,6 +55,12 @@ Steering randomization (29–37°) stays in `mdp.AckermannAction`.
 
 **Done when:** the ONNX file matches torch within 1e-5, and its inference time is measured on a Pi 5.
 
+**Status (2026-10-31):** `lab/scripts/export_onnx.py` exports with the normalizer baked in and writes the observation and action layouts into the ONNX metadata. On the office policy (`model_599.onnx`, 186 KiB):
+- **Parity:** 1.2e-6 max difference over 6,400 recorded noisy observations (PASS).
+- **Speed on this laptop's CPU:** 0.01 ms per step on 1 thread.
+
+**Remaining:** time it on a Pi 5 once the cars arrive.
+
 ## 3. Measure the real cars and update the model
 **Why:** several values are unpublished or contradictory. See `docs/research/00-overview.md` "Open items" and `robot/mentorpi_a1_constants.py`.
 
@@ -76,6 +82,52 @@ Steering randomization (29–37°) stays in `mdp.AckermannAction`.
 `Robotlab-Follow-MentorPiA1` (`logs/rsl_rl/follow/2026-10-30_09-23-00`) was trained before the steering fix, with the car steering about 5°. That checkpoint is invalid.
 
 **Done when:** it's retrained on the fixed car model and evaluated.
+
+## 4b. Training replan, T1–T3 (2026-10-31, `project-plan.md` §13.4)
+- **Leader:** stock Nav2.
+- **Follower:** a trained formation policy.
+- **Shelved:** the RL navigate task, because Nav2 already does that. A diagnosis from its evaluation is kept: v1 clipped standing people's feet at ~0.6 m/s.
+
+**T1 status (end of the 2026-10-31 session): trained and evaluated, NOT done yet.**
+
+Task `Robotlab-Formation-MentorPiA1` (`lab/src/robotlab/tasks/mentorpi_formation_env_cfg.py`):
+- **Leader (Nav2-like):** slows in turns, stops for people ahead, accelerates at a limited rate, and cruises at 0.2–0.6 m/s. The source is Hiwonder's stock Nav2: velocity smoother caps at 0.32 m/s, TEB at 0.6 m/s.
+- **Slot input:** column, diagonal L/R, side-by-side L/R.
+- **Adaptive slot:** the rewarded target slides in behind the leader where there's no room beside it (ground-truth occupancy grid), and always at intersections ("single file").
+- **People:** walking people that yield, and turn back after 3 s.
+- **Sensors:** 360-ray LiDAR min-pooled to 36 sectors; depth camera (12 height-filtered sectors, `tasks/camera.py`), which sees feet the LiDAR can't (256/256 in the smoke test); stock-YOLO-style person detections (2 nearest).
+
+Best checkpoint: `logs/rsl_rl/formation/2026-10-31_22-22-47_t1b_adaptive_fast/model_998.pt` (T1b, fine-tuned from T1 `2026-10-31_21-21-12/model_599.pt`). `lab/scripts/evaluate_formation.py`, 1000 runs × 60 s, without / with sensor noise:
+
+| Slot | Completed | Wall | Person | Error to adapted slot | Fell back |
+|---|---|---|---|---|---|
+| column | 100 / 99.5% | 0% | 0 / 0.5% | 3.6 cm | 0% |
+| diagonal L/R | 97–98 / 96–98% | 2–4% | 0–0.4% | 12–14 cm | 64% |
+| side-by-side L | 87.5 / 87% | 12.5% | 0–0.5% | 42 cm | 74% |
+| side-by-side R | 74 / 69% | 25–29% | 0.5–2.2% | 45 cm | 72% |
+| all | 91.7 / 90.2% | 8–9% | 0.1–0.7% | 21 cm | — |
+
+Person contacts were 1 / 7 per 1000 minutes, all with standing people. Before the camera input, v1 navigate had 21% of cars hitting someone within 2 minutes.
+
+**Remaining problems (next session):**
+1. **Side-by-side crashes** (12–29%) and loose tracking (~45 cm). Every simulated hallway is 1.4 m, which doesn't fit two cars side by side with 0.25 m clearance, so side-by-side is mostly falling back and spreading out again, and it fails during those transitions.
+   - **Next:** randomize hallway width (e.g. 1.2–2.4 m), then narrow to the **measured real office hallways** (user to measure; ties to #11).
+   - Also look at why the right side is worse than the left.
+2. **Standing-person contacts aren't zero** (up to 7 per 1000 min with noise).
+   - **Next:** diagnose as for v1, with car speed, bearing and leg vs foot at contact.
+   - Then decide: more depth weight, a speed limit near people, or longer training.
+3. **Done bar for T1:** ≥95% completed on every slot with sensor noise, and 0 standing-person contacts.
+4. **No pytest yet** for the formation task. Smoke and stress scripts are in the git-ignored `lab/scratch/` (`formation_smoke.py`, `formation_stress.py`); promote the key checks to `lab/tests/`.
+5. **Training throughput on the RTX 2060:** ~7.8–13k env-steps/s at 1024 envs, 600 iterations ≈ 45 min. Move training to the GB10 (#10) and measure the speedup.
+
+**Shelved:** the RL navigate task `Robotlab-Navigate-MentorPiA1` (Nav2 already does this). Its `people.py` walkers, `camera.py` sensors and `evaluate_navigate.py` are reused or kept.
+
+**Tools added this session:**
+- `lab/scripts/export_onnx.py` (#2)
+- `lab/scripts/evaluate_navigate.py`
+- `lab/scripts/evaluate_formation.py`
+- `lab/scripts/tour_viewer.py`: live viewer with a scripted camera path from `lab/scratch/tour_plan.json`. Use still shots: live camera moves shake in the browser.
+- **Demo video:** `runs/video/virtual_lab_tour.mp4`.
 
 ## 5. Two learning cars (multi-agent)
 **Goal:** project plan Phase A, with both cars controlled by policies.
@@ -118,6 +170,17 @@ An AprilTag on each car's rear, seen by the follower's HP60C, is the cross-check
 - **Training-speed note:** the 6 GB RTX 2060 can't train and run the viewer at the same time (4.4× slowdown). Write this down.
 
 ## 10. Run the lab on the GB10
+**Expected speedup: unknown until measured.** No published MuJoCo Warp / mjlab benchmark compares the GB10 with an RTX 2060. From the specs:
+
+| | RTX 2060 laptop (this PC) | GB10 | Ratio |
+|---|---|---|---|
+| CUDA cores | 1920 | 6144 | 3.2× |
+| FP32 | ~4.6–6.0 TFLOPS (derived: 1920 × 2 × 1.2–1.56 GHz boost) | 31 TFLOPS (NVIDIA, Hot Chips 2025) | ~5–7× |
+| Memory bandwidth | 336 GB/s | 273 GB/s | 0.8× |
+| Memory | 6 GB | 128 GB unified | ~21× |
+
+So compute-heavy parts (rays, contacts, the MLP) should gain several times over, while memory-bound kernels may not gain at all. The 128 GB also allows 4–8× more parallel worlds, and running the viewer while training. Benchmark the formation task at 1024 / 4096 / 8192 envs on both machines; first runs are slow while the SM 12.1 kernels compile.
+
 **Do:**
 - Build the image natively on aarch64 (`docker/env/gb10.env`, sm_121, cu130).
 - Run `pytest` and a short training run.
@@ -147,6 +210,11 @@ Ideas for later:
 - Pipeline: car detection → crop → matching on the GB10 (or on the Pi, if profiling allows).
 
 **Done when:** in office lighting, known people are recognized and unknown people are reported as unknown. Accuracy, false-match rate and latency are measured.
+
+**Parked (user, 2026-10-31).** Research is done: `docs/research/04-face-recognition.md`. Key points:
+- **Camera geometry:** the stock camera (0.12 m up, no tilt) only sees a standing person's eyes beyond ~3 m, and gives 6–16 px between the eyes at 640×480 (≥48 px are needed).
+- **Proposal:** add an upward-tilted Pi Camera Module 3 for recognition.
+- **Decisions pending:** that camera, and the weights license (AdaFace/InsightFace are research-only; SFace and dlib are clean).
 
 ## 14. Local brain on the GB10
 **Do:**
