@@ -16,6 +16,10 @@ Train two robot cars to operate as a team using simulation-based reinforcement l
    - live **video** from each car to the central PC,
    - real-time **telemetry** sharing,
    - **shared mapping**: when one car discovers a new room, the other car receives the updated map immediately.
+3. **End goal (user, 2026-10-31): fully autonomous office robots.** See §13. The driving and formation skills from Phase A serve this goal. Without any human in the loop, the cars:
+   - **find a specific person** in the office and **deliver a message** to them;
+   - **greet people they already know** in a funny way when they meet them;
+   - **go home to the user's office when the battery is low** and ask *the user* for "food" because they're hungry. This act is only for the user, and only on low battery; never toward other people.
 
 **User's working style / expectations (important for the agent):**
 - Wants real engineering solutions to the actual problem, **not simplified approaches or workarounds**.
@@ -58,6 +62,7 @@ Train two robot cars to operate as a team using simulation-based reinforcement l
 
 ## 4. Way of working (decided)
 
+- **Claude Code + the MCP server are development-stage tools** (user, 2026-10-31). They measure metrics and bring the cars up when they arrive. The cars' autonomous behaviour at the end runs on **our own brain with a local model on the GB10** (§13), not on Claude.
 - **Claude Code runs on the GB10**, with access to the local network, the cars (SSH + ROS2), the simulator, and the training jobs.
 - **MCP server runs locally on the GB10** — nothing exposed to the internet.
 - **Division of work:**
@@ -69,6 +74,7 @@ Train two robot cars to operate as a team using simulation-based reinforcement l
 ## 5. System architecture (decided)
 
 ### Control layers on each car
+0. **Mission layer ("brain", §13)**. It decides what to do next: search for a person, deliver a message, greet, go home. It runs our own logic plus a local model on the GB10, and gives the layers below a goal on the map.
 1. **Localization** — each car knows its own pose and the teammate's pose (lidar SLAM on a shared map; later collaborative SLAM, see §9.3). ArUco markers on cars are a supplementary option for direct relative pose.
 2. **Formation policy (trained in simulation)** — small neural network.
    - Inputs: own speed + steering, pose relative to target formation slot, teammate relative pose + velocity, downsampled lidar distances, (later) link-quality measurements (§9.2).
@@ -218,3 +224,36 @@ Options discussed:
 3. Explore the Hiwonder software layout on the cars (launch files, topics, message types, Docker usage).
 4. Build the MCP server + safety node (Phase 1), test with wheels off the ground.
 5. In parallel, resolve §10.1 (radio hardware) with the user, since it gates the building-scale work in §9.
+
+---
+
+## 13. Autonomous office behaviours (end goal, 2026-10-31)
+
+### 13.1 Behaviours
+| Behaviour | Trigger | What the car does |
+|---|---|---|
+| Deliver a message | A task: "find X, tell them Y" | 1. Searches the office; with two cars, they split the map. 2. Finds X by face. 3. Approaches and stops at a polite distance. 4. Speaks the message. 5. Reports back. |
+| Greet a known person | It sees an enrolled face, and hasn't recently greeted that person | Says something funny by name, possibly with a small motion. Never blocks the person's path. |
+| Go home when hungry | Battery below a threshold, from a **measured** discharge curve | Abandons or parks the current task and drives home to the user's office. **Only to the user** (recognized face) does it say it's hungry and ask for "food" (charging). |
+| Idle / patrol | No task | Parks at home, or patrols, as the user decides. |
+
+### 13.2 Components: what the Advanced kit ships vs what we build
+Checked 2026-10-31 against Hiwonder's code (`docs/vendor/hiwonder/code/`), the docs' table of contents and the product page. See `research/02` and `research/03`.
+
+| Component | Out of the box | We build |
+|---|---|---|
+| Face **detection** | ✅ MediaPipe FaceDetector (`mediapipe_example/face_detect.py`), plus pose, hands, face mesh | – |
+| Face **recognition** (who it is) | ❌ Not in the code, docs or product page | Face-embedding model and an enrolled-people store. Detection runs on the car, matching on the GB10 or the Pi (profile it) |
+| Person / object detection | ✅ YOLOv5 (product page: YOLOv11); VLM "track anything" | Person-search behaviour |
+| Voice | ✅ WonderEcho Pro, speech-to-text, text-to-speech, LLM function calling (`large_models`) | Our phrases and personality; local speech models |
+| Language / vision model | ✅ OpenAI-compatible client with a configurable `base_url`. Defaults are cloud APIs (Alibaba Qwen, StepFun) | **Local model served on the GB10**, with no cloud |
+| Map, localization, route to a room or person | ✅ slam_toolbox, AMCL, Nav2 | Shared map and named places such as "home = the user's office" (`research/03` §3) |
+| Local driving among obstacles | – | Our RL driving policy (§7; trained in sim) |
+| Battery level | ✅ RRC Lite battery voltage (`/ros_robot_controller/battery`) | Measured discharge curve → "hungry" threshold with a reserve to reach home |
+| Mission logic | – | Our brain: a task/behaviour layer on the GB10 that talks to each car over the network |
+
+### 13.3 Rules
+- **Privacy:** only people who agreed are enrolled for recognition. Faces and embeddings stay on our machines (car and GB10); nothing goes to the cloud.
+- **"Hungry" is owner-only:** it's triggered only by low battery and addressed only to the recognized user.
+- **Safety (§6):** the safety rules still apply to every autonomous behaviour: watchdog, speed limits, kill switch and geofence.
+- **Network loss:** the brain runs on the GB10, so a car that loses the link must stop safely or drive home on its own. Define this together with the mesh work (§9).

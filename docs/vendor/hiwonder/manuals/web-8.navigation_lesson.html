@@ -1,0 +1,726 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="readthedocs-addons-api-version" content="1"><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>7. Navigation Lesson &mdash; MentorPi v2.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=7ab3649f" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/style.css?v=f476ad27" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=731f67d5"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../_static/custom.js?v=fd93d8dd"></script>
+    <script src="../_static/js/theme.js"></script>
+    <script src="../_static/js/versions.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="8. ROS+OpenCV Lesson" href="9.ros%2Bopencv_lesson.html" />
+    <link rel="prev" title="6. Mapping Lesson" href="7.mapping_lesson.html" /> 
+<script async type="text/javascript" src="/_/static/javascript/readthedocs-addons.js"></script><meta name="readthedocs-project-slug" content="mentorpi" /><meta name="readthedocs-version-slug" content="latest" /><meta name="readthedocs-resolver-filename" content="/docs/8.navigation_lesson.html" /><meta name="readthedocs-http-status" content="200" /></head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #f98800" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            MentorPi
+          </a>
+              <div class="switch-menus">
+                <div class="version-switch"></div>
+                <div class="language-switch"></div>
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">MentorPi</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="1.getting_ready.html">1. Getting Ready</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.set_development_environment.html">2. Set Development Environment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.motion_control_lesson.html">3. Motion Control Lesson</a></li>
+<li class="toctree-l1"><a class="reference internal" href="5.lidar_lesson.html">4. Lidar Lesson</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.depth_camera_basic_lesson.html">5. Depth Camera Basic Lesson</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.mapping_lesson.html">6. Mapping Lesson</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">7. Navigation Lesson</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#ros-robot-autonomous-navigation">7.1 ROS Robot Autonomous Navigation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#description">7.1.1 Description</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#package-explanation">7.1.2 Package Explanation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#amcl-adaptive-monte-carlo-positioning">7.2 AMCL Adaptive Monte Carlo Positioning</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#amcl-positioning">7.2.1 AMCL Positioning</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#particle-filter">7.2.2 Particle Filter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#adaptive-monte-carlo-positioning">7.2.3 Adaptive Monte Carlo Positioning</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cost-map">7.2.4 Cost Map</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#global-path-planning">7.2.5 Global Path Planning</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#dwa-path-planning">7.3 DWA Path Planning</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#dwa-algorithm">7.3.1 DWA Algorithm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#teb-algorithm">7.3.2 TEB Algorithm</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#point-to-point-and-multi-point-navigation-and-obstacle-avoidance">7.4 Point-to-Point and Multi-Point Navigation and Obstacle Avoidance</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#robot-operations">7.4.1 Robot Operations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#virtual-machine-operations">7.4.2 Virtual Machine Operations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#launch-description">7.4.3 Launch Description</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#feature-pack-description">7.4.4 Feature Pack Description</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#rtab-vslam-3d-navigation">7.5 RTAB-VSLAM 3D Navigation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#algorithm-introduction-principle">7.5.1 Algorithm Introduction &amp; Principle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id1">7.5.2 Robot Operations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id2">7.5.3 Virtual Machine Operations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3">7.5.4 Launch Description</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="9.ros%2Bopencv_lesson.html">8. ROS+OpenCV Lesson</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10.mediapipe_human_robot_interaction.html">9. MediaPipe Human-robot Interaction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11.machine_learning.html">10. Machine Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="12.autonomous_driving_lesson.html">11. Autonomous Driving Lesson</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13.MasterSlaveAndGroupControl.html">12. Master Slave And Group Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14.Robot%20Network%20Configuration.html">13. Robot Network Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15.Large_AI_Model_Course.html">14. Large AI Model Course</a></li>
+<li class="toctree-l1"><a class="reference internal" href="resources_download.html">Appendix</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://drive.google.com/drive/folders/1P00n6IemouAnga8EjpO7suF3Mou8zv4K?usp=sharing">Download</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #f98800" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MentorPi</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">7. Navigation Lesson</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/docs/8.navigation_lesson.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="navigation-lesson">
+<h1>7. Navigation Lesson<a class="headerlink" href="#navigation-lesson" title="Link to this heading"></a></h1>
+<section id="ros-robot-autonomous-navigation">
+<h2>7.1 ROS Robot Autonomous Navigation<a class="headerlink" href="#ros-robot-autonomous-navigation" title="Link to this heading"></a></h2>
+<section id="description">
+<h3>7.1.1 Description<a class="headerlink" href="#description" title="Link to this heading"></a></h3>
+<p>Autonomous navigation involves guiding a device along a predefined route from one point to another. It finds application in various domains:</p>
+<p>Land Applications: Including autonomous vehicle navigation, vehicle tracking and monitoring, intelligent vehicle information systems, Internet of Vehicles applications, railway operation monitoring, etc.</p>
+<p>Navigation Applications: Encompassing ocean transportation, inland waterway shipping, ship berthing and docking, etc.</p>
+<p>Aviation Applications: Such as route navigation, airport surface monitoring, precision approach, etc.</p>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.1/media/image2.png"  />
+<p>ROS (Robot Operating System) follows the principle of leveraging existing solutions and provides a comprehensive set of navigation-related function packages. These packages offer universal implementations for robot navigation, sparing developers from dealing with complex low-level tasks like navigation algorithms and hardware interactions. Managed and maintained by professional R&amp;D personnel, these implementations allow developers to focus on higher-level functions. To utilize the navigation function, developers simply need to configure relevant parameters for their robots in the provided configuration files. Custom requirements can also be accommodated through secondary development of existing packages, enhancing research and development efficiency and expediting product deployment.</p>
+<p>In summary, ROS’s navigation function package set offers several advantages for developers. Developed and maintained by a professional team, these packages provide stable and comprehensive functionality, allowing developers to concentrate on upper-layer functions, thus streamlining development processes.</p>
+</section>
+<section id="package-explanation">
+<h3>7.1.2 Package Explanation<a class="headerlink" href="#package-explanation" title="Link to this heading"></a></h3>
+<p>This section will provide a detailed analysis and explanation of the navigation function package, including the usage of parameters.</p>
+<ul class="simple">
+<li><p><strong>Principle Structure Framework Explanation</strong></p></li>
+</ul>
+<p>The Nav2 project inherits and promotes the spirit of the ROS Navigation Stack. The project strives to safely navigate mobile robots from point A to point B. Nav2 can also be applied to other applications, including robot navigation tasks such as dynamic point tracking, which involves dynamic path planning, velocity calculation, obstacle avoidance, and recovery behaviors.</p>
+<p>Nav2 utilizes behavior trees to invoke modular servers to accomplish an action. These actions can involve path computation, control forces, recovery, or any other navigation-related operation. These are achieved through independent nodes communicating with ROS Action servers and the behavior tree (BT). You can refer to the diagram below for a preliminary understanding of Nav2’s architecture:</p>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.1/media/image3.png"   />
+<p>The architecture diagram above can be further explained as one major component and three minor components, totaling four services.</p>
+<p><strong>Major:</strong></p>
+<p>BT Navigator Server: This service organizes and invokes the following three minor services.</p>
+<p><strong>Minor:</strong></p>
+<p>Planner Server: Responsible for path planning, the planner server computes paths based on selected naming conventions and algorithms. These paths are essentially routes calculated on the map.</p>
+<p>Controller Server: Also known as the local planner in ROS 1, this server provides the method for the robot to follow the globally computed path or complete local tasks. In simple terms, it controls the robot’s movement based on the planned route.</p>
+<p>Recovery Server: The backbone of the fault-tolerant system, the recovery server handles unknown or faulty conditions autonomously. Its goal is to manage unexpected situations the robot may encounter and recover autonomously. For example, if the robot falls into a hole while moving, the recovery server finds a way to get it out.</p>
+<p>By continuously switching between planning paths, controlling the robot along the path, and autonomously recovering from issues, the robot achieves autonomous navigation.</p>
+<p>During robot navigation, relying solely on the original map generated by SLAM is insufficient. The robot may encounter new obstacles during movement, or it may find that obstacles in certain areas of the original map have disappeared. Therefore, the maintained map during robot navigation is dynamic. Depending on the update frequency and purpose, it can be categorized into the following two types:</p>
+<p><strong>Global Costmap:</strong></p>
+<p>The global costmap is mainly used for global path planners. As seen in the structure diagram above, it is located within the Planner Server.</p>
+<p>It typically includes the following layers:</p>
+<p>Static Map Layer: This layer consists of the static map usually created by SLAM.</p>
+<p>Obstacle Map Layer: This layer is used to dynamically record obstacle information perceived by sensors.</p>
+<p>Inflation Layer: This layer inflates (expands outward) the maps from the previous two layers to prevent the robot’s shell from colliding with obstacles.</p>
+<p><strong>Local Costmap:</strong></p>
+<p>The local costmap is primarily used for the local path planner, as seen in the Controller Server in the architecture diagram above. It typically consists of the following layers:</p>
+<p>Obstacle Map Layer: This layer records dynamically sensed obstacle information from sensors.</p>
+<p>Inflation Layer: This layer inflates (expands outward) on top of the obstacle map layer to prevent the robot’s shell from colliding with obstacles.</p>
+<ul class="simple">
+<li><p><strong>Install Navigation Package</strong></p></li>
+</ul>
+<p>Note: The navigation package is pre-installed on the robot. You do not need to install it again. This section is for learning only.</p>
+<p>The navigation system takes navigation targets, localization information, and map information as inputs and outputs the actual control quantities that manipulate the robot. You need to know where the robot is and where the robot needs to go.</p>
+<p>There are two ways to install the navigation package:</p>
+<p>(1) Install it directly into the system using apt-get, with the commands:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>ros-yoursystem-navigation2
+</pre></div>
+</div>
+<p>“<strong>yoursystem</strong>” is your ROS version. The ROS system installed on MentorPi is the Humble version.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>ros-yoursystem-nav2-bringup
+</pre></div>
+</div>
+<p>“<strong>yoursystem</strong>” is your ROS version. The ROS system installed on MentorPi is the Humble version.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>“<strong>yoursystem</strong>” represents your ROS2 version, which can be viewed by entering “<strong>echo $ROS_DISTRO</strong>” in the terminal.</p>
+</div>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.1/media/image6.png"  />
+<p>(2) Download the source code of the package and manually compile and install it. If you only need to use the navigation package for learning, install it in binary form for convenience. If you need to modify the code in the package to improve the algorithm, manually install it through the source code.</p>
+<p>Navigation package wiki link: <a class="reference external" href="https://wiki.ros.org/Robots/Nav2">https://wiki.ros.org/Robots/Nav2</a></p>
+</section>
+</section>
+<section id="amcl-adaptive-monte-carlo-positioning">
+<h2>7.2 AMCL Adaptive Monte Carlo Positioning<a class="headerlink" href="#amcl-adaptive-monte-carlo-positioning" title="Link to this heading"></a></h2>
+<section id="amcl-positioning">
+<h3>7.2.1 AMCL Positioning<a class="headerlink" href="#amcl-positioning" title="Link to this heading"></a></h3>
+<p>Positioning involves determining the robot’s position in the global map. While SLAM also includes positioning algorithm implementation, SLAM’s positioning is utilized for building the global map and occurs before navigation begins. Current positioning, on the other hand, is employed during navigation, where the robot needs to move according to the designated route. Through positioning, it can be assessed whether the robot’s actual trajectory aligns with expectations.</p>
+<p>The AMCL (Adaptive Monte Carlo Localization) system, provided in the ROS navigation function package ros-navigation, facilitates robot positioning during navigation. AMCL utilizes the adaptive Monte Carlo positioning method and employs particle filters to compute the robot’s position based on existing maps.</p>
+<p>Positioning addresses the association between the robot and obstacles, as path planning fundamentally involves decision-making based on surrounding obstacles. While theoretically, completing the navigation task only requires knowledge of the robot’s global positioning and real-time obstacle avoidance using laser radar and other sensors, the real-time performance and accuracy of global positioning are typically limited. Local positioning from odometry, IMUs, etc., ensures the real-time performance and accuracy of the robot’s motion trajectory. The amcl node in the navigation function package provides global positioning by publishing map_odom. However, users can substitute amcl global positioning with other methods that provide map_odom, such as SLAM, UWB, QR code positioning, etc.</p>
+<p>Global positioning and local positioning establish a dynamic set of tf coordinates map_odombase_footprint, with static tf coordinates between various sensors in the robot provided through the robot URDF type. This TF relationship resolves the association problem between the robot and obstacles. For instance, if the lidar detects an obstacle 3m ahead, the tf coordinates between the lidar and the robot chassis, base_link to laser_link, are utilized. Through standard transformation, the relationship between the obstacle and the robot chassis can be determined.</p>
+</section>
+<section id="particle-filter">
+<h3>7.2.2 Particle Filter<a class="headerlink" href="#particle-filter" title="Link to this heading"></a></h3>
+<p>The Monte Carlo positioning process simulates particle updates for a one-dimensional robot. Initially, a group of particles is randomly generated, with each particle representing a potential position, direction, or state variable that requires estimation. Each particle is assigned a weight indicating its similarity to the actual system state. Next, the state of each particle at the next time step is predicted, and particles are moved based on the anticipated behavior of the real system. The weights of the particles are then updated based on measurements. Particles that closely match the measured value receive higher weights and are resampled, while highly unlikely particles are discarded and replaced with more probable ones. Finally, the weighted average and covariance of the particle set are calculated to derive the state estimate.</p>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.2/media/image2.png"  />
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.2/media/image3.png"  />
+<p>Monte Carlo methods generally follow a specific pattern:</p>
+<p>(1) Define possible input fields.</p>
+<p>(2) Randomly generate inputs from a probability distribution over the domain.</p>
+<p>(3) Perform deterministic calculations on inputs.</p>
+<p>(4) Summarize results.</p>
+<p>Two important considerations are:</p>
+<p>(1) If the points are not uniformly distributed, the approximation effect will be poor.</p>
+<p>(2) This process requires many points. The approximation is usually poor if only a few points are randomly placed throughout the square. On average, the accuracy of the approximation improves as more points are placed.</p>
+<p>The Monte Carlo particle filter algorithm finds applications in various fields, including physical science, engineering, climatology, and computational biology.</p>
+</section>
+<section id="adaptive-monte-carlo-positioning">
+<h3>7.2.3 Adaptive Monte Carlo Positioning<a class="headerlink" href="#adaptive-monte-carlo-positioning" title="Link to this heading"></a></h3>
+<p>AMCL can be viewed as an enhanced iteration of the Monte Carlo positioning algorithm, designed to boost real-time performance by employing a reduced number of samples compared to the traditional method, thereby minimizing execution time. It implements an adaptive or KLD sampling Monte Carlo localization method, utilizing particle filtering to track a robot’s pose against an existing map.</p>
+<p>The Adaptive Monte Carlo positioning nodes primarily utilize laser scanning and lidar maps to exchange messages and perform pose estimation calculations. The implementation process entails initializing the adaptive Monte Carlo positioning algorithm’s particle filter for each parameter provided by the ROS system during initialization. In instances where the initial pose is not specified, the algorithm assumes that the robot commences its journey from the origin of the coordinate system, resulting in a more intricate calculation process.</p>
+<p>Hence, it is advisable to set the initial pose using the “<strong>2D Pose Estimate</strong>” button in rviz. For further information on Adaptive Monte Carlo positioning, you can also refer to the wiki address link: <a class="reference external" href="https://github.com/ros-planning/navigation">https://github.com/ros-planning/navigation</a></p>
+<p>AMCL can be viewed as an enhanced iteration of the Monte Carlo positioning algorithm, designed to boost real-time performance by employing a reduced number of samples compared to the traditional method, thereby minimizing execution time. It implements an adaptive or KLD sampling Monte Carlo localization method, utilizing particle filtering to track a robot’s pose against an existing map.</p>
+<p>The Adaptive Monte Carlo positioning nodes primarily utilize laser scanning and lidar maps to exchange messages and perform pose estimation calculations. The implementation process entails initializing the adaptive Monte Carlo positioning algorithm’s particle filter for each parameter provided by the ROS system during initialization. In instances where the initial pose is not specified, the algorithm assumes that the robot commences its journey from the origin of the coordinate system, resulting in a more intricate calculation process.</p>
+<p>Hence, it is advisable to set the initial pose using the “<strong>2D Pose Estimate</strong>” button in rviz. For further information on Adaptive Monte Carlo positioning, you can also refer to the wiki address link: <a class="reference external" href="https://github.com/ros-planning/navigation">https://github.com/ros-planning/navigation</a></p>
+</section>
+<section id="cost-map">
+<h3>7.2.4 Cost Map<a class="headerlink" href="#cost-map" title="Link to this heading"></a></h3>
+<p>Regardless of whether it’s a 2D or 3D SLAM map generated by LiDAR or a depth camera, it cannot be directly employed for actual navigation. Instead, it needs to be converted into a costmap. In ROS, the costmap typically adopts a grid format, where each grid cell in the raster map occupies 1 byte (8 bits). This allows for data storage ranging from 0 to 255, representing different cell costs.</p>
+<p>The costmap only requires consideration of three scenarios: occupied (barrier), free area (barrier-free), and unknown space.</p>
+<p>Before delving into costmap_2d, it’s important to introduce the Bresenham algorithm. This algorithm is utilized to draw a straight line between two points by calculating the closest point of a line segment on an n-dimensional raster. It relies solely on relatively fast integer operations such as addition, subtraction, and bit shifting, making it a fundamental algorithm in computer graphics.</p>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.2/media/image4.png"  />
+<p>To construct a set of virtual grid lines, we begin by passing them through the pixel centers of each row and column. The intersection points of these straight lines with each vertical grid line are calculated sequentially, starting from the line’s origin and moving towards its endpoint. Subsequently, the pixel closest to each intersection point within the pixel column is determined based on the sign of the error term.</p>
+<p>The core concept of the algorithm relies on the assumption that k=dy/dx, where k represents the slope. Since the straight line originates from the center of a pixel, the initial error term d is set to d0＝0. With each increment in the subscript X, d increases by the slope value k, i.e., d=d+k. When d≥1, 1 is subtracted from it to ensure that d remains between 0 and 1. If d≥0.5, the pixel closest to the upper-right of the current pixel is considered (i.e., (x+1,y+1)); otherwise, it’s closer to the pixel on the right (i.e.,(x+1,y)). For ease of calculation, let e=d−0.5; initially, e is set to -0.5, and it increments by k. When e≥0, the upper-right pixel of the current pixel (xi, yi) is selected, and when e&lt;0, the pixel closer to the right (x+1,y) is chosen instead. Integers are preferred to avoid division. Since the algorithm only uses the sign of the error term, it can be replaced as follows: e1 = 2*e*dx.</p>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.2/media/image5.png"  />
+<p>The Costmap2D class is responsible for managing the cost value of each raster. Meanwhile, the Layer class serves as a virtual base class, standardizing the interfaces of costmap layers for each plugin. Key interface functions include:</p>
+<p>The initialize function, which invokes the onInitialize function to initialize each costmap layer individually.</p>
+<p>The matchSize function, found in the StaticLayer and ObstacleLayer classes, ensures consistency across costmap layers by calling the matchSize function of the CostmapLayer class. This initialization process sets the size, resolution, origin, and default cost value of each layer. In the inflationLayer class, a cost table is computed based on the expansion radius, enabling subsequent cost value queries based on distance. Additionally, the seen_ array is defined to mark traversed rasters. For the VoxelLayer class, initialization involves setting the size of the voxel grid.</p>
+<p>The updateBounds function adjusts the size range of the current costmap layer requiring updates. For the StaticLayer class, the update range is determined by the size of the static map (typically used in global costmaps). Conversely, the ObstacleLayer class determines obstacle boundaries by traversing sensor data in clearing_observations.</p>
+<p>The initialize and matchSize functions are executed only once each, while updateBounds and updateCosts are performed periodically, their frequency determined by map_update_frequency.</p>
+<p>The CostmapLayer class inherits from both the Layer class and the Costmap2D class, providing various methods for updating cost values. The StaticLayer and ObstacleLayer classes, needing to retain cost values of instantiated layers, also inherit from CostmapLayer. The StaticLayer updates its costmap using static raster map data, whereas the ObstacleLayer employs sensor data for updates. In contrast, the VoxelLayer class considers z-axis data more extensively, particularly in obstacle clearance. This distinction primarily affects obstacle removal, with two-dimensional clearance in one case and three-dimensional clearance in the other.</p>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.2/media/image6.png"   />
+<p>Costmap measurement barriers offer remarkable flexibility. You can tailor a specific layer to your requirements, thereby managing pertinent barrier information effectively. For instance, if your robot is equipped solely with LiDAR, you’ll need to establish an Obstacles layer to handle obstacle data scanned by the LiDAR. In case ultrasonic sensors are integrated into the robot, creating a new Sonar layer becomes necessary to manage obstacle information from the sonic sensor. Each layer can define its own rules for obstacle updates, encompassing tasks such as obstacle addition, deletion, and confidence level updates. This approach significantly enhances the scalability of the navigation system.</p>
+</section>
+<section id="global-path-planning">
+<h3>7.2.5 Global Path Planning<a class="headerlink" href="#global-path-planning" title="Link to this heading"></a></h3>
+<p>Preface: Based on the mobile robot’s perception of the environment, the characteristics of the environment, and the algorithms employed, path planning can be categorized into environment-based, map knowledge-based, and completeness-based path planning algorithms.</p>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.2/media/image7.png"  />
+<p>Commonly used path planning algorithms in robot autonomous navigation encompass Diikstra, A*, D*, PRM, RRT, genetic algorithms, ant colony algorithms, fuzzy algorithms, and others.</p>
+<p>Dijkstra and A* are graph-based path search algorithms commonly utilized in robotic applications. The navigation function package integrates navfn, global planner, and carrot planner as global route planning plug-ins. Users have the option to select one of these plug-ins to load into move_base for utilization. Alternatively, they can opt for a third-party global path planning plug-in, such as SBPL_Lattice_Planner or srl_global_planner, or develop a custom global path planning plug-in adhering to the interface specification of nav_core.</p>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.2/media/image8.png"   />
+<p>Mobile robot navigation facilitates reaching a target point through path planning. The navigation planning layer comprises several components:</p>
+<p><strong>(1) Global path planning layer:</strong> This layer generates a global weight map based on the provided goal and accepts weight map information. It then plans a global path from the starting point to the target location, serving as a reference for local path planning.</p>
+<p><strong>(2) Local path planning layer:</strong> This component, constituting the local planning aspect of the navigation system, operates on the local weight map information derived from the weight map. It conducts local path planning considering nearby obstacle information.</p>
+<p><strong>(3) Behavior execution layer:</strong> This layer integrates instructions and path planning data from the higher layers to determine the current behavior of the mobile robot.</p>
+<p>Path planning algorithms for mobile robots are a crucial area of research, significantly impacting the efficiency of robotic operations.</p>
+<ul class="simple">
+<li><p><strong>Dijkstra Algorithm</strong></p></li>
+</ul>
+<p>Dijkstra’s algorithm is a classic shortest path algorithm known for its efficiency in finding the shortest path from a single source to all other vertices in a graph. It operates by expanding outward in layers from the starting point, employing a breadth-first search approach while considering edge weights. This makes it one of the most widely used algorithms in global path planning.</p>
+<p>Here is a diagram illustrating the process of Dijkstra’s algorithm:</p>
+<p>(1) Initially, we set the distance from the starting point (start) to itself as 0, and all other points’ distances are initialized to infinity.</p>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.2/media/image9.png"  />
+<p>(2) During the first iteration, we identify the point (let’s call it Point 1) with the smallest distance value, mark it as processed, and update the distances of all adjacent points (previously unprocessed) connected to Point 1. For instance, if Point 1 is connected to Points 2, 3, and 4, we update their distances as follows: dis[2]=2, dis[3]=4, and dis[4]=7.</p>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.2/media/image10.png"  />
+<p>(3) In the subsequent iterations, we repeat the process: find the point with the smallest distance value (e.g., Point 2 in the second iteration), mark it as processed, and update the distances of its adjacent points (if necessary). For example, if Point 2 is connected to Points 3 and 5, we update their distances as dis[3]=3 and dis[5]=4.</p>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.2/media/image11.png"  />
+<p>(4) This procedure continues until all points have been processed. At each iteration, we select the unprocessed point with the smallest distance and update distances of its adjacent points accordingly.</p>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.2/media/image12.png"  />
+<p>(5) Once all points have been processed, the algorithm terminates, and the shortest path distances from the starting point to all other points are determined.</p>
+<p>To access the introduction and usage details of the Dijkstra algorithm, please log in to the wiki using the following link:</p>
+<p><a class="reference external" href="http://wiki.ros.org/navfn">http://wiki.ros.org/navfn</a></p>
+<ul class="simple">
+<li><p><strong>A Star Algorithm</strong></p></li>
+</ul>
+<p>A-star is an enhancement of Dijkstra’s algorithm tailored for single destination optimization. While Dijkstra’s algorithm determines paths to all locations, A-star focuses on finding the path to a specific location or the nearest location among several options. It prioritizes paths that seem to be closer to the goal.</p>
+<p>The formula for the A-star algorithm is: F=G+H, where G represents the movement cost from the starting point to the designated square, and H denotes the estimated cost from the designated square to the endpoint. There are two methods for calculating the H value:</p>
+<p>(1) Calculate the distance of horizontal and vertical movement; diagonal calculation is not applicable (Manhattan distance).</p>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.2/media/image13.png"  />
+<p>(2) Calculate the distance of horizontal and vertical movement; diagonal calculation is applicable (diagonal distance).</p>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.2/media/image14.png"  />
+<p>For an introduction to and usage of the A* algorithm, please consult the video tutorial or visit the following links:</p>
+<p>ROS Wiki: <a class="reference external" href="http://wiki.ros.org/global%20planner">http://wiki.ros.org/global%20planner</a></p>
+<p>Red Blob Games website: <a class="reference external" href="https://www.redblobgames.com/pathfinding/a-star/introduction.html#graphs">https://www.redblobgames.com/pathfinding/a-star/introduction.html#graphs</a></p>
+</section>
+</section>
+<section id="dwa-path-planning">
+<h2>7.3 DWA Path Planning<a class="headerlink" href="#dwa-path-planning" title="Link to this heading"></a></h2>
+<section id="dwa-algorithm">
+<h3>7.3.1 DWA Algorithm<a class="headerlink" href="#dwa-algorithm" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Description</strong></p></li>
+</ul>
+<p>The Dynamic Window Approach (DWA), a classic algorithm for path planning and motion control of mobile robots, ensures safe navigation on a known map. By exploring the speed and angular velocity state space, DWA identifies the optimal combination for safe navigation. Below, you’ll find a basic description along with some key formulas of the DWA algorithm.</p>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.3/media/image2.png"   />
+<p>The core concept of the DWA algorithm involves the robot assessing its current state and sensor data to generate a series of potential motion trajectories (referred to as dynamic windows) in the speed and angular velocity state space. These trajectories are then evaluated based on criteria such as obstacle avoidance, maximizing forward speed, and minimizing angular velocity to select the optimal trajectory. Through iterative iterations of this process, the robot dynamically plans its trajectory in real-time to adapt to changing environments and obstacles.</p>
+<ul class="simple">
+<li><p><strong>Formula</strong></p></li>
+</ul>
+<p>(1) Robot status: current position (x, y) and orientation (θ)</p>
+<p>(2) Motion control parameters: linear velocity (V) and angular velocity (ω).</p>
+<p>(3) Range of velocity and angular velocity sampling: minimum (Vmin, ωmin) and maximum (Vmax, ωmax).</p>
+<p>(4) Time step: Δt</p>
+<p>The formula is as below:</p>
+<p><strong>① Velocity Sampling:</strong> In the DWA algorithm, the initial step involves sampling the state space of velocity and angular velocity to create a set of potential velocity-angular velocity pairs, known as dynamic windows.</p>
+<p>V<sub>samples</sub> = [v<sub>min</sub>, v<sub>max</sub>]</p>
+<p>ω<sub>samples</sub> = [-ω<sub>max</sub>, ω<sub>max</sub>]</p>
+<p>(V<sub>samples</sub>) denotes the speed sampling range, while (ω<sub>samples</sub>) indicates the angular speed sampling range.</p>
+<p><strong>② Motion Simulation:</strong> The DWA algorithm conducts a motion simulation for each speed-angular velocity pair, determining the trajectory of the robot based on these combinations in its current state.</p>
+<p>x(t+1) = x(t) + v * cos(θ(t)) *Δt</p>
+<p>y(t+1) = y(t) + v * sin(θ(t)) *Δt</p>
+<p>θ(t+1) = θ(t) + ω * Δt</p>
+<p>Here, x(t) and y(t) denote the robot’s position, θ(t) represents its orientation, v stands for linear velocity, ω for angular velocity, and Δt represents the time step.</p>
+<p><strong>③ Trajectory Evaluation:</strong> The DWA algorithm assesses each generated trajectory using evaluation functions, including obstacle avoidance, maximum speed, and minimum angular velocity.</p>
+<p><strong>④ Obstacle Avoidance Evaluation:</strong> Detects if the trajectory intersects with obstacles.</p>
+<p><strong>⑤ Maximum Speed Evaluation:</strong> Verifies if the maximum linear speed on the trajectory falls within the permissible range.</p>
+<p><strong>⑥ Minimum Angular Velocity Evaluation:</strong> Ensures that the minimum angular velocity on the trajectory remains within the allowed range.</p>
+<p>These evaluation functions can be defined and adjusted as per task requirements.</p>
+<p><strong>⑦ Select optimal trajectory</strong>: The DWA algorithm chooses the trajectory with the highest evaluation score as the next move for the robot.</p>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.3/media/image3.png"   />
+<ul class="simple">
+<li><p><strong>Expansion</strong></p></li>
+</ul>
+<p>Extensions and resources for learning about the DWA algorithm:</p>
+<p>The DWA algorithm serves as a fundamental method in mobile robotics, with numerous extended and enhanced versions designed to boost performance and efficiency in path planning. Some notable variations include:</p>
+<p>(1) DWA Algorithm Extension: <a class="reference external" href="https://arxiv.org/abs/1703.08862">https://arxiv.org/abs/1703.08862</a></p>
+<p>(2) Enhanced DWA (e-DWA) Algorithm: <a class="reference external" href="https://arxiv.org/abs/1612.07470">https://arxiv.org/abs/1612.07470</a>)</p>
+<p>(3)  DP-DWA Algorithm (DP-based Dynamic Window Approach): <a class="reference external" href="https://arxiv.org/abs/1909.05305">https://arxiv.org/abs/1909.05305</a></p>
+<p>(4) ROS Wiki: <a class="reference external" href="http://wiki.ros.org/dwa_local_planner">http://wiki.ros.org/dwa_local_planner</a></p>
+<p>These resources provide in-depth insights and further exploration into the DWA algorithm and its various extensions.</p>
+</section>
+<section id="teb-algorithm">
+<h3>7.3.2 TEB Algorithm<a class="headerlink" href="#teb-algorithm" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Description</strong></p></li>
+</ul>
+<p>The TEB (Timed Elastic Band) algorithm is utilized for both path planning and motion planning, particularly in domains like robotics and autonomous vehicles. At its core, the TEB algorithm treats path planning as an optimization challenge, aiming to generate the best trajectory within a specified timeframe while accommodating dynamic constraints and obstacle avoidance needs for the robot or vehicle. Key characteristics of the TEB algorithm encompass:</p>
+<p><strong>(1) Time Layered Representation:</strong> The TEB algorithm employs time layering, dividing the trajectory into discrete time steps, each corresponding to a position of the robot or vehicle. This aids in setting timing constraints and preventing collisions.</p>
+<p><strong>(2) Trajectory Parameterization:</strong> TEB parameterizes the trajectory into displacements and velocities, facilitating optimization. Each time step is associated with displacement and velocity parameters.</p>
+<p><strong>(3) Constrained Optimization:</strong> TEB considers dynamic constraints, obstacle avoidance, and trajectory smoothness, integrating them into the objective function of the optimization problem.</p>
+<p><strong>(4) Optimization Solution:</strong> TEB utilizes techniques like linear quadratic programming (QP) or nonlinear programming (NLP) to determine optimal trajectory parameters that fulfill the constraints.</p>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.3/media/image4.png"  />
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.3/media/image5.png"  />
+<ul class="simple">
+<li><p><strong>Formula</strong></p></li>
+</ul>
+<p>The figure below illustrates the optimization objective function in the TEB algorithm:</p>
+<img class="common_img" src="../_static/media/8.Navigation_Lesson/8.3/media/image1.png"  />
+<p>In the following expression:</p>
+<p>J(x) denotes the objective function, where x represents the trajectory parameter.</p>
+<p>wsmooth and wobstacle represent weights assigned to smoothness and obstacle avoidance, respectively.</p>
+<p>H signifies the smoothness penalty matrix.</p>
+<p>f(xi, oj) represents the obstacle cost function between trajectory point xi and obstacle oj.</p>
+<p>(1) Status Definition:</p>
+<p>Firstly, we define the state of the robot (or vehicle) in the path planning problem as follows:</p>
+<p>Position: P = [X, Y], indicating the coordinates of the robot on the two-dimensional plane.</p>
+<p>Velocity: V = [Vx, Vy], representing the robot’s velocity along the X and Y axes.</p>
+<p>Time: t, denoting the current time.</p>
+<p>Control Input: u = [ux, uy], representing the control input of the robot, which can be speed or acceleration.</p>
+<p>Robot Trajectory: x(t) = [p(t), v(t)], indicating the state of the robot at time t.</p>
+<p>(2) Target Function:</p>
+<p>The essence of the TEB algorithm lies in solving an optimization problem. The objective is to minimize a composite function comprising various components:</p>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.3/media/image8.png"  />
+<p>Jsmooth(x): Smoothness objective function, ensuring trajectory smoothness.</p>
+<p>Jobstacle(x): Obstacle avoidance objective function, preventing collisions with obstacles.</p>
+<p>Jdynamic(x): Dynamic objective function, ensuring compliance with the robot’s dynamic constraints.</p>
+<p>(3) Smoothness objective function Jsmooth(x):</p>
+<p>Smoothness objective functions typically involve the curvature of trajectories to ensure the generated trajectories are smooth. It can be represented as:</p>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.3/media/image6.png"  />
+<p>Where k(t) is the curvature.</p>
+<p>(4) Obstacle avoidance objective function Jobstacle(x):</p>
+<p>The obstacle avoidance objective function calculates the distance between trajectory points and obstacles. It penalizes trajectory points that are in close proximity to obstacles. The specific obstacle cost function, denoted as f(x,o), can be adjusted according to specific requirements or needs.</p>
+<div class="math notranslate nohighlight">
+\[J_{obstacle}(x)\  = \ \sum_{o \in obstacles}^{}{\int_{}^{}(x,o)}\ \]</div>
+<p>(5) Dynamic objective function Jdynamic(x):</p>
+<p>The dynamics objective function ensures that the generated trajectory adheres to the robot’s dynamic constraints, which are determined by its kinematics and dynamics model. This typically includes limitations on velocity and acceleration.</p>
+<p>(6) Optimization:</p>
+<p>In the end, the Trajectory Optimization with Ellipsoidal Bounds (TEB) algorithm addresses the stated objective function by framing it as a constrained optimization problem. This problem incorporates optimization variables for trajectory parameters, time allocation, and control inputs. Typically, this optimization problem falls under the category of nonlinear programming (NLP) problems.</p>
+<ul class="simple">
+<li><p><strong>Expansion</strong></p></li>
+</ul>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.3/media/image7.png"  />
+<p>Additional resources and learning materials for the TEB algorithm:</p>
+<p>The TEB algorithm is a significant technology within the realm of path planning, boasting numerous extended and enhanced versions. Below are some learning links and extension topics aimed at facilitating a more comprehensive understanding of the TEB algorithm and its associated concepts:</p>
+<p>(1) Original TEB Paper: “<strong>Trajectory modification considering dynamic constraints of autonomous robots</strong>” by M. Rösmann et al.</p>
+<p>(2) TEB implementation in ROS: The TEB algorithm is commonly implemented as a ROS package (Robot Operating System Package), making it readily available for robot path planning tasks.</p>
+<p>ROS TEB Local Planner Package:</p>
+<p><a class="reference external" href="https://github.com/rst-tu-dortmund/teb_local_planner">https://github.com/rst-tu-dortmund/teb_local_planner</a></p>
+<p>Wiki website:</p>
+<p><a class="reference external" href="http://wiki.ros.org/teb_local_planner">http://wiki.ros.org/teb_local_planner</a></p>
+<p>These links provide valuable resources for users seeking to explore the TEB algorithm and its associated topics in greater detail.</p>
+</section>
+</section>
+<section id="point-to-point-and-multi-point-navigation-and-obstacle-avoidance">
+<h2>7.4 Point-to-Point and Multi-Point Navigation and Obstacle Avoidance<a class="headerlink" href="#point-to-point-and-multi-point-navigation-and-obstacle-avoidance" title="Link to this heading"></a></h2>
+<p>Before initiating navigation, it’s essential to enable the robot to map. You can find detailed guidance on this process in “<strong><a class="reference internal" href="7.mapping_lesson.html#slam_toolbox-mapping-algorithm"><span class="std std-ref">6. Mapping Lesson/ 6.5 slam_toolbox Mapping Algorithm</span></a></strong>”.</p>
+<section id="robot-operations">
+<h3>7.4.1 Robot Operations<a class="headerlink" href="#robot-operations" title="Link to this heading"></a></h3>
+<p>(1) Click-on <img src="../_static/media/8.Navigation_Lesson/8.4/media/image2.png" style="width:0.49861in;height:0.37639in" /> to open the command line terminal.</p>
+<p>(2) Execute the command to disable the app auto-start service:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>~/.stop_ros.sh
+</pre></div>
+</div>
+<p>(3) Enter the following command to start the navigation service and press Enter:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>navigation<span class="w"> </span>navigation.launch.py<span class="w"> </span>map:<span class="o">=</span>map_01
+</pre></div>
+</div>
+<p>The “<strong>map_01</strong>” at the end of the command is the map name. You can modify this parameter according to your needs. The map is stored at “/home/ubuntu/ros2_ws/src/slam/maps”.</p>
+</section>
+<section id="virtual-machine-operations">
+<h3>7.4.2 Virtual Machine Operations<a class="headerlink" href="#virtual-machine-operations" title="Link to this heading"></a></h3>
+<p>(1) Click-on <img src="../_static/media/8.Navigation_Lesson/8.4/media/image5.png" style="width:0.41042in;height:0.34514in" /> to open the command-line terminal on the virtual machine.</p>
+<p>(2) Enter the following command to start the RViz tool for navigation display:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>navigation<span class="w"> </span>rviz_navigation.launch.py
+</pre></div>
+</div>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.4/media/image7.png"  />
+<ul class="simple">
+<li><p><strong>Point-to-Point Navigation</strong></p></li>
+</ul>
+<p>In the software menu bar, <strong>“2D Pose Estimate”</strong> is used to set the initial position of the JetRover robot; “<strong>2D Nav Goal</strong>” is used to set a single target point for the robot; “<strong>Publish Point</strong>” is used to set multiple target points for the robot.</p>
+<img src="../_static/media/8.Navigation_Lesson/8.4/media/image8.png" class="common_img"  />
+<p>(1) Click <img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.4/media/image9.png" style="width:1.01111in;height:0.19931in" /> to set the initial position of the robot. On the map interface, choose a position, click, and drag the mouse to select the robot’s pose.</p>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.4/media/image10.png"  />
+<p>(2) After setting the initial position of the robot, the effect is as shown in the figure below:</p>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.4/media/image11.png"  />
+<p>(3) Click <img src="../_static/media/8.Navigation_Lesson/8.4/media/image12.png" style="width:1.16667in;height:0.33333in" /> and select a location on the map interface as the target point. Click the mouse once at that point. After selection, the robot will automatically generate a route and move to the target point.</p>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.4/media/image13.png"  />
+<p>(4) After confirming the target point, the map will display two paths: the green line represents the direct path between the robot and the target point, and the dark blue line represents the planned path of the robot.</p>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.4/media/image14.png"  />
+<p>(5) When encountering obstacles, the robot will bypass them and continuously adjust its posture and travel route.</p>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.4/media/image15.png"  />
+<ul class="simple">
+<li><p><strong>Multi-Point Navigation</strong></p></li>
+</ul>
+<p>(1) Click the “<strong>waypoint</strong>” button to start multi-point navigation:</p>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.4/media/image16.png"  />
+<p>(2) Set each navigation point using <img src="../_static/media/8.Navigation_Lesson/8.4/media/image17.png" style="width:1.05208in;height:0.35417in" /> as shown in the figure below:</p>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.4/media/image18.png"  />
+<p>(3) Finally, click “<strong>Start Nav Through Poses</strong>” or “<strong>Start Waypoint Following</strong>” to start navigation. “<strong>Start Nav Through Poses</strong>” will control the robot’s pose at each navigation point; “<strong>Start Waypoint Following</strong>” will not focus on the robot’s pose at each navigation point.</p>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.4/media/image19.png"   />
+<p>(4) The effect during multi-point navigation is shown in the figure below, with the robot reaching the target points in sequence:</p>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.4/media/image20.png"  />
+<p>(5) The effect after completing multi-point navigation is shown in the figure below:</p>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.4/media/image21.png"  />
+<p>(6) If you want to exit the game, press “<strong>Ctrl+C</strong>” in the terminal interface.</p>
+<p>After experiencing the game, you can enable the app service through commands or by restarting the robot. If the app is not enabled, the related app functions will not work. If the robot is restarted, the app will be automatically enabled.</p>
+<p>Click <img src="../_static/media/4.MotionControlLesson/4.3/media/image21.png" /> and enter the command. Press enter to start the app, and wait for the buzzer to beep. Please enter the command in the system path, not in the Docker container.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>start_node.service
+</pre></div>
+</div>
+</section>
+<section id="launch-description">
+<h3>7.4.3 Launch Description<a class="headerlink" href="#launch-description" title="Link to this heading"></a></h3>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.4/media/image24.png"   />
+<p>The path to the launch file is located at:<a class="reference download internal" download="" href="../_downloads/a8134f3fc06553c1c37cfe864f8a4832/navigation.zip"><span class="xref download myst">/home/ubuntu/ros2_ws/src/navigation/launch/navigation.launch.py</span></a></p>
+<p>(1) Set Paths</p>
+<p>Obtain the paths for the “<strong>slam</strong>” and “<strong>navigation</strong>” packages.</p>
+<div class="highlight-python notranslate"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span></pre></div></td><td class="code"><div><pre><span></span>    <span class="k">if</span> <span class="n">compiled</span> <span class="o">==</span> <span class="s1">&#39;True&#39;</span><span class="p">:</span>
+        <span class="n">slam_package_path</span> <span class="o">=</span> <span class="n">get_package_share_directory</span><span class="p">(</span><span class="s1">&#39;slam&#39;</span><span class="p">)</span>
+        <span class="n">navigation_package_path</span> <span class="o">=</span> <span class="n">get_package_share_directory</span><span class="p">(</span><span class="s1">&#39;navigation&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">slam_package_path</span> <span class="o">=</span> <span class="s1">&#39;/home/ubuntu/ros2_ws/src/slam&#39;</span>
+        <span class="n">navigation_package_path</span> <span class="o">=</span> <span class="s1">&#39;/home/ubuntu/ros2_ws/src/navigation&#39;</span>
+</pre></div></td></tr></table></div>
+</div>
+<p>(2) Enable Other Launch Files</p>
+<p><code class="docutils literal notranslate"><span class="pre">base_launch</span></code> for various hardware</p>
+<p><code class="docutils literal notranslate"><span class="pre">navigation_launch</span></code> to start the navigation algorithm</p>
+<p><code class="docutils literal notranslate"><span class="pre">bringup_launch</span></code> to initialize actions</p>
+<div class="highlight-python notranslate"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span></pre></div></td><td class="code"><div><pre><span></span>    <span class="n">base_launch</span> <span class="o">=</span> <span class="n">IncludeLaunchDescription</span><span class="p">(</span>
+        <span class="n">PythonLaunchDescriptionSource</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">slam_package_path</span><span class="p">,</span> <span class="s1">&#39;launch/include/robot.launch.py&#39;</span><span class="p">)),</span>
+        <span class="n">launch_arguments</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;sim&#39;</span><span class="p">:</span> <span class="n">sim</span><span class="p">,</span>
+            <span class="s1">&#39;master_name&#39;</span><span class="p">:</span> <span class="n">master_name</span><span class="p">,</span>
+            <span class="s1">&#39;robot_name&#39;</span><span class="p">:</span> <span class="n">robot_name</span>
+        <span class="p">}</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span>
+    <span class="p">)</span>
+    
+    <span class="n">navigation_launch</span> <span class="o">=</span> <span class="n">IncludeLaunchDescription</span><span class="p">(</span>
+        <span class="n">PythonLaunchDescriptionSource</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">navigation_package_path</span><span class="p">,</span> <span class="s1">&#39;launch/include/bringup.launch.py&#39;</span><span class="p">)),</span>
+        <span class="n">launch_arguments</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;use_sim_time&#39;</span><span class="p">:</span> <span class="n">use_sim_time</span><span class="p">,</span>
+            <span class="s1">&#39;map&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">slam_package_path</span><span class="p">,</span> <span class="s1">&#39;maps&#39;</span><span class="p">,</span> <span class="n">map_name</span> <span class="o">+</span> <span class="s1">&#39;.yaml&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;params_file&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">navigation_package_path</span><span class="p">,</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="s1">&#39;nav2_params.yaml&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;namespace&#39;</span><span class="p">:</span> <span class="n">robot_name</span><span class="p">,</span>
+            <span class="s1">&#39;use_namespace&#39;</span><span class="p">:</span> <span class="n">use_namespace</span><span class="p">,</span>
+            <span class="s1">&#39;autostart&#39;</span><span class="p">:</span> <span class="s1">&#39;true&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;use_teb&#39;</span><span class="p">:</span> <span class="n">use_teb</span><span class="p">,</span>
+        <span class="p">}</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span>
+    <span class="p">)</span>
+
+    <span class="n">bringup_launch</span> <span class="o">=</span> <span class="n">GroupAction</span><span class="p">(</span>
+     <span class="n">actions</span><span class="o">=</span><span class="p">[</span>
+         <span class="n">PushRosNamespace</span><span class="p">(</span><span class="n">robot_name</span><span class="p">),</span>
+         <span class="n">base_launch</span><span class="p">,</span>
+         <span class="n">TimerAction</span><span class="p">(</span>
+             <span class="n">period</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span>  <span class="c1"># 延时等待其它节点启动好(delay for enabling other nodes)</span>
+             <span class="n">actions</span><span class="o">=</span><span class="p">[</span><span class="n">navigation_launch</span><span class="p">],</span>
+         <span class="p">),</span>
+      <span class="p">]</span>
+    <span class="p">)</span>
+</pre></div></td></tr></table></div>
+</div>
+</section>
+<section id="feature-pack-description">
+<h3>7.4.4 Feature Pack Description<a class="headerlink" href="#feature-pack-description" title="Link to this heading"></a></h3>
+<p>The path to the navigation package is: /home/ubuntu/ros2_ws/src/navigation/</p>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.4/media/image28.png" style="width:780px" />
+<p>config: Contains configuration parameters related to navigation, as shown below:</p>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.4/media/image29.png"  />
+<p>launch: Contains launch files related to navigation, including localization, map loading, navigation modes, and simulation model launch files, as shown below:</p>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.4/media/image30.png"  />
+<p>rviz: Contains parameter loading for the RViz visualization tool, including RViz configuration files for robots using different navigation algorithms and navigation configuration files, as shown below:</p>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.4/media/image31.png" style="width:780px" />
+<p>Package.xml: Configuration information file for the current package.</p>
+</section>
+</section>
+<section id="rtab-vslam-3d-navigation">
+<h2>7.5 RTAB-VSLAM 3D Navigation<a class="headerlink" href="#rtab-vslam-3d-navigation" title="Link to this heading"></a></h2>
+<section id="algorithm-introduction-principle">
+<h3>7.5.1 Algorithm Introduction &amp; Principle<a class="headerlink" href="#algorithm-introduction-principle" title="Link to this heading"></a></h3>
+<p>For an introduction to the RTAB-VSLAM algorithm and its principles, refer to “<a class="reference internal" href="7.mapping_lesson.html#rtab-vslam-3d-mapping"><span class="std std-ref"><strong>6. Mapping Lesson/ 6.6 RTAB-VSLAM 3D Mapping</strong></span></a>” for study and reference.</p>
+</section>
+<section id="id1">
+<h3>7.5.2 Robot Operations<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<p>(1) Start the robot, and access the robot system desktop using VNC.</p>
+<p>(2) Click-on <img  src="../_static/media/8.Navigation_Lesson/8.5/media/image2.png" style="width:0.49861in;height:0.37639in" /> to open the command line terminal.</p>
+<p>(3) Execute the command to disable the app auto-start service:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>~/.stop_ros.sh
+</pre></div>
+</div>
+<p>(3) Enter the following command to start the navigation service and press Enter:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>navigation<span class="w"> </span>rtabmap_navigation.launch.py
+</pre></div>
+</div>
+</section>
+<section id="id2">
+<h3>7.5.3 Virtual Machine Operations<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<p>(1) Click-on <img src="../_static/media/8.Navigation_Lesson/8.5/media/image5.png" style="width:0.41042in;height:0.34514in" /> to open the command-line terminal on the virtual machine.</p>
+<p>(2) Enter the following command to start the RViz tool for navigation display:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>navigation<span class="w"> </span>rviz_rtabmap_navigation.launch.py
+</pre></div>
+</div>
+<p>In the software menu bar, “<strong>2D Nav Goal</strong>” is used to set a single target point for the robot, and “<strong>Publish Point</strong>” is used to set multiple target points for the robot.</p>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.5/media/image7.png"  />
+<p>(3) Click <img src="../_static/media/8.Navigation_Lesson/8.5/media/image8.png" style="width:1.16667in;height:0.33333in" />, and on the map interface, select a location as the target point by clicking the mouse once at that point. After the selection is made, the robot will automatically generate a route and move to the target point.</p>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.5/media/image9.png"  />
+<p>(4) After confirming the target point, the map will display two paths: a line composed of blue squares representing the straight-line path between the robot and the target point, while the dark blue line represents the planned path of the robot.</p>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.5/media/image10.png"  />
+<p>(5) After encountering obstacles, the car will navigate around them and continuously adjust its posture and trajectory.</p>
+<p>(6) If you want to exit the game, press “<strong>Ctrl+C</strong>” in the terminal interface.</p>
+<p>After experiencing the game, you can enable the app service through commands or by restarting the robot. If the app is not enabled, the related app functions will not work. If the robot is restarted, the app will be automatically enabled.</p>
+<p>Click <img src="../_static/media/4.MotionControlLesson/4.3/media/image21.png" /> and enter the command. Press enter to start the app, and wait for the buzzer to beep. Please enter the command in the system path, not in the Docker container.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>start_node.service
+</pre></div>
+</div>
+</section>
+<section id="id3">
+<h3>7.5.4 Launch Description<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<img  class="common_img" src="../_static/media/8.Navigation_Lesson/8.5/media/image13.png"   />
+<p>The launch file is saved in: <strong><a class="reference download internal" download="" href="../_downloads/a8134f3fc06553c1c37cfe864f8a4832/navigation.zip"><span class="xref download myst">/home/ubuntu/ros2_ws/src/navigation/launch/navigation.launch.py</span></a></strong></p>
+<p><strong>(1) Set Paths</strong></p>
+<p>Obtain the paths for the “<strong>slam</strong>” and “<strong>navigation</strong>” packages.</p>
+<div class="highlight-python notranslate"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span></pre></div></td><td class="code"><div><pre><span></span>    <span class="k">if</span> <span class="n">compiled</span> <span class="o">==</span> <span class="s1">&#39;True&#39;</span><span class="p">:</span>
+        <span class="n">slam_package_path</span> <span class="o">=</span> <span class="n">get_package_share_directory</span><span class="p">(</span><span class="s1">&#39;slam&#39;</span><span class="p">)</span>
+        <span class="n">navigation_package_path</span> <span class="o">=</span> <span class="n">get_package_share_directory</span><span class="p">(</span><span class="s1">&#39;navigation&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">slam_package_path</span> <span class="o">=</span> <span class="s1">&#39;/home/ubuntu/ros2_ws/src/slam&#39;</span>
+        <span class="n">navigation_package_path</span> <span class="o">=</span> <span class="s1">&#39;/home/ubuntu/ros2_ws/src/navigation&#39;</span>
+</pre></div></td></tr></table></div>
+</div>
+<p><strong>(2) Enable Other Launch Files</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">rtabmap_launch</span></code> to start 3D navigation algorithm</p>
+<p><code class="docutils literal notranslate"><span class="pre">navigation_launch</span></code> to start 2D navigation algorithm</p>
+<p><code class="docutils literal notranslate"><span class="pre">bringup_launch</span></code> to initialize actions</p>
+<div class="highlight-python notranslate"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span></pre></div></td><td class="code"><div><pre><span></span>    <span class="n">base_launch</span> <span class="o">=</span> <span class="n">IncludeLaunchDescription</span><span class="p">(</span>
+        <span class="n">PythonLaunchDescriptionSource</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">slam_package_path</span><span class="p">,</span> <span class="s1">&#39;launch/include/robot.launch.py&#39;</span><span class="p">)),</span>
+        <span class="n">launch_arguments</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;sim&#39;</span><span class="p">:</span> <span class="n">sim</span><span class="p">,</span>
+            <span class="s1">&#39;master_name&#39;</span><span class="p">:</span> <span class="n">master_name</span><span class="p">,</span>
+            <span class="s1">&#39;robot_name&#39;</span><span class="p">:</span> <span class="n">robot_name</span>
+        <span class="p">}</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span>
+    <span class="p">)</span>
+    
+    <span class="n">navigation_launch</span> <span class="o">=</span> <span class="n">IncludeLaunchDescription</span><span class="p">(</span>
+        <span class="n">PythonLaunchDescriptionSource</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">navigation_package_path</span><span class="p">,</span> <span class="s1">&#39;launch/include/bringup.launch.py&#39;</span><span class="p">)),</span>
+        <span class="n">launch_arguments</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;use_sim_time&#39;</span><span class="p">:</span> <span class="n">use_sim_time</span><span class="p">,</span>
+            <span class="s1">&#39;map&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">slam_package_path</span><span class="p">,</span> <span class="s1">&#39;maps&#39;</span><span class="p">,</span> <span class="n">map_name</span> <span class="o">+</span> <span class="s1">&#39;.yaml&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;params_file&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">navigation_package_path</span><span class="p">,</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="s1">&#39;nav2_params.yaml&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;namespace&#39;</span><span class="p">:</span> <span class="n">robot_name</span><span class="p">,</span>
+            <span class="s1">&#39;use_namespace&#39;</span><span class="p">:</span> <span class="n">use_namespace</span><span class="p">,</span>
+            <span class="s1">&#39;autostart&#39;</span><span class="p">:</span> <span class="s1">&#39;true&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;use_teb&#39;</span><span class="p">:</span> <span class="n">use_teb</span><span class="p">,</span>
+        <span class="p">}</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span>
+    <span class="p">)</span>
+
+    <span class="n">bringup_launch</span> <span class="o">=</span> <span class="n">GroupAction</span><span class="p">(</span>
+     <span class="n">actions</span><span class="o">=</span><span class="p">[</span>
+         <span class="n">PushRosNamespace</span><span class="p">(</span><span class="n">robot_name</span><span class="p">),</span>
+         <span class="n">base_launch</span><span class="p">,</span>
+         <span class="n">TimerAction</span><span class="p">(</span>
+             <span class="n">period</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span>  <span class="c1"># 延时等待其它节点启动好(delay for enabling other nodes)</span>
+             <span class="n">actions</span><span class="o">=</span><span class="p">[</span><span class="n">navigation_launch</span><span class="p">],</span>
+         <span class="p">),</span>
+      <span class="p">]</span>
+    <span class="p">)</span>
+</pre></div></td></tr></table></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="7.mapping_lesson.html" class="btn btn-neutral float-left" title="6. Mapping Lesson" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="9.ros%2Bopencv_lesson.html" class="btn btn-neutral float-right" title="8. ROS+OpenCV Lesson" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Hiwonder.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -97,6 +97,11 @@ def car_motion(env: ManagerBasedRlEnv) -> torch.Tensor:
 # car can; a car-like robot that overshoots a corner can't recover otherwise. With 0, speed is forward only.
 # steer_max_range: each car's steering limit is drawn from this range at every reset (our two cars may
 # be the 29 deg 2024 build or the 40 deg 2025 build, capped at 37 deg by Hiwonder's code).
+# Per-car actuation randomization, drawn at every reset (tasks/randomization.py sets the ranges):
+#   latency_range_s:        policy output -> motors and servo (ROS, serial, firmware); delays both.
+#   steer_deadtime_range_s: extra steering delay: the servo reads a new pulse once per 20 ms PWM period.
+#   steer_rate_scale_range: servo speed relative to its 0.16 s/60 deg rating.
+# Delays are whole physics steps (5 ms).
 
 
 @dataclass(kw_only=True)
@@ -104,6 +109,9 @@ class AckermannActionCfg(ActionTermCfg):
   leader_step: Callable[..., None] | None = None   # (env) -> None; loose hint so tyro can resolve it
   v_reverse: float = 0.0
   steer_max_range: tuple[float, float] = (STEER_MAX, STEER_MAX)
+  latency_range_s: tuple[float, float] = (0.0, 0.0)
+  steer_deadtime_range_s: tuple[float, float] = (0.0, 0.0)
+  steer_rate_scale_range: tuple[float, float] = (1.0, 1.0)
 
   def build(self, env: ManagerBasedRlEnv) -> AckermannAction:
     return AckermannAction(self, env)
@@ -122,6 +130,14 @@ class AckermannAction(ActionTerm):
     self.steer_max = torch.full((self.num_envs,), cfg.steer_max_range[1], device=self.device)
     self._steer_now = torch.zeros(self.num_envs, 2, device=self.device)   # servo position, rate-limited
     self._steer_step = STEER_RATE * env.physics_dt
+    self._dt = env.physics_dt
+    steps = lambda s: round(s / env.physics_dt)
+    self._hist_len = steps(cfg.latency_range_s[1]) + steps(cfg.steer_deadtime_range_s[1]) + 1
+    self._hist = torch.zeros(self.num_envs, self._hist_len, 3, device=self.device)  # (steer, omega_l, omega_r)
+    self._head = 0
+    self._lag = torch.zeros(self.num_envs, dtype=torch.long, device=self.device)        # physics steps
+    self._steer_lag = torch.zeros(self.num_envs, dtype=torch.long, device=self.device)
+    self._rate_scale = torch.ones(self.num_envs, device=self.device)
 
   @property
   def action_dim(self) -> int:
@@ -146,14 +162,26 @@ class AckermannAction(ActionTerm):
       self.cfg.leader_step(self._env)
 
   def apply_actions(self) -> None:
-    # The servo moves toward the commanded angle at its rated speed, not instantly.
-    self._steer_now += (self._steer - self._steer_now).clamp(-self._steer_step, self._steer_step)
+    # Commands reach the car late (per-car latency); the servo then moves toward the commanded angle at
+    # its own speed, not instantly.
+    self._head = (self._head + 1) % self._hist_len
+    self._hist[:, self._head] = torch.cat([self._steer[:, :1], self._omega], -1)
+    ar = torch.arange(self.num_envs, device=self.device)
+    steer = self._hist[ar, (self._head - self._steer_lag) % self._hist_len, 0][:, None]
+    omega = self._hist[ar, (self._head - self._lag) % self._hist_len, 1:]
+    step = (self._steer_step * self._rate_scale)[:, None]
+    self._steer_now += torch.clamp(steer - self._steer_now, -step, step)
     self._entity.set_joint_position_target(self._steer_now, joint_ids=self._steer_ids)
-    self._entity.set_joint_velocity_target(self._omega, joint_ids=self._drive_ids)
+    self._entity.set_joint_velocity_target(omega, joint_ids=self._drive_ids)
 
   def reset(self, env_ids: torch.Tensor | slice | None = None) -> None:
     self._raw[env_ids] = 0.0
     self._steer_now[env_ids] = 0.0
     lo, hi = self.cfg.steer_max_range
     n = self.num_envs if env_ids is None or isinstance(env_ids, slice) else len(env_ids)
-    self.steer_max[env_ids] = lo + (hi - lo) * torch.rand(n, device=self.device)
+    u = lambda r: r[0] + (r[1] - r[0]) * torch.rand(n, device=self.device)
+    self.steer_max[env_ids] = u((lo, hi))
+    self._hist[env_ids] = 0.0
+    self._lag[env_ids] = torch.round(u(self.cfg.latency_range_s) / self._dt).long()
+    self._steer_lag[env_ids] = self._lag[env_ids] + torch.round(u(self.cfg.steer_deadtime_range_s) / self._dt).long()
+    self._rate_scale[env_ids] = u(self.cfg.steer_rate_scale_range)

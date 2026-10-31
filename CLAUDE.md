@@ -21,6 +21,6 @@ Rules for using values:
 - **Next steps:** `docs/open-issues.md`, in priority order. Start new work from there.
 - Virtual lab (sim + training) setup plan, written to start before the GB10 arrives: `docs/virtual-lab-plan.md`.
 - Lab runs **only in Docker** (same image on this PC and the GB10): `docs/docker-env.md`. Quick start: `cp docker/env/pc.env .env && docker compose build && docker compose run --rm lab pytest`. Don't install Python deps on the host; change `lab/pyproject.toml`, re-lock inside Linux, rebuild.
-- Hardware and software research, and the findings that affect the plan: `docs/research/00-overview.md`, then `01-mentorpi-a1-hardware.md` and `02-mentorpi-a1-software.md`.
+- Hardware and software research, and the findings that affect the plan: `docs/research/00-overview.md`, then `01-mentorpi-a1-hardware.md`, `02-mentorpi-a1-software.md` and `03-sensors-mapping-multirobot.md` (sensors, camera, shared map and relative pose).
 - Vendor docs (Hiwonder manuals, RRC Lite lessons, datasheets, product images): `docs/vendor/`. Hiwonder code has no license: read and run it, but don't copy it into the repo. Clone it into the git-ignored `docs/vendor/hiwonder/code/`.
 - Dimensions: Hiwonder's drawings and code disagree on wheel size, wheelbase, track and steering angle. Mark unmeasured values as estimates until they're measured on the real cars.

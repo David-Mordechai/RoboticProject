@@ -4,7 +4,8 @@
 
 Outcome per episode: completed (30 s without failing), crash (chassis touched a wall/obstacle),
 lost (more than 1.5 m off the trail). Also: gap tracking error while driving, time-to-failure.
-Deterministic policy (mean action), no observation noise, fresh random offices/routes per env.
+Deterministic policy (mean action), fresh random offices/routes per env. Physics/actuation randomization is
+on (randomization.py); sensor noise and delay only with --obs-noise.
 """
 
 import argparse
@@ -25,6 +26,7 @@ p.add_argument("--checkpoint", required=True)
 p.add_argument("--num-envs", type=int, default=512)
 p.add_argument("--seconds", type=float, default=30.0)
 p.add_argument("--seed", type=int, default=123)
+p.add_argument("--obs-noise", action="store_true", help="keep the actor's sensor noise/delay on (randomization.py)")
 args = p.parse_args()
 
 torch.manual_seed(args.seed)
@@ -32,6 +34,7 @@ cfg = load_env_cfg(TASK, play=True)
 cfg.scene.num_envs = args.num_envs
 cfg.seed = args.seed
 cfg.episode_length_s = 1e6                 # we stop each env at its first episode end ourselves
+cfg.observations["actor"].enable_corruption = args.obs_noise
 for sensor in cfg.scene.sensors:
   if hasattr(sensor, "debug_vis"):
     sensor.debug_vis = False

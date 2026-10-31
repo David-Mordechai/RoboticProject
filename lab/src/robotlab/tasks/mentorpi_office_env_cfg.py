@@ -11,6 +11,7 @@ its own motion and the leader's relative pose (shared over the network on the re
 
 from __future__ import annotations
 
+import copy
 import math
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
@@ -39,6 +40,7 @@ from robotlab.tasks.mdp import (
   LidarPatternCfg, AckermannActionCfg, car_motion, car_pose, place_car, to_frame, wrap, write_leader_pose,
 )
 from robotlab.tasks.office_terrain import NODES, PATCH_SIZE, LayoutTensors, OfficeTerrainCfg, layout_tensors
+from robotlab.tasks.randomization import apply_domain_randomization
 
 if TYPE_CHECKING:
   from mjlab.envs import ManagerBasedRlEnv
@@ -294,7 +296,9 @@ def make_mentorpi_office_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
     ),
     observations={
       "actor": ObservationGroupCfg(actor_terms, enable_corruption=True),
-      "critic": ObservationGroupCfg({**actor_terms}),
+      # Own term objects: domain randomization adds noise and delay to the actor's only; the critic sees
+      # the true state.
+      "critic": ObservationGroupCfg({k: copy.copy(v) for k, v in actor_terms.items()}),
     },
     actions={"drive": AckermannActionCfg(entity_name="car", leader_step=advance_leader, v_reverse=0.3,
                                          steer_max_range=(STEER_2024, STEER_CODE))},
@@ -330,6 +334,7 @@ def make_mentorpi_office_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
     decimation=10,               # 20 Hz policy
     episode_length_s=30.0,
   )
+  apply_domain_randomization(cfg, lidar_range=LIDAR_RANGE)
   if play:
     cfg.episode_length_s = 120.0
     cfg.observations["actor"].enable_corruption = False

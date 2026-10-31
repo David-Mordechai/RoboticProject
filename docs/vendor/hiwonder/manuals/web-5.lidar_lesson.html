@@ -1,0 +1,1186 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="readthedocs-addons-api-version" content="1"><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>4. Lidar Lesson &mdash; MentorPi v2.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=7ab3649f" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/style.css?v=f476ad27" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=731f67d5"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script src="../_static/custom.js?v=fd93d8dd"></script>
+    <script src="../_static/js/theme.js"></script>
+    <script src="../_static/js/versions.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="5. Depth Camera Basic Lesson" href="6.depth_camera_basic_lesson.html" />
+    <link rel="prev" title="3. Motion Control Lesson" href="4.motion_control_lesson.html" /> 
+<script async type="text/javascript" src="/_/static/javascript/readthedocs-addons.js"></script><meta name="readthedocs-project-slug" content="mentorpi" /><meta name="readthedocs-version-slug" content="latest" /><meta name="readthedocs-resolver-filename" content="/docs/5.lidar_lesson.html" /><meta name="readthedocs-http-status" content="200" /></head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #f98800" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            MentorPi
+          </a>
+              <div class="switch-menus">
+                <div class="version-switch"></div>
+                <div class="language-switch"></div>
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">MentorPi</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="1.getting_ready.html">1. Getting Ready</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.set_development_environment.html">2. Set Development Environment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.motion_control_lesson.html">3. Motion Control Lesson</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">4. Lidar Lesson</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#introduction-to-lidar">4.1 Introduction to Lidar</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#product-description">4.1.1 Product Description</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#lidar-working-principle">4.1.2 Lidar Working Principle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#lidar-parameter">4.1.3 Lidar Parameter</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#lidar-working-and-ranging-principle">4.2 Lidar Working and Ranging Principle</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#lidar-ranging">4.2.1 Lidar Ranging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#lidar-working-result">4.2.2 Lidar Working Result</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#lidar-obstacle-avoidance">4.3 Lidar Obstacle Avoidance</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#enable-game">4.3.1 Enable Game</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#program-outcome">4.3.2 Program Outcome</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#program-analysis">4.3.3 Program Analysis</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#lidar-following">4.4 Lidar Following</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">4.4.1 Enable Game</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id2">4.4.2 Program Outcome</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3">4.4.3 Program Analysis</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#lidar-guarding">4.5 Lidar Guarding</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id4">4.5.1 Enable Game</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id5">4.5.2 Program Outcome</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id6">4.5.3 Program Analysis</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="6.depth_camera_basic_lesson.html">5. Depth Camera Basic Lesson</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.mapping_lesson.html">6. Mapping Lesson</a></li>
+<li class="toctree-l1"><a class="reference internal" href="8.navigation_lesson.html">7. Navigation Lesson</a></li>
+<li class="toctree-l1"><a class="reference internal" href="9.ros%2Bopencv_lesson.html">8. ROS+OpenCV Lesson</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10.mediapipe_human_robot_interaction.html">9. MediaPipe Human-robot Interaction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11.machine_learning.html">10. Machine Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="12.autonomous_driving_lesson.html">11. Autonomous Driving Lesson</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13.MasterSlaveAndGroupControl.html">12. Master Slave And Group Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14.Robot%20Network%20Configuration.html">13. Robot Network Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15.Large_AI_Model_Course.html">14. Large AI Model Course</a></li>
+<li class="toctree-l1"><a class="reference internal" href="resources_download.html">Appendix</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://drive.google.com/drive/folders/1P00n6IemouAnga8EjpO7suF3Mou8zv4K?usp=sharing">Download</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #f98800" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MentorPi</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">4. Lidar Lesson</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/docs/5.lidar_lesson.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="lidar-lesson">
+<h1>4. Lidar Lesson<a class="headerlink" href="#lidar-lesson" title="Link to this heading"></a></h1>
+<section id="introduction-to-lidar">
+<h2>4.1 Introduction to Lidar<a class="headerlink" href="#introduction-to-lidar" title="Link to this heading"></a></h2>
+<section id="product-description">
+<h3>4.1.1 Product Description<a class="headerlink" href="#product-description" title="Link to this heading"></a></h3>
+<p>Lidar is a remote sensing technology that uses laser beams to detect target characteristics such as position and velocity. It offers advantages including high measurement resolution, strong penetration ability, robust anti-interference capability, and effective stealth detection.</p>
+<p>According to the measurement principle, Lidar can be classified into three types: triangulation Lidar, pulse Lidar, and coherent Lidar. The Lidar equipped on the MentorPi is of the pulse lidar type.</p>
+<img class="common_img" src="../_static/media/5.lidar_lesson/5.1/media/image2.png"  style="width:400px;" />
+</section>
+<section id="lidar-working-principle">
+<h3>4.1.2 Lidar Working Principle<a class="headerlink" href="#lidar-working-principle" title="Link to this heading"></a></h3>
+<p>A Lidar system consists of a laser emission system, a scanning system, a laser receiving system, and a signal processing system.</p>
+<p>First, the laser emission system sends out a detection signal (laser beam) toward the target. The scanning system scans the plane to gather planar information.</p>
+<p>Next, the laser receiving system captures the laser beam reflected from the target object and generates a received signal.</p>
+<p>Finally, the signal processing system processes the received signal to extract features such as the target’s surface shape and physical properties (e.g., position, height, and velocity), thereby enabling the construction of a 3D model of the object.</p>
+</section>
+<section id="lidar-parameter">
+<h3>4.1.3 Lidar Parameter<a class="headerlink" href="#lidar-parameter" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Communication Interface</strong></p></li>
+</ul>
+<p>The MS200 lidar connects to external systems via a connector for power supply and data transmission. For detailed interface definitions and parameter requirements, refer to the diagram/table below.</p>
+<img class="common_img" src="../_static/media/5.lidar_lesson/5.1/media/image3.png" />
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th>Pin</th>
+<th>Signal</th>
+<th>Attribute</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Tx</td>
+<td>Serial data transmission</td>
+<td>Tx (Transmitting from this device, 0V~3.3V)</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Rx</td>
+<td>Processing Incoming Data</td>
+<td>Rx</td>
+</tr>
+<tr>
+<td>3</td>
+<td>GND</td>
+<td>Power supply input (positive)</td>
+<td>GND</td>
+</tr>
+<tr>
+<td>4</td>
+<td>VCC</td>
+<td>Power supply input (positive)</td>
+<td>DC 5V（4.5V~5.5V）</td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><p><strong>Electrical Parameter</strong></p></li>
+</ul>
+<p>Before use, it is essential to understand the operating conditions of the lidar. Please ensure that the external power supply is properly designed or selected according to the Oradar MS200’s input voltage range and peak startup current, to guarantee stable and reliable operation of the device.</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Minimum value</th>
+<th>Typical value</th>
+<th>Maximum value</th>
+<th>Remarks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Operating power</td>
+<td>4.5V</td>
+<td>5.0V</td>
+<td>5.5V</td>
+<td>Pc power supply</td>
+</tr>
+<tr>
+<td>Voltage ripple</td>
+<td>-</td>
+<td>-</td>
+<td>100mV</td>
+<td></td>
+</tr>
+<tr>
+<td>Startup current</td>
+<td>-</td>
+<td>-</td>
+<td>400mA</td>
+<td></td>
+</tr>
+<tr>
+<td>Operating current</td>
+<td>180mA</td>
+<td>230mA</td>
+<td>280mA</td>
+<td></td>
+</tr>
+<tr>
+<td>Operating temperature</td>
+<td>-10℃</td>
+<td>25℃</td>
+<td>50℃</td>
+<td></td>
+</tr>
+<tr>
+<td>Storage temperature</td>
+<td>20℃</td>
+<td>25℃</td>
+<td>70℃</td>
+<td></td>
+</tr>
+<tr>
+<td>Operating temperature</td>
+<td>0</td>
+<td>30%</td>
+<td>80%</td>
+<td>Non-condensing</td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><p><strong>Specification Parameter</strong></p></li>
+</ul>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th>Model</th>
+<th>MS200:</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td>Short-range</td>
+</tr>
+<tr>
+<td>Distance Measurement Principle</td>
+<td>TOF (Time of Flight) ranging, suitable for both indoor and outdoor applications</td>
+</tr>
+<tr>
+<td>Scanning Angle</td>
+<td>360°</td>
+</tr>
+<tr>
+<td>Angular Resolution</td>
+<td>0.8°</td>
+</tr>
+<tr>
+<td>Measurement Frequency</td>
+<td>4500 times per second</td>
+</tr>
+<tr>
+<td>Scanning Frequency</td>
+<td>7-15Hz</td>
+</tr>
+<tr>
+<td>Dimensions</td>
+<td>37.7*37.5*33mm</td>
+</tr>
+<tr>
+<td>Weight</td>
+<td>40g</td>
+</tr>
+<tr>
+<td>Distance Measurement Accuracy:</td>
+<td>3 m to 12 m: ±20 mm</td>
+</tr>
+<tr>
+<td>Light Source</td>
+<td>905 nm laser</td>
+</tr>
+<tr>
+<td>Measurement Range</td>
+<td>White objects: 13.4 m<br> Black objects: 13.4 m</td>
+</tr>
+<tr>
+<td>Minimum Measurement Distance</td>
+<td>0.1m</td>
+</tr>
+<tr>
+<td>Ambient Light Resistance</td>
+<td>30 KLux (illumination intensity)</td>
+</tr>
+<tr>
+<td>Power Supply</td>
+<td>DC5V±0.5V</td>
+</tr>
+<tr>
+<td>Operating Temperature</td>
+<td>Working: -10°C to 50°C<br> Storage: -30°C to 70°C</td>
+</tr>
+<tr>
+<td>Drive Method</td>
+<td>Built-in brushless motor</td>
+</tr>
+<tr>
+<td>Windows Support</td>
+<td>Provides Windows-based PC software</td>
+</tr>
+<tr>
+<td>ROS Support</td>
+<td>ROS1/ROS2</td>
+</tr>
+<tr>
+<td>Communication port</td>
+<td>Standard asynchronous serial port (UART)</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="lidar-working-and-ranging-principle">
+<h2>4.2 Lidar Working and Ranging Principle<a class="headerlink" href="#lidar-working-and-ranging-principle" title="Link to this heading"></a></h2>
+<section id="lidar-ranging">
+<h3>4.2.1 Lidar Ranging<a class="headerlink" href="#lidar-ranging" title="Link to this heading"></a></h3>
+<p>Two common methods are employed by Lidar to determine the distance to a target: triangulation and Time of Flight (TOF).</p>
+<p>In the case of TOF, as depicted in the diagram, the Lidar initially projects light onto the object. The object reflects the light directly back to the Lidar, which calculates the time it takes for the light to return. The distance between the object and the Lidar is then obtained by multiplying this time by the speed of light.</p>
+<img class="common_img" src="../_static/media/5.lidar_lesson/5.2/media/image2.png" />
+<p>In triangulation, as illustrated in the diagram, the Lidar undergoes adjustments during manufacturing to ensure that the light does not directly strike the object. Instead, it is projected at a specific angle, a pre-set value that remains constant during operation. The distance from the object to the Lidar can be calculated by incorporating this angle into trigonometric functions.</p>
+<img class="common_img" src="../_static/media/5.lidar_lesson/5.2/media/image3.png" />
+</section>
+<section id="lidar-working-result">
+<h3>4.2.2 Lidar Working Result<a class="headerlink" href="#lidar-working-result" title="Link to this heading"></a></h3>
+<p>Its working result is as follows. Lidar will emit light and shine it on the object surface. When receiving the light reflected by the object, Lidar will mark the contour of the object at the position where the light is reflected.</p>
+<img class="common_img" src="../_static/media/5.lidar_lesson/5.2/media/image4.png" />
+</section>
+</section>
+<section id="lidar-obstacle-avoidance">
+<h2>4.3 Lidar Obstacle Avoidance<a class="headerlink" href="#lidar-obstacle-avoidance" title="Link to this heading"></a></h2>
+<p>For instructions on app connection, please consult the tutorial located in “<a class="reference internal" href="1.getting_ready.html#app-control"><span class="std std-ref"><strong>1. Getting Ready-&gt;1.6 APP Control</strong></span></a>”.</p>
+<section id="enable-game">
+<h3>4.3.1 Enable Game<a class="headerlink" href="#enable-game" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Initiate Lidar Game through App</strong></p></li>
+</ul>
+<p>(1) Connect the robot to <strong>“WonderPi”</strong> app.</p>
+<p>(2) Click-on Lidar to navigate to the game interface.</p>
+<img class="common_img" src="../_static/media/5.lidar_lesson/5.3/media/image2.png" style="width:700px;" />
+<p>(3) Switch on <strong>“Avoid obstacle”</strong> button to start the game.</p>
+<img class="common_img" src="../_static/media/5.lidar_lesson/5.3/media/image3.jpeg" style="width:700px;" />
+<ul class="simple">
+<li><p><strong>Initiate Lidar Game Using Command</strong></p></li>
+</ul>
+<p>(1) Start the robot, and access the robot system desktop using VNC according to the tutorial saved in “<a class="reference internal" href="3.set_development_environment.html#vnc-installation-and-connection"><span class="std std-ref"><strong>2. Set Development Environment-&gt;2.1 VNC Installation and Connection</strong></span></a>”.</p>
+<p>(2) Click-on <img src="../_static/media/5.lidar_lesson/5.3/media/image4.png" /> to open the command line terminal.</p>
+<p>(3) Execute the command and press Enter to deactivate the automatic start service for the app.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>~/.stop_ros.sh
+</pre></div>
+</div>
+<p>(4) Run the command to enable the local services for app-related game and chassis control services.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>app<span class="w"> </span>lidar_node.launch.py<span class="w"> </span>debug:<span class="o">=</span><span class="nb">true</span>
+</pre></div>
+</div>
+<p>(5) Open a new terminal, and execute the command. Then, press Enter to start the Lidar game.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lidar_app/enter<span class="w"> </span>std_srvs/srv/Trigger<span class="w"> </span><span class="o">{}</span>
+</pre></div>
+</div>
+<img class="common_img" src="../_static/media/5.lidar_lesson/5.3/media/image7.png" />
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The robot’s performance initiated by the app and command is identical.</p>
+</div>
+<p>(6) Enter the command and hit Enter to launch Lidar obstacle avoidance game.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lidar_app/set_running<span class="w"> </span>interfaces/srv/SetInt64<span class="w"> </span><span class="s2">&quot;{data: 1}&quot;</span>
+</pre></div>
+</div>
+<img class="common_img" src="../_static/media/5.lidar_lesson/5.3/media/image8.png" />
+<p>(7) If you want to exit the game, enter the command and press “Enter”.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lidar_app/set_running<span class="w"> </span>interfaces/srv/SetInt64<span class="w"> </span><span class="s2">&quot;{data: 0}&quot;</span>
+</pre></div>
+</div>
+<img class="common_img" src="../_static/media/5.lidar_lesson/5.3/media/image9.png" />
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The game will continue to run under the current Raspberry Pi power-on state if not exited. To avoid excessive use of the Raspberry Pi’s operating memory, please follow the above instructions to close the current game before executing other games.</p>
+</div>
+<p>(8) If you need to terminate the program, press short-cut <strong>“Ctrl+C”</strong> on the terminal opened in steps (4) and (5).</p>
+<p>After experiencing the Lidar game, you can activate the app service either by using a command or restarting the robot. If the app service is not activated, related app functions will be disabled. In the case of a robot restart, the app service will start automatically.</p>
+<p>Click <img src="../_static/media/4.MotionControlLesson/4.3/media/image21.png" /> and enter the command. Press enter to start the app, and wait for the buzzer to beep. Please enter the command in the system path, not in the Docker container.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>start_node.service
+</pre></div>
+</div>
+</section>
+<section id="program-outcome">
+<h3>4.3.2 Program Outcome<a class="headerlink" href="#program-outcome" title="Link to this heading"></a></h3>
+<p>Let’s use a book as the object to be detected. In the function of Lidar following, the object to be detected needs to be higher than the scanning height of the Lidar. Only in this way the Lidar mounted on the MentorPi can effectively scan its position information. Then, the MentorPi moves forward. When the obstacle is detected, the MentorPi will automatically turn to avoid it.</p>
+<img class="common_img" src="../_static/media/5.lidar_lesson/5.3/media/1.gif" />
+</section>
+<section id="program-analysis">
+<h3>4.3.3 Program Analysis<a class="headerlink" href="#program-analysis" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Launch File</p></li>
+</ul>
+<p>The launch file is located in: <a class="reference download internal" download="" href="../_downloads/478c78c70edb431c8286c61a60d61683/app.zip"><span class="xref download myst">/home/ubuntu/ros2_ws/src/app/launch/lidar_node.launch.py</span></a></p>
+<img class="common_img" src="../_static/media/5.lidar_lesson/5.3/media/image12.png" />
+<p>(1) Set the storage path</p>
+<p>Retrieve the paths for the two packages: peripherals and controller.</p>
+<div class="highlight-python notranslate"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span></pre></div></td><td class="code"><div><pre><span></span>    <span class="k">if</span> <span class="n">compiled</span> <span class="o">==</span> <span class="s1">&#39;True&#39;</span><span class="p">:</span>
+        <span class="n">controller_package_path</span> <span class="o">=</span> <span class="n">get_package_share_directory</span><span class="p">(</span><span class="s1">&#39;controller&#39;</span><span class="p">)</span>
+        <span class="n">peripherals_package_path</span> <span class="o">=</span> <span class="n">get_package_share_directory</span><span class="p">(</span><span class="s1">&#39;peripherals&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">controller_package_path</span> <span class="o">=</span> <span class="s1">&#39;/home/ubuntu/ros2_ws/src/driver/controller&#39;</span>
+        <span class="n">peripherals_package_path</span> <span class="o">=</span> <span class="s1">&#39;/home/ubuntu/ros2_ws/src/peripherals&#39;</span>
+</pre></div></td></tr></table></div>
+</div>
+<p>(2) Initiate other Launch files</p>
+<div class="highlight-python notranslate"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span></pre></div></td><td class="code"><div><pre><span></span>    <span class="n">lidar_controller_node</span> <span class="o">=</span> <span class="n">GroupAction</span><span class="p">([</span>
+        <span class="n">IncludeLaunchDescription</span><span class="p">(</span>
+            <span class="n">PythonLaunchDescriptionSource</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">peripherals_package_path</span><span class="p">,</span> <span class="s1">&#39;launch/lidar.launch.py&#39;</span><span class="p">)),</span>
+            <span class="n">condition</span><span class="o">=</span><span class="n">IfCondition</span><span class="p">(</span><span class="n">debug</span><span class="p">),</span>
+            <span class="p">),</span>
+
+        <span class="n">IncludeLaunchDescription</span><span class="p">(</span>
+            <span class="n">PythonLaunchDescriptionSource</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">controller_package_path</span><span class="p">,</span> <span class="s1">&#39;launch/controller.launch.py&#39;</span><span class="p">)),</span>
+            <span class="n">condition</span><span class="o">=</span><span class="n">IfCondition</span><span class="p">(</span><span class="n">debug</span><span class="p">),</span>
+            <span class="p">),</span>
+</pre></div></td></tr></table></div>
+</div>
+<p>lidar.launch.py Lidar launch</p>
+<p>controller.launch.py Motion control launch</p>
+<p>(3) Initiate Node</p>
+<div class="highlight-python notranslate"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span></pre></div></td><td class="code"><div><pre><span></span>        <span class="n">Node</span><span class="p">(</span>
+            <span class="n">package</span><span class="o">=</span><span class="s1">&#39;app&#39;</span><span class="p">,</span>
+            <span class="n">executable</span><span class="o">=</span><span class="s1">&#39;lidar_controller&#39;</span><span class="p">,</span>
+            <span class="n">output</span><span class="o">=</span><span class="s1">&#39;screen&#39;</span><span class="p">,</span>
+            <span class="p">),</span>
+    <span class="p">])</span>
+</pre></div></td></tr></table></div>
+</div>
+<p>Enable Lidar game node.</p>
+<ul class="simple">
+<li><p>Source Code File</p></li>
+</ul>
+<p>The source code of the program is saved in: <a class="reference download internal" download="" href="../_downloads/478c78c70edb431c8286c61a60d61683/app.zip"><span class="xref download myst">/home/ubuntu/ros2_ws/src/app/app/lidar_controller.py</span></a></p>
+<p>The process logic of the program based on the implemented effect is shown in the diagram:</p>
+<img class="common_img" src="../_static/media/5.lidar_lesson/5.3/media/image17.png" />
+<p>(1) Initialization</p>
+<div class="highlight-python notranslate"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span></pre></div></td><td class="code"><div><pre><span></span><span class="k">class</span> <span class="nc">LidarController</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">rclpy</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">running_mode</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.6</span>  <span class="c1"># meters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scan_angle</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="mi">360</span><span class="p">)</span>  <span class="c1"># radians</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">speed</span> <span class="o">=</span> <span class="mf">0.2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_act</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">angle_data</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># pid参数</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pid_yaw</span> <span class="o">=</span> <span class="n">pid</span><span class="o">.</span><span class="n">PID</span><span class="p">(</span><span class="mf">1.6</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.16</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pid_dist</span> <span class="o">=</span> <span class="n">pid</span><span class="o">.</span><span class="n">PID</span><span class="p">(</span><span class="mf">1.7</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.16</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">RLock</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lidar_sub</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lidar_type</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;LIDAR_TYPE&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">machine_type</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;MACHINE_TYPE&#39;</span><span class="p">)</span>
+</pre></div></td></tr></table></div>
+</div>
+<p>self.name: stores the incoming name as the property of the object.</p>
+<p>Other attributes include parameters for controlling the Lidar, such as operating mode, threshold, scanning angle, and speed.</p>
+<p>self.lock: creates a thread lock for safe access in a multi-threaded environment.</p>
+<p>(2) Create ROS service</p>
+<div class="highlight-python notranslate"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span></pre></div></td><td class="code"><div><pre><span></span>        <span class="bp">self</span><span class="o">.</span><span class="n">create_service</span><span class="p">(</span><span class="n">Trigger</span><span class="p">,</span> <span class="s1">&#39;~/enter&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">enter_srv_callback</span><span class="p">)</span>  <span class="c1"># 进入玩法(enter the game)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_service</span><span class="p">(</span><span class="n">Trigger</span><span class="p">,</span> <span class="s1">&#39;~/exit&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exit_srv_callback</span><span class="p">)</span>  <span class="c1"># 退出玩法(exit the game)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_service</span><span class="p">(</span><span class="n">SetInt64</span><span class="p">,</span> <span class="s1">&#39;~/set_running&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_running_srv_callback</span><span class="p">)</span>  <span class="c1"># 开启玩法(start the game)</span>
+        <span class="n">Heart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;/heartbeat&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">exit_srv_callback</span><span class="p">(</span><span class="n">request</span><span class="o">=</span><span class="n">Trigger</span><span class="o">.</span><span class="n">Request</span><span class="p">(),</span> <span class="n">response</span><span class="o">=</span><span class="n">Trigger</span><span class="o">.</span><span class="n">Response</span><span class="p">()))</span>  <span class="c1"># 心跳包(heartbeat package)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_service</span><span class="p">(</span><span class="n">SetFloat64List</span><span class="p">,</span> <span class="s1">&#39;~/set_param&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_parameters_srv_callback</span><span class="p">)</span>  <span class="c1"># 参数设置(set parameter)</span>
+</pre></div></td></tr></table></div>
+</div>
+<p>Enter game: A ROS service named <code class="docutils literal notranslate"><span class="pre">/enter</span></code> is created with the type Trigger, and the callback function is enter_srv_callback. When this service is called, it will execute the enter_srv_callback function.</p>
+<p>Exit game: A ROS service named <code class="docutils literal notranslate"><span class="pre">/exit</span></code> is created with the type Trigger, and the callback function is exit_srv_callback. When this service is called, it will execute the exit_srv_callback function.</p>
+<p>Enable game: A ROS service named <code class="docutils literal notranslate"><span class="pre">/set_running</span></code> is created with the type SetInt64, and the callback function is set_running_srv_callback. When this service is called, it will execute the set_running_srv_callback function.</p>
+<p>Set parameters: A ROS service named <code class="docutils literal notranslate"><span class="pre">/set_param</span></code> is created with the type SetFloat64List, and the callback function is set_parameters_srv_callback. When this service is called, it will execute the set_parameters_srv_callback function.</p>
+<p>(3) Lidar obstacle avoidance</p>
+<div class="highlight-python notranslate"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span></pre></div></td><td class="code"><div><pre><span></span>                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">running_mode</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">&lt;=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">():</span>
+                    <span class="n">left_nonzero</span> <span class="o">=</span> <span class="n">left_range</span><span class="o">.</span><span class="n">nonzero</span><span class="p">()</span>
+                    <span class="n">right_nonzero</span> <span class="o">=</span> <span class="n">right_range</span><span class="o">.</span><span class="n">nonzero</span><span class="p">()</span>
+                    <span class="n">left_nonan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">left_range</span><span class="p">[</span><span class="n">left_nonzero</span><span class="p">])</span>
+                    <span class="n">right_nonan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">right_range</span><span class="p">[</span><span class="n">right_nonzero</span><span class="p">])</span>
+                    <span class="n">min_dist_left_</span> <span class="o">=</span> <span class="n">left_range</span><span class="p">[</span><span class="n">left_nonzero</span><span class="p">][</span><span class="n">left_nonan</span><span class="p">]</span>
+                    <span class="n">min_dist_right_</span> <span class="o">=</span> <span class="n">right_range</span><span class="p">[</span><span class="n">right_nonzero</span><span class="p">][</span><span class="n">right_nonan</span><span class="p">]</span>
+                    <span class="c1"># 取左右最近的距离(Take the nearest distance left and right)</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">min_dist_left_</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">min_dist_right_</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="n">min_dist_left</span> <span class="o">=</span> <span class="n">min_dist_left_</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+                        <span class="n">min_dist_right</span> <span class="o">=</span> <span class="n">min_dist_right_</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+                        <span class="k">if</span> <span class="n">min_dist_left</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span> <span class="ow">and</span> <span class="n">min_dist_right</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span><span class="p">:</span>  <span class="c1"># 左侧有障碍(there is obstacle at left)</span>
+                            <span class="n">twist</span><span class="o">.</span><span class="n">linear</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">speed</span> <span class="o">/</span> <span class="mi">6</span>  <span class="c1"># 转弯时向前速度尽量小(keep the forward velocity as low as possible when turning)</span>
+                            <span class="n">max_angle</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="mi">90</span><span class="p">)</span>  <span class="c1"># 转90度(turn 90 degree)</span>
+                            <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">speed</span> <span class="o">*</span> <span class="mf">6.0</span>  <span class="c1"># 转弯速度尽量大(keep the turning speed as high as possible)</span>
+                            <span class="n">twist</span><span class="o">.</span><span class="n">angular</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="o">-</span><span class="n">w</span>
+                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_act</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_act</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                                <span class="n">twist</span><span class="o">.</span><span class="n">angular</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="n">w</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">last_act</span> <span class="o">=</span> <span class="mi">1</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">mecanum_pub</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">twist</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">+</span> <span class="p">(</span><span class="n">max_angle</span> <span class="o">/</span> <span class="n">w</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+                        <span class="k">elif</span> <span class="n">min_dist_left</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span> <span class="ow">and</span> <span class="n">min_dist_right</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span><span class="p">:</span>  <span class="c1"># 两侧都有障碍</span>
+                            <span class="n">twist</span><span class="o">.</span><span class="n">linear</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">speed</span> <span class="o">/</span> <span class="mi">6</span>  <span class="c1"># 转弯时向前速度尽量小(keep the forward velocity as low as possible when turning)</span>
+                            <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">speed</span> <span class="o">*</span> <span class="mf">6.0</span>  <span class="c1"># 转弯速度尽量大(keep the turning speed as high as possible)</span>
+                            <span class="n">twist</span><span class="o">.</span><span class="n">angular</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="n">w</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">last_act</span> <span class="o">=</span> <span class="mi">3</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">mecanum_pub</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">twist</span><span class="p">)</span>
+                            <span class="c1"># 转180度</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">+</span> <span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="mi">180</span><span class="p">)</span> <span class="o">/</span> <span class="n">w</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+                        <span class="k">elif</span> <span class="n">min_dist_left</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span> <span class="ow">and</span> <span class="n">min_dist_right</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span><span class="p">:</span>  <span class="c1"># 右侧有障碍(there is obstacles at right)</span>
+                            <span class="n">twist</span><span class="o">.</span><span class="n">linear</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">speed</span> <span class="o">/</span> <span class="mi">6</span>  <span class="c1"># 转弯时向前速度尽量小(keep the forward velocity as low as possible when turning)</span>
+                            <span class="n">max_angle</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="mi">90</span><span class="p">)</span>  <span class="c1"># 转90度 turn 90 degrees</span>
+                            <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">speed</span> <span class="o">*</span> <span class="mf">6.0</span>  <span class="c1"># 转弯速度尽量大(keep the turning speed as high as possible)</span>
+                            <span class="n">twist</span><span class="o">.</span><span class="n">angular</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="n">w</span>
+                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_act</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_act</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+                                <span class="n">twist</span><span class="o">.</span><span class="n">angular</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="o">-</span><span class="n">w</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">last_act</span> <span class="o">=</span> <span class="mi">2</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">mecanum_pub</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">twist</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">+</span> <span class="p">(</span><span class="n">max_angle</span> <span class="o">/</span> <span class="n">w</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>  <span class="c1"># 没有障碍(none obstacle)</span>
+</pre></div></td></tr></table></div>
+</div>
+<p>The code detects the minimum distances on the left and right sides of the robot, stored in variables min_dist_left and min_dist_right, respectively. Based on the relationship between the minimum distances and a threshold value self.threshold, the code determines the presence of obstacles on either side. If there is an obstacle on the left side, the robot will turn right by 90 degrees. If there are obstacles on both sides, the robot will turn around by 180 degrees. If there is an obstacle on the right side, the robot will turn left by 90 degrees. If there is no obstacle, the robot will continue moving forward.</p>
+<p>To avoid repetitive turns, the code keeps track of the last action performed by the robot in the variable self.last_act.</p>
+</section>
+</section>
+<section id="lidar-following">
+<h2>4.4 Lidar Following<a class="headerlink" href="#lidar-following" title="Link to this heading"></a></h2>
+<p>For instructions on app connection, please consult the tutorial located in “<a class="reference internal" href="1.getting_ready.html#app-control"><span class="std std-ref"><strong>1.Getting Ready-&gt;1.6 APP Control</strong></span></a>”.</p>
+<section id="id1">
+<h3>4.4.1 Enable Game<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Initiate Lidar Game through App</strong></p></li>
+</ul>
+<p>(1) Connect the robot to <strong>“WonderPi”</strong> app.</p>
+<p>(2) Click-on Lidar to navigate to the game interface.</p>
+<img class="common_img" src="../_static/media/5.lidar_lesson/5.4/media/image2.png" style="width:700px;" />
+<p>(3) Switch on <strong>“Lidar following”</strong> button to start the game.</p>
+<img class="common_img" src="../_static/media/5.lidar_lesson/5.4/media/image3.png" style="width:700px;" />
+<ul class="simple">
+<li><p><strong>Initiate Lidar Game Using Command</strong></p></li>
+</ul>
+<p>(1) Start the robot, and access the robot system desktop using VNC according to the tutorial saved in “<a class="reference internal" href="3.set_development_environment.html#vnc-installation-and-connection"><span class="std std-ref"><strong>2. Set Development Environment-&gt;2.1 VNC Installation and Connection</strong></span></a>”.</p>
+<p>(2) Click-on <img src="../_static/media/5.lidar_lesson/5.4/media/image4.png" /> to open the command line terminal.</p>
+<p>(3) Execute the command and press Enter to deactivate the automatic start service for the app.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>~/.stop_ros.sh
+</pre></div>
+</div>
+<p>(4) Run the command to enable the local services for app-related game and chassis control services.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>app<span class="w"> </span>lidar_node.launch.py<span class="w"> </span>debug:<span class="o">=</span><span class="nb">true</span>
+</pre></div>
+</div>
+<p>(5) Open a new terminal, and execute the command. Then, press Enter to start the Lidar game.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lidar_app/enter<span class="w"> </span>std_srvs/srv/Trigger<span class="w"> </span><span class="o">{}</span>
+</pre></div>
+</div>
+<img class="common_img" src="../_static/media/5.lidar_lesson/5.4/media/image7.png" />
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The robot’s performance initiated by the app and command is identical.</p>
+</div>
+<p>(6) Enter the command and hit Enter to launch Lidar following game.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lidar_app/set_running<span class="w"> </span>interfaces/srv/SetInt64<span class="w"> </span><span class="s2">&quot;{data: 2}&quot;</span>
+</pre></div>
+</div>
+<img class="common_img" src="../_static/media/5.lidar_lesson/5.4/media/image8.png" />
+<p>(7) If you want to exit the game, enter the command and press “<strong>Enter</strong>”.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lidar_app/set_running<span class="w"> </span>interfaces/srv/SetInt64<span class="w"> </span><span class="s2">&quot;{data: 0}&quot;</span>
+</pre></div>
+</div>
+<img class="common_img" src="../_static/media/5.lidar_lesson/5.4/media/image9.png" />
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The game will continue to run under the current Raspberry Pi power-on state if not exited. To avoid excessive use of the Raspberry Pi’s operating memory, please follow the above instructions to close the current game before executing other games.</p>
+</div>
+<p>(8) If you need to terminate the program, press short-cut <strong>“Ctrl+C”</strong> on the terminal opened in steps (4) and (5).</p>
+<p>After experiencing the Lidar game, you can activate the app service either by using a command or restarting the robot. If the app service is not activated, related app functions will be disabled. In the case of a robot restart, the app service will start automatically.</p>
+<p>Click <img src="../_static/media/4.MotionControlLesson/4.3/media/image21.png" /> and enter the command. Press enter to start the app, and wait for the buzzer to beep. Please enter the command in the system path, not in the Docker container.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>start_node.service
+</pre></div>
+</div>
+</section>
+<section id="id2">
+<h3>4.4.2 Program Outcome<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<p>Let’s use a book as the object to be detected. When using the Lidar following function, it’s important to ensure that the object to be detected is higher than the scanning height of the Lidar mounted on the MentorPi. This will enable the Lidar to effectively scan the position information of the object. Once the position information is obtained, the MentorPi will adjust its position to maintain a distance of around 0.35m between itself and the obstacle.</p>
+<img class="common_img" src="../_static/media/5.lidar_lesson/5.4/media/1.gif" />
+</section>
+<section id="id3">
+<h3>4.4.3 Program Analysis<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Launch File</strong></p></li>
+</ul>
+<p>The launch file is located in: <a class="reference download internal" download="" href="../_downloads/478c78c70edb431c8286c61a60d61683/app.zip"><span class="xref download myst">/home/ubuntu/ros2_ws/src/app/launch/lidar_node.launch.py</span></a></p>
+<img class="common_img" src="../_static/media/5.lidar_lesson/5.4/media/image12.png" />
+<p>(1) Set the storage path</p>
+<p>Retrieve the paths for the two packages: peripherals and controller.</p>
+<div class="highlight-python notranslate"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span></pre></div></td><td class="code"><div><pre><span></span>    <span class="k">if</span> <span class="n">compiled</span> <span class="o">==</span> <span class="s1">&#39;True&#39;</span><span class="p">:</span>
+        <span class="n">controller_package_path</span> <span class="o">=</span> <span class="n">get_package_share_directory</span><span class="p">(</span><span class="s1">&#39;controller&#39;</span><span class="p">)</span>
+        <span class="n">peripherals_package_path</span> <span class="o">=</span> <span class="n">get_package_share_directory</span><span class="p">(</span><span class="s1">&#39;peripherals&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">controller_package_path</span> <span class="o">=</span> <span class="s1">&#39;/home/ubuntu/ros2_ws/src/driver/controller&#39;</span>
+        <span class="n">peripherals_package_path</span> <span class="o">=</span> <span class="s1">&#39;/home/ubuntu/ros2_ws/src/peripherals&#39;</span>
+</pre></div></td></tr></table></div>
+</div>
+<p>(2) Initiate other Launch files</p>
+<div class="highlight-python notranslate"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span></pre></div></td><td class="code"><div><pre><span></span>    <span class="n">lidar_controller_node</span> <span class="o">=</span> <span class="n">GroupAction</span><span class="p">([</span>
+        <span class="n">IncludeLaunchDescription</span><span class="p">(</span>
+            <span class="n">PythonLaunchDescriptionSource</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">peripherals_package_path</span><span class="p">,</span> <span class="s1">&#39;launch/lidar.launch.py&#39;</span><span class="p">)),</span>
+            <span class="n">condition</span><span class="o">=</span><span class="n">IfCondition</span><span class="p">(</span><span class="n">debug</span><span class="p">),</span>
+            <span class="p">),</span>
+
+        <span class="n">IncludeLaunchDescription</span><span class="p">(</span>
+            <span class="n">PythonLaunchDescriptionSource</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">controller_package_path</span><span class="p">,</span> <span class="s1">&#39;launch/controller.launch.py&#39;</span><span class="p">)),</span>
+            <span class="n">condition</span><span class="o">=</span><span class="n">IfCondition</span><span class="p">(</span><span class="n">debug</span><span class="p">),</span>
+            <span class="p">),</span>
+</pre></div></td></tr></table></div>
+</div>
+<p>lidar.launch.py Lidar launch</p>
+<p>controller.launch.py Motion control launch</p>
+<p>(3) Initiate Node</p>
+<div class="highlight-python notranslate"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span></pre></div></td><td class="code"><div><pre><span></span>        <span class="n">Node</span><span class="p">(</span>
+            <span class="n">package</span><span class="o">=</span><span class="s1">&#39;app&#39;</span><span class="p">,</span>
+            <span class="n">executable</span><span class="o">=</span><span class="s1">&#39;lidar_controller&#39;</span><span class="p">,</span>
+            <span class="n">output</span><span class="o">=</span><span class="s1">&#39;screen&#39;</span><span class="p">,</span>
+            <span class="p">),</span>
+    <span class="p">])</span>
+</pre></div></td></tr></table></div>
+</div>
+<p>Enable Lidar game node.</p>
+<ul class="simple">
+<li><p><strong>Source Code File</strong></p></li>
+</ul>
+<p>The source code of the program is saved in: <a class="reference download internal" download="" href="../_downloads/478c78c70edb431c8286c61a60d61683/app.zip"><span class="xref download myst">/home/ubuntu/ros2_ws/src/app/app/lidar_controller.py</span></a></p>
+<p>The process logic of the program based on the implemented effect is shown in the diagram:</p>
+<img class="common_img" src="../_static/media/5.lidar_lesson/5.4/media/image17.png" />
+<p>(1) Initialization</p>
+<div class="highlight-python notranslate"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span></pre></div></td><td class="code"><div><pre><span></span><span class="k">class</span> <span class="nc">LidarController</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">rclpy</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">running_mode</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.6</span>  <span class="c1"># meters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scan_angle</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="mi">360</span><span class="p">)</span>  <span class="c1"># radians</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">speed</span> <span class="o">=</span> <span class="mf">0.2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_act</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">angle_data</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># pid参数</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pid_yaw</span> <span class="o">=</span> <span class="n">pid</span><span class="o">.</span><span class="n">PID</span><span class="p">(</span><span class="mf">1.6</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.16</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pid_dist</span> <span class="o">=</span> <span class="n">pid</span><span class="o">.</span><span class="n">PID</span><span class="p">(</span><span class="mf">1.7</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.16</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">RLock</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lidar_sub</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lidar_type</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;LIDAR_TYPE&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">machine_type</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;MACHINE_TYPE&#39;</span><span class="p">)</span>
+</pre></div></td></tr></table></div>
+</div>
+<p>self.name: stores the incoming name as the property of the object.</p>
+<p>Other attributes include parameters for controlling the Lidar, such as operating mode, threshold, scanning angle, and speed.</p>
+<p>self.lock: creates a thread lock for safe access in a multi-threaded environment.</p>
+<p>(2)  Create ROS service</p>
+<div class="highlight-python notranslate"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span></pre></div></td><td class="code"><div><pre><span></span>        <span class="bp">self</span><span class="o">.</span><span class="n">create_service</span><span class="p">(</span><span class="n">Trigger</span><span class="p">,</span> <span class="s1">&#39;~/enter&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">enter_srv_callback</span><span class="p">)</span>  <span class="c1"># 进入玩法(enter the game)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_service</span><span class="p">(</span><span class="n">Trigger</span><span class="p">,</span> <span class="s1">&#39;~/exit&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exit_srv_callback</span><span class="p">)</span>  <span class="c1"># 退出玩法(exit the game)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_service</span><span class="p">(</span><span class="n">SetInt64</span><span class="p">,</span> <span class="s1">&#39;~/set_running&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_running_srv_callback</span><span class="p">)</span>  <span class="c1"># 开启玩法(start the game)</span>
+        <span class="n">Heart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;/heartbeat&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">exit_srv_callback</span><span class="p">(</span><span class="n">request</span><span class="o">=</span><span class="n">Trigger</span><span class="o">.</span><span class="n">Request</span><span class="p">(),</span> <span class="n">response</span><span class="o">=</span><span class="n">Trigger</span><span class="o">.</span><span class="n">Response</span><span class="p">()))</span>  <span class="c1"># 心跳包(heartbeat package)</span>
+</pre></div></td></tr></table></div>
+</div>
+<p>Enter game: A ROS service named <code class="docutils literal notranslate"><span class="pre">/enter</span></code> is created with the type Trigger, and the callback function is enter_srv_callback. When this service is called, it will execute the enter_srv_callback function.</p>
+<p>Exit game: A ROS service named  <code class="docutils literal notranslate"><span class="pre">/exit</span></code> is created with the type Trigger, and the callback function is exit_srv_callback. When this service is called, it will execute the exit_srv_callback function.</p>
+<p>Enable game: A ROS service named  <code class="docutils literal notranslate"><span class="pre">/set_running</span></code> is created with the type SetInt64, and the callback function is set_running_srv_callback. When this service is called, it will execute the set_running_srv_callback function.</p>
+<p>Set parameters: A ROS service named  <code class="docutils literal notranslate"><span class="pre">/set_param</span></code> is created with the type SetFloat64List, and the callback function is set_parameters_srv_callback. When this service is called, it will execute the set_parameters_srv_callback function.</p>
+<p>(3) Lidar following</p>
+<div class="highlight-python notranslate"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span></pre></div></td><td class="code"><div><pre><span></span>                    <span class="c1"># 拼合距离数据, 从右半侧逆时针到左半侧(the merged distance data from right half counterclockwise to the left half)</span>
+                    <span class="n">ranges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">right_range</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">left_range</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">ranges</span><span class="p">))</span>
+                    <span class="n">nonzero</span> <span class="o">=</span> <span class="n">ranges</span><span class="o">.</span><span class="n">nonzero</span><span class="p">()</span>
+                    <span class="n">nonan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">ranges</span><span class="p">[</span><span class="n">nonzero</span><span class="p">])</span>
+                    <span class="n">dist_</span> <span class="o">=</span> <span class="n">ranges</span><span class="p">[</span><span class="n">nonzero</span><span class="p">][</span><span class="n">nonan</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dist_</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">dist</span> <span class="o">=</span> <span class="n">dist_</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+                        <span class="n">min_index</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ranges</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span>
+                        <span class="n">angle</span> <span class="o">=</span> <span class="o">-</span><span class="n">angle</span> <span class="o">+</span> <span class="n">lidar_data</span><span class="o">.</span><span class="n">angle_increment</span> <span class="o">*</span> <span class="n">min_index</span>  <span class="c1"># 计算最小值对应的角度(calculate the angle corresponding to the minimum value)</span>
+                        <span class="c1"># self.get_logger().info(str(dist_))</span>
+                        <span class="c1"># self.get_logger().info(str([dist, angle]))</span>
+                        <span class="k">if</span> <span class="n">dist</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span> <span class="ow">and</span> <span class="nb">abs</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">angle</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span>  <span class="c1"># 控制左右(control the left and right)</span>
+                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lidar_type</span> <span class="o">!=</span> <span class="s1">&#39;G4&#39;</span><span class="p">:</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">pid_yaw</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">-</span><span class="n">angle</span><span class="p">)</span>
+                                <span class="n">twist</span><span class="o">.</span><span class="n">angular</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">set_range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pid_yaw</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">speed</span> <span class="o">*</span> <span class="mf">6.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">speed</span> <span class="o">*</span> <span class="mf">6.0</span><span class="p">)</span> 
+                            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">lidar_type</span> <span class="o">==</span> <span class="s1">&#39;G4&#39;</span><span class="p">:</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">pid_yaw</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
+                                <span class="n">twist</span><span class="o">.</span><span class="n">angular</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="o">-</span><span class="n">common</span><span class="o">.</span><span class="n">set_range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pid_yaw</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">speed</span> <span class="o">*</span> <span class="mf">6.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">speed</span> <span class="o">*</span> <span class="mf">6.0</span><span class="p">)</span> 
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">pid_yaw</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+                        <span class="k">if</span> <span class="n">dist</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span> <span class="ow">and</span> <span class="nb">abs</span><span class="p">(</span><span class="mf">0.2</span> <span class="o">-</span> <span class="n">dist</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.02</span><span class="p">:</span>  <span class="c1"># 控制前后(control the front and back)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">pid_dist</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">threshold</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">dist</span><span class="p">)</span>
+                            <span class="n">twist</span><span class="o">.</span><span class="n">linear</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">set_range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pid_dist</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">speed</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">speed</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">pid_dist</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+                        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">twist</span><span class="o">.</span><span class="n">angular</span><span class="o">.</span><span class="n">z</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.008</span><span class="p">:</span>
+                            <span class="n">twist</span><span class="o">.</span><span class="n">angular</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="mf">0.0</span>
+                        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">twist</span><span class="o">.</span><span class="n">linear</span><span class="o">.</span><span class="n">x</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">:</span>
+                            <span class="n">twist</span><span class="o">.</span><span class="n">linear</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="mf">0.0</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">mecanum_pub</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">twist</span><span class="p">)</span>
+</pre></div></td></tr></table></div>
+</div>
+<p>The code concatenates the distance data from the left and right sides of the robot, obtained from the Lidar, into an array <code class="docutils literal notranslate"><span class="pre">ranges</span></code> to form a circular scan. It then calculates the minimum distance value “<strong>dist</strong>” and its corresponding angle <code class="docutils literal notranslate"><span class="pre">angle</span></code> from the <code class="docutils literal notranslate"><span class="pre">ranges</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">dist</span></code> is checked if it is less than a threshold value. If it is and the angle deviates from the forward direction by more than 5 degrees, the robot will rotate to avoid the obstacle. The angular velocity is controlled using a PID controller. If <code class="docutils literal notranslate"><span class="pre">dist</span></code> is less than the threshold and the robot is close to a distance of 0.2m in the forward direction, the robot will stop or move forward using a PID controller for the linear velocity. The control commands are published as a Twist message to the robot to execute the desired actions.</p>
+</section>
+</section>
+<section id="lidar-guarding">
+<h2>4.5 Lidar Guarding<a class="headerlink" href="#lidar-guarding" title="Link to this heading"></a></h2>
+<p>For instructions on app connection, please consult the tutorial located in “<a class="reference internal" href="1.getting_ready.html#app-control"><span class="std std-ref"><strong>1. Getting Ready-&gt;1.6  APP Control</strong></span></a>”.</p>
+<section id="id4">
+<h3>4.5.1 Enable Game<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The MentorPi of Ackerman version does not support Lidar guarding function.</p>
+</div>
+<ul class="simple">
+<li><p><strong>Initiate Lidar Game through App</strong></p></li>
+</ul>
+<p>(1) Connect the robot to <strong>“WondePi”</strong> app.</p>
+<p>(2) Click-on Lidar to navigate to the game interface.</p>
+<img class="common_img" src="../_static/media/5.lidar_lesson/5.5/media/image2.png" style="width:700px;" />
+<p>(3) Switch on <strong>“Lidar guarding”</strong> button to start the game.</p>
+<img class="common_img" src="../_static/media/5.lidar_lesson/5.5/media/image3.png" style="width:700px;" />
+<ul class="simple">
+<li><p><strong>Initiate Lidar Game Using Command</strong></p></li>
+</ul>
+<p>(1) Start the robot, and access the robot system desktop using VNC according to the tutorial saved in “<a class="reference internal" href="3.set_development_environment.html#vnc-installation-and-connection"><span class="std std-ref"><strong>2. Set Development Environment-&gt;2.1 VNC Installation and Connection</strong></span></a>”.</p>
+<p>(2) Click-on <img src="../_static/media/5.lidar_lesson/5.5/media/image4.png" /> to open the command line terminal.</p>
+<p>(3) Execute the command and press Enter to deactivate the automatic start service for the app.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>~/.stop_ros.sh
+</pre></div>
+</div>
+<p>(4) Run the command to enable the local services for app-related game and chassis control services.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>app<span class="w"> </span>lidar_node.launch.py<span class="w"> </span>debug:<span class="o">=</span><span class="nb">true</span>
+</pre></div>
+</div>
+<p>(5) Open a new terminal, and execute the command. Then, press Enter to start the Lidar game.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lidar_app/enter<span class="w"> </span>std_srvs/srv/Trigger<span class="w"> </span><span class="o">{}</span>
+</pre></div>
+</div>
+<img class="common_img" src="../_static/media/5.lidar_lesson/5.5/media/image7.png" />
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The robot’s performance initiated by the app and command is identical.</p>
+</div>
+<p>(6) Enter the command and hit Enter to launch Lidar guarding game.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lidar_app/set_running<span class="w"> </span>interfaces/srv/SetInt64<span class="w"> </span><span class="s2">&quot;{data: 3}&quot;</span>
+</pre></div>
+</div>
+<img class="common_img" src="../_static/media/5.lidar_lesson/5.5/media/image8.png" />
+<p>(7) If you want to exit the game, enter the command and press “<strong>Enter</strong>”.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lidar_app/set_running<span class="w"> </span>interfaces/srv/SetInt64<span class="w"> </span><span class="s2">&quot;{data: 0}&quot;</span>
+</pre></div>
+</div>
+<img class="common_img" src="../_static/media/5.lidar_lesson/5.5/media/image9.png" />
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The game will continue to run under the current Raspberry Pi power-on state if not exited. To avoid excessive use of the Raspberry Pi’s operating memory, please follow the above instructions to close the current game before executing other games.</p>
+</div>
+<p>(8) If you need to terminate the program, press short-cut <strong>“Ctrl+C”</strong> on the terminal opened in steps (4) and (5).</p>
+<p>After experiencing the Lidar game, you can activate the app service either by using a command or restarting the robot. If the app service is not activated, related app functions will be disabled. In the case of a robot restart, the app service will start automatically.</p>
+<p>Click <img src="../_static/media/4.MotionControlLesson/4.3/media/image21.png" /> and enter the command. Press enter to start the app, and wait for the buzzer to beep. Please enter the command in the system path, not in the Docker container.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>start_node.service
+</pre></div>
+</div>
+</section>
+<section id="id5">
+<h3>4.5.2 Program Outcome<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<p>Let’s use a book as the object to be detected. When using the Lidar following function, it’s important to ensure that the object to be detected is higher than the scanning height of the Lidar mounted on the MentorPi. This will enable the Lidar to effectively scan the position information of the object. Once the position information is obtained, the MentorPi will adjust its orientation to face towards the obstacle. It means that the camera will face directly towards the obstacle.</p>
+<img class="common_img" src="../_static/media/5.lidar_lesson/5.5/media/1.gif" />
+</section>
+<section id="id6">
+<h3>4.5.3 Program Analysis<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Launch File</strong></p></li>
+</ul>
+<p>The launch file is located in: <a class="reference download internal" download="" href="../_downloads/478c78c70edb431c8286c61a60d61683/app.zip"><span class="xref download myst">/home/ubuntu/ros2_ws/src/app/launch/lidar_node.launch.py</span></a></p>
+<img class="common_img" src="../_static/media/5.lidar_lesson/5.5/media/image12.png" />
+<p>(1) Set the storage path</p>
+<p>Retrieve the paths for the two packages: peripherals and controller.</p>
+<div class="highlight-python notranslate"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span></pre></div></td><td class="code"><div><pre><span></span>    <span class="k">if</span> <span class="n">compiled</span> <span class="o">==</span> <span class="s1">&#39;True&#39;</span><span class="p">:</span>
+        <span class="n">controller_package_path</span> <span class="o">=</span> <span class="n">get_package_share_directory</span><span class="p">(</span><span class="s1">&#39;controller&#39;</span><span class="p">)</span>
+        <span class="n">peripherals_package_path</span> <span class="o">=</span> <span class="n">get_package_share_directory</span><span class="p">(</span><span class="s1">&#39;peripherals&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">controller_package_path</span> <span class="o">=</span> <span class="s1">&#39;/home/ubuntu/ros2_ws/src/driver/controller&#39;</span>
+        <span class="n">peripherals_package_path</span> <span class="o">=</span> <span class="s1">&#39;/home/ubuntu/ros2_ws/src/peripherals&#39;</span>
+</pre></div></td></tr></table></div>
+</div>
+<p>(2) Initiate other Launch files</p>
+<div class="highlight-python notranslate"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span></pre></div></td><td class="code"><div><pre><span></span>    <span class="n">lidar_controller_node</span> <span class="o">=</span> <span class="n">GroupAction</span><span class="p">([</span>
+        <span class="n">IncludeLaunchDescription</span><span class="p">(</span>
+            <span class="n">PythonLaunchDescriptionSource</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">peripherals_package_path</span><span class="p">,</span> <span class="s1">&#39;launch/lidar.launch.py&#39;</span><span class="p">)),</span>
+            <span class="n">condition</span><span class="o">=</span><span class="n">IfCondition</span><span class="p">(</span><span class="n">debug</span><span class="p">),</span>
+            <span class="p">),</span>
+
+        <span class="n">IncludeLaunchDescription</span><span class="p">(</span>
+            <span class="n">PythonLaunchDescriptionSource</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">controller_package_path</span><span class="p">,</span> <span class="s1">&#39;launch/controller.launch.py&#39;</span><span class="p">)),</span>
+            <span class="n">condition</span><span class="o">=</span><span class="n">IfCondition</span><span class="p">(</span><span class="n">debug</span><span class="p">),</span>
+            <span class="p">),</span>
+</pre></div></td></tr></table></div>
+</div>
+<p>lidar.launch.py Lidar launch</p>
+<p>controller.launch.py Motion control launch</p>
+<p>(3) Initiate Node</p>
+<div class="highlight-python notranslate"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span></pre></div></td><td class="code"><div><pre><span></span>        <span class="n">Node</span><span class="p">(</span>
+            <span class="n">package</span><span class="o">=</span><span class="s1">&#39;app&#39;</span><span class="p">,</span>
+            <span class="n">executable</span><span class="o">=</span><span class="s1">&#39;lidar_controller&#39;</span><span class="p">,</span>
+            <span class="n">output</span><span class="o">=</span><span class="s1">&#39;screen&#39;</span><span class="p">,</span>
+            <span class="p">),</span>
+    <span class="p">])</span>
+</pre></div></td></tr></table></div>
+</div>
+<p>Enable Lidar game node.</p>
+<ul class="simple">
+<li><p><strong>Source Code File</strong></p></li>
+</ul>
+<p>The source code of the program is saved in:<a class="reference download internal" download="" href="../_downloads/478c78c70edb431c8286c61a60d61683/app.zip"><span class="xref download myst">/home/ubuntu/ros2_ws/src/app/app/lidar_controller.py</span></a></p>
+<p>The process logic of the program based on the implemented effect is shown in the diagram:</p>
+<img class="common_img" src="../_static/media/5.lidar_lesson/5.5/media/image17.png" />
+<p>(1) Initialization</p>
+<div class="highlight-py notranslate"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span></pre></div></td><td class="code"><div><pre><span></span><span class="k">class</span> <span class="nc">LidarController</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">rclpy</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">running_mode</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.6</span>  <span class="c1"># meters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scan_angle</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="mi">360</span><span class="p">)</span>  <span class="c1"># radians</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">speed</span> <span class="o">=</span> <span class="mf">0.2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_act</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">angle_data</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># pid参数</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pid_yaw</span> <span class="o">=</span> <span class="n">pid</span><span class="o">.</span><span class="n">PID</span><span class="p">(</span><span class="mf">1.6</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.16</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pid_dist</span> <span class="o">=</span> <span class="n">pid</span><span class="o">.</span><span class="n">PID</span><span class="p">(</span><span class="mf">1.7</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.16</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">RLock</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lidar_sub</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lidar_type</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;LIDAR_TYPE&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">machine_type</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;MACHINE_TYPE&#39;</span><span class="p">)</span>
+</pre></div></td></tr></table></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">self.name</span></code>: stores the incoming name as the property of the object.</p>
+<p>Other attributes include parameters for controlling the Lidar, such as operating mode, threshold, scanning angle, and speed.</p>
+<p><code class="docutils literal notranslate"><span class="pre">self.lock</span></code>: creates a thread lock for safe access in a multi-threaded environment.</p>
+<p>(2) Create ROS service</p>
+<div class="highlight-python notranslate"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span></pre></div></td><td class="code"><div><pre><span></span>        <span class="bp">self</span><span class="o">.</span><span class="n">create_service</span><span class="p">(</span><span class="n">Trigger</span><span class="p">,</span> <span class="s1">&#39;~/enter&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">enter_srv_callback</span><span class="p">)</span>  <span class="c1"># 进入玩法(enter the game)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_service</span><span class="p">(</span><span class="n">Trigger</span><span class="p">,</span> <span class="s1">&#39;~/exit&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exit_srv_callback</span><span class="p">)</span>  <span class="c1"># 退出玩法(exit the game)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_service</span><span class="p">(</span><span class="n">SetInt64</span><span class="p">,</span> <span class="s1">&#39;~/set_running&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_running_srv_callback</span><span class="p">)</span>  <span class="c1"># 开启玩法(start the game)</span>
+        <span class="n">Heart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;/heartbeat&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">exit_srv_callback</span><span class="p">(</span><span class="n">request</span><span class="o">=</span><span class="n">Trigger</span><span class="o">.</span><span class="n">Request</span><span class="p">(),</span> <span class="n">response</span><span class="o">=</span><span class="n">Trigger</span><span class="o">.</span><span class="n">Response</span><span class="p">()))</span>  <span class="c1"># 心跳包(heartbeat package)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_service</span><span class="p">(</span><span class="n">SetFloat64List</span><span class="p">,</span> <span class="s1">&#39;~/set_param&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_parameters_srv_callback</span><span class="p">)</span>  <span class="c1"># 参数设置(set parameter)</span>
+</pre></div></td></tr></table></div>
+</div>
+<p>Enter game: A ROS service named <code class="docutils literal notranslate"><span class="pre">/enter</span></code> is created with the type Trigger, and the callback function is enter_srv_callback. When this service is called, it will execute the enter_srv_callback function.</p>
+<p>Exit game: A ROS service named <code class="docutils literal notranslate"><span class="pre">/exit</span></code> is created with the type Trigger, and the callback function is exit_srv_callback. When this service is called, it will execute the exit_srv_callback function.</p>
+<p>Enable game: A ROS service named <code class="docutils literal notranslate"><span class="pre">/set_running</span></code> is created with the type SetInt64, and the callback function is set_running_srv_callback. When this service is called, it will execute the set_running_srv_callback function.</p>
+<p>Set parameters: A ROS service named <code class="docutils literal notranslate"><span class="pre">/set_param</span></code> is created with the type SetFloat64List, and the callback function is set_parameters_srv_callback. When this service is called, it will execute the set_parameters_srv_callback function.</p>
+<p>(3) Lidar guarding</p>
+<div class="highlight-python notranslate"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span></pre></div></td><td class="code"><div><pre><span></span>                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">running_mode</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="c1"># 拼合距离数据, 从右半侧逆时针到左半侧(the merged distance data from right half counterclockwise to the left half)</span>
+                    <span class="n">ranges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">right_range</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">left_range</span><span class="p">)</span>
+                    <span class="n">nonzero</span> <span class="o">=</span> <span class="n">ranges</span><span class="o">.</span><span class="n">nonzero</span><span class="p">()</span>
+                    <span class="n">nonan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">ranges</span><span class="p">[</span><span class="n">nonzero</span><span class="p">])</span>
+                    <span class="n">dist_</span> <span class="o">=</span> <span class="n">ranges</span><span class="p">[</span><span class="n">nonzero</span><span class="p">][</span><span class="n">nonan</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dist_</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="n">dist</span> <span class="o">=</span> <span class="n">dist_</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+                        <span class="n">min_index</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ranges</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span>
+                        
+                        <span class="n">angle</span> <span class="o">=</span> <span class="o">-</span><span class="n">angle</span> <span class="o">+</span> <span class="n">lidar_data</span><span class="o">.</span><span class="n">angle_increment</span> <span class="o">*</span> <span class="n">min_index</span>  <span class="c1"># 计算最小值对应的角度(calculate the angle corresponding to the minimum value)</span>
+                        <span class="k">if</span> <span class="n">dist</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span> <span class="ow">and</span> <span class="nb">abs</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">angle</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span>  <span class="c1"># 控制左右(control the left and right)</span>
+                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lidar_type</span> <span class="o">!=</span> <span class="s1">&#39;G4&#39;</span><span class="p">:</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">pid_yaw</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">-</span><span class="n">angle</span><span class="p">)</span>
+                                <span class="n">twist</span><span class="o">.</span><span class="n">angular</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">set_range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pid_yaw</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">speed</span> <span class="o">*</span> <span class="mf">6.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">speed</span> <span class="o">*</span> <span class="mf">6.0</span><span class="p">)</span>
+                            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">lidar_type</span> <span class="o">==</span> <span class="s1">&#39;G4&#39;</span><span class="p">:</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">pid_yaw</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
+                                <span class="n">twist</span><span class="o">.</span><span class="n">angular</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="o">-</span><span class="n">common</span><span class="o">.</span><span class="n">set_range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pid_yaw</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">speed</span> <span class="o">*</span> <span class="mf">6.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">speed</span> <span class="o">*</span> <span class="mf">6.0</span><span class="p">)</span> 
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">pid_yaw</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+                        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">twist</span><span class="o">.</span><span class="n">angular</span><span class="o">.</span><span class="n">z</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.008</span><span class="p">:</span>
+                            <span class="n">twist</span><span class="o">.</span><span class="n">angular</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="mf">0.0</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">mecanum_pub</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">twist</span><span class="p">)</span>
+</pre></div></td></tr></table></div>
+</div>
+<p>The code concatenates the distance data from the left and right sides of the robot, obtained from the Lidar, into an array ranges to form a circular scan. It then calculates the minimum distance value dist and its corresponding angle angle from the ranges array.</p>
+<p>If dist is less than a threshold value and the angle deviates from the forward direction by more than 5 degrees, the Yaw axis PID controller will be activated. Based on the output of the PID controller, the code calculates the turning angular velocity twist.angular.z. The control commands are published as a Twist message to the robot to execute the desired actions.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="4.motion_control_lesson.html" class="btn btn-neutral float-left" title="3. Motion Control Lesson" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="6.depth_camera_basic_lesson.html" class="btn btn-neutral float-right" title="5. Depth Camera Basic Lesson" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Hiwonder.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,1251 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="readthedocs-addons-api-version" content="1"><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>6. Mapping Lesson &mdash; MentorPi v2.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=7ab3649f" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/style.css?v=f476ad27" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=731f67d5"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script src="../_static/custom.js?v=fd93d8dd"></script>
+    <script src="../_static/js/theme.js"></script>
+    <script src="../_static/js/versions.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="7. Navigation Lesson" href="8.navigation_lesson.html" />
+    <link rel="prev" title="5. Depth Camera Basic Lesson" href="6.depth_camera_basic_lesson.html" /> 
+<script async type="text/javascript" src="/_/static/javascript/readthedocs-addons.js"></script><meta name="readthedocs-project-slug" content="mentorpi" /><meta name="readthedocs-version-slug" content="latest" /><meta name="readthedocs-resolver-filename" content="/docs/7.mapping_lesson.html" /><meta name="readthedocs-http-status" content="200" /></head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #f98800" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            MentorPi
+          </a>
+              <div class="switch-menus">
+                <div class="version-switch"></div>
+                <div class="language-switch"></div>
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">MentorPi</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="1.getting_ready.html">1. Getting Ready</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.set_development_environment.html">2. Set Development Environment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.motion_control_lesson.html">3. Motion Control Lesson</a></li>
+<li class="toctree-l1"><a class="reference internal" href="5.lidar_lesson.html">4. Lidar Lesson</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.depth_camera_basic_lesson.html">5. Depth Camera Basic Lesson</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">6. Mapping Lesson</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#install-winscp">6.1 Install WinSCP</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#install-winscp-tool">6.1.1 Install WinSCP Tool</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#urdf-model">6.2 URDF Model</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#urdf-model-introduction">6.2.1 URDF Model Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#comparison-between-xacro-and-urdf-models">6.2.2 Comparison between Xacro and URDF Models</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#basic-syntax-of-urdf-model">6.2.3 Basic Syntax of URDF Model</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#ros-robot-urdf-model-instruction">6.3 ROS Robot URDF Model Instruction</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#getting-ready">6.3.1 Getting Ready</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#check-code-of-robot-model">6.3.2 Check Code of Robot Model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#brief-analysis-of-robot-s-main-body-model">6.3.3 Brief Analysis of Robot’s Main Body Model</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#slam-mapping-principle">6.4 SLAM Mapping Principle</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#slam-introduction">6.4.1 SLAM Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id1">6.4.2 SLAM Mapping Principle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#notes">6.4.3 Notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#judge-mapping-result">6.4.4 Judge Mapping Result</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#slam-toolbox-mapping-algorithm">6.5 slam_toolbox Mapping Algorithm</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#algorithm-definition">6.5.1 Algorithm Definition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mapping-operation-steps">6.5.2 Mapping Operation Steps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#slam-mapping-instructions">6.5.3 slam Mapping Instructions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#save-map">6.5.4 Save Map</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#effect-optimization">6.5.5 Effect Optimization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#parameter-explanation">6.5.6 Parameter Explanation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#launch-file-analysis">6.5.7 Launch File Analysis</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#rtab-vslam-3d-mapping">6.6 RTAB-VSLAM 3D Mapping</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#rtab-vslam-description">6.6.1 RTAB-VSLAM Description</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rtab-vslam-working-principle">6.6.2 RTAB-VSLAM Working Principle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rtab-vslam-3d-mapping-instructions">6.6.3 RTAB-VSLAM 3D Mapping Instructions</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="8.navigation_lesson.html">7. Navigation Lesson</a></li>
+<li class="toctree-l1"><a class="reference internal" href="9.ros%2Bopencv_lesson.html">8. ROS+OpenCV Lesson</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10.mediapipe_human_robot_interaction.html">9. MediaPipe Human-robot Interaction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11.machine_learning.html">10. Machine Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="12.autonomous_driving_lesson.html">11. Autonomous Driving Lesson</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13.MasterSlaveAndGroupControl.html">12. Master Slave And Group Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14.Robot%20Network%20Configuration.html">13. Robot Network Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15.Large_AI_Model_Course.html">14. Large AI Model Course</a></li>
+<li class="toctree-l1"><a class="reference internal" href="resources_download.html">Appendix</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://drive.google.com/drive/folders/1P00n6IemouAnga8EjpO7suF3Mou8zv4K?usp=sharing">Download</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #f98800" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MentorPi</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">6. Mapping Lesson</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/docs/7.mapping_lesson.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="mapping-lesson">
+<h1>6. Mapping Lesson<a class="headerlink" href="#mapping-lesson" title="Link to this heading"></a></h1>
+<section id="install-winscp">
+<h2>6.1 Install WinSCP<a class="headerlink" href="#install-winscp" title="Link to this heading"></a></h2>
+<section id="install-winscp-tool">
+<h3>6.1.1 Install WinSCP Tool<a class="headerlink" href="#install-winscp-tool" title="Link to this heading"></a></h3>
+<p>WinSCP is an open-source graphical SFTP client for Windows that supports the SSH and SCP protocols. It can securely copy files between local and remote computers. The tool can also directly edit files.</p>
+<p>The installation steps for WinSCP are as follows:</p>
+<p>(1) Double-click the <a class="reference internal" href="resources_download.html"><span class="std std-doc">WinSCP-5.15.3-Setup.exe</span></a> installation pack in the directory of this section. Click <strong>“Accept”</strong> to start installing.</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.1/media/image2.png"  />
+<p>(2) Click <strong>“Next”</strong>.</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.1/media/image3.png"  />
+<p>(3) Click <strong>“Next”</strong>.</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.1/media/image4.png"  />
+<p>(4) Keep the default installation location and click “<strong>Install</strong>”.</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.1/media/image5.png"  />
+<p>(5) After waiting for a moment, a prompt window will appear indicating that the installation is complete. Click “<strong>Finish</strong>”.</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.1/media/image6.png"  />
+<p>(6) After the installation is completed, click <img src="../_static/media/7.Mapping_Lesson/7.1/media/image7.png" style="width:0.57292in;height:0.71875in" /> to open it.</p>
+<p id="anchor_6_2"></p>
+</section>
+</section>
+<section id="urdf-model">
+<h2>6.2 URDF Model<a class="headerlink" href="#urdf-model" title="Link to this heading"></a></h2>
+<section id="urdf-model-introduction">
+<h3>6.2.1 URDF Model Introduction<a class="headerlink" href="#urdf-model-introduction" title="Link to this heading"></a></h3>
+<p>The Unified Robot Description Format (URDF) is an XML file format widely used in ROS (Robot Operating System) to comprehensively describe all components of a robot.</p>
+<p>Robots are typically composed of multiple links and joints. A link is defined as a rigid object with certain physical properties, while a joint connects two links and constrains their relative motion.</p>
+<p>By connecting links with joints and imposing motion restrictions, a kinematic model is formed. The URDF file specifies the relationships between joints and links, their inertial properties, geometric characteristics, and collision models.</p>
+</section>
+<section id="comparison-between-xacro-and-urdf-models">
+<h3>6.2.2 Comparison between Xacro and URDF Models<a class="headerlink" href="#comparison-between-xacro-and-urdf-models" title="Link to this heading"></a></h3>
+<p>The URDF model serves as a description file for simple robot models, offering a clear and easily understandable structure. However, when it comes to describing complex robot structures, using URDF alone can result in lengthy and unclear descriptions.</p>
+<p>To address this limitation, the xacro model extends the capabilities of URDF while maintaining its core features. The xacro format provides a more advanced approach to describe robot structures. It greatly improves code reusability and helps avoid excessive description length.</p>
+<p>For instance, when describing the two legs of a humanoid robot, the URDF model would require separate descriptions for each leg. On the other hand, the xacro model allows for describing a single leg and reusing that description for the other leg, resulting in a more concise and efficient representation.</p>
+</section>
+<section id="basic-syntax-of-urdf-model">
+<h3>6.2.3 Basic Syntax of URDF Model<a class="headerlink" href="#basic-syntax-of-urdf-model" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>XML Basic Syntax</strong></p></li>
+</ul>
+<p>The URDF model is written using XML standard.</p>
+<p>(1) Elements:</p>
+<p>An element can be defined as desired using the following formula:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;element&gt;</span>
+
+<span class="nt">&lt;/element&gt;</span>
+</pre></div>
+</div>
+<p>(2) Poperties:</p>
+<p>Properties are included within elements to define characteristics and parameters. Please refer to the following formula to define an element with properties:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;element</span><span class="w"> </span><span class="na">property_1=</span><span class="s">&quot;property value1&quot;</span><span class="w"> </span><span class="na">property_2=</span><span class="s">&quot;property value2&quot;</span><span class="nt">&gt;</span>
+
+<span class="nt">&lt;/element&gt;</span>
+</pre></div>
+</div>
+<p>(3) Comments:</p>
+<p>Comments have no impact on the definition of other properties and elements. Please use the following formula to define a comment:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="cm">&lt;!-- comment content --&gt;</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><strong>Link</strong></p></li>
+</ul>
+<p>The Link element describes the visual and physical properties of the robot’s rigid component. The following tags are commonly used to define the motion of a link:</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.2/media/image2.png" />
+<p><code class="docutils literal notranslate"><span class="pre">&lt;visual&gt;</span></code>: Describe the appearance of the link, such as size, color and shape.</p>
+<p><code class="docutils literal notranslate"><span class="pre">&lt;inertial&gt;</span></code>: Describe the inertia parameters of the link, which will used in dynamics calculation.</p>
+<p><code class="docutils literal notranslate"><span class="pre">&lt;collision&gt;</span></code>: Describe the collision inertia property of the link.</p>
+<p>Each tag contains the corresponding child tag. The functions of the tags are listed below.</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;"><strong>Tag</strong></th>
+<th style="text-align: center;"><strong>Function</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">origin</td>
+<td style="text-align: center;">Describe the pose of the link. It contains two parameters, including xyz and rpy. Xyz describes the pose of the link in the simulated map. Rpy describes the pose of the link in the simulated map.</td>
+</tr>
+<tr>
+<td style="text-align: center;">mess</td>
+<td style="text-align: center;">Describe the mess of the link</td>
+</tr>
+<tr>
+<td style="text-align: center;">inertia</td>
+<td style="text-align: center;">Describe the inertia of the link. As the inertia matrix is symmetrical, these six parameters need to be input, ixx, ixy, ixz, iyy, iyz and izz, as properties. These parameters can be calculated.</td>
+</tr>
+<tr>
+<td style="text-align: center;">geometry</td>
+<td style="text-align: center;">Describe the shape of the link. It uses mesh parameter to load texture file, and em[ploys filename parameters to load the path for texture file. It has three child tags, namely box, cylinder and sphere.</td>
+</tr>
+<tr>
+<td style="text-align: center;">material</td>
+<td style="text-align: center;">Describe the material of the link. The parameter name is the required filed. The tag color can be used to change the color and transparency of the link.</td>
+</tr>
+</tbody>
+</table>
+<p id="anchor_3_Joint"></p>
+<ul class="simple">
+<li><p><strong>Joint</strong></p></li>
+</ul>
+<p>The “<strong>Joint</strong>” tag describes the kinematic and dynamic properties of the robot’s joints, including the joint’s range of motion, target positions, and speed limitations. In terms of motion style, joints can be categorized into six types.</p>
+<table  class="docutils-nobg" border="1" style="text-align:center;">
+  <thead>
+    <tr>
+      <th>Type and Explanation</th>
+      <th>Tag</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>continuous joint: rotate around single axis continuously</td>
+      <td>continuous</td>
+    </tr>
+    <tr>
+      <td>revolute joint: similar to continuous, but its rotation angle is limited</td>
+      <td>revolute</td>
+    </tr>
+    <tr>
+      <td>prismatic joint: move along a axis within limited range</td>
+      <td>prismatic</td>
+    </tr>
+    <tr>
+      <td>Planar joints: translate or rotate in plane orthogonal directions</td>
+      <td>planar</td>
+    </tr>
+    <tr>
+      <td>floating joint: translate and rotate</td>
+      <td>floating</td>
+    </tr>
+    <tr>
+      <td>fixed joint: not allowed to do any movements</td>
+      <td>fixed</td>
+    </tr>
+  </tbody>
+</table>
+<p>The following tags will be used to write joint motion.</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.2/media/image4.png"  />
+<p><code class="docutils literal notranslate"><span class="pre">&lt;parent_link&gt;</span></code>: Parent link</p>
+<p><code class="docutils literal notranslate"><span class="pre">&lt;child_link&gt;</span></code>: Child link</p>
+<p><code class="docutils literal notranslate"><span class="pre">&lt;calibration&gt;</span></code>: Calibrate the joint angle</p>
+<p><code class="docutils literal notranslate"><span class="pre">&lt;dynamics&gt;</span></code>: Describes some physical properties of motion</p>
+<p><code class="docutils literal notranslate"><span class="pre">&lt;limit&gt;</span></code>: Describes some limitations of the motion</p>
+<p>The function of each tag is listed below. Each tag involves one or several child tags.</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;"><strong>Tag</strong></th>
+<th style="text-align: center;"><strong>Function</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">origin</td>
+<td style="text-align: center;">Describe the pose of the parent link. It involves two parameters, including xyz and rpy. Both xyz and rpy describe the pose of the link in simulated map.</td>
+</tr>
+<tr>
+<td style="text-align: center;">axis</td>
+<td style="text-align: center;">Control the child link to rotate around any axis of the parent link.</td>
+</tr>
+<tr>
+<td style="text-align: center;">limit</td>
+<td style="text-align: center;">The motion of the child link is constrained using the lower and upper properties, which define the limits of rotation for the child link. The effort properties restrict the allowable force range applied during rotation (values: positive and negative; units: N). The velocity properties confine the rotational speed, measured in meters per second (m/s).</td>
+</tr>
+<tr>
+<td style="text-align: center;">mimic</td>
+<td style="text-align: center;">Describe the relationship between joints.</td>
+</tr>
+<tr>
+<td style="text-align: center;">safety_controller</td>
+<td style="text-align: center;">Describes the parameters of the safety controller used for protecting the joint motion of the robot.</td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><p><strong>Robot Tag</strong></p></li>
+</ul>
+<p>The complete top tags of a robot, including the &lt;link&gt; and &lt;joint&gt; tags, must be enclosed within the &lt;robot&gt; tag. The format is as follows:</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.2/media/image5.png"  />
+<ul class="simple">
+<li><p><strong>gazebo Tag</strong></p></li>
+</ul>
+<p>This tag is used in conjunction with the Gazebo simulator. Within this tag, you can define simulation parameters and import Gazebo plugins, as well as specify Gazebo’s physical properties, and more.</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.2/media/image6.png" />
+<ul class="simple">
+<li><p><strong>Write Simple URDF Model</strong></p></li>
+</ul>
+<p>(1) Name the model of the robot</p>
+<p>To start writing the URDF model, we need to set the name of the robot following this format: “<strong>&lt;robot name=”robot model name”&gt;</strong>”. Lastly, input “<strong>&lt;/robot&gt;</strong>” at the end to represent that the model is written successfully.</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.2/media/image7.png"  />
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.2/media/image8.png" />
+<p>(2) Set links</p>
+<p>① To write the first link and use indentation to indicate that it is part of the currently set model. Set the name of the link using the following format: <strong>&lt;link name=”link name”&gt;</strong>. Finally, conclude with “<strong>&lt;/link&gt;</strong>” to indicate the successful completion of the link definition.</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.2/media/image9.png"  />
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.2/media/image10.png" />
+<p>② Write the link description and use indentation to indicate that it is part of the currently set link, and conclude with “<strong>&lt;/visual&gt;</strong>”.</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.2/media/image11.png" />
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.2/media/image12.png" />
+<p>③ The “<strong>&lt;geometry&gt;</strong>” tag is employed to define the shape of a link. Once the description is complete, include “<strong>&lt;/geometry&gt;</strong>”. Within the “<strong>&lt;geometry&gt;</strong>” tag, indentation is used to specify the detailed description of the link’s shape. The following example demonstrates a link with a cylindrical shape: “<strong>&lt;cylinder length=”0.01” radius=”0.2”/&gt;</strong>”. In this instance, “<strong>length=”0.01”</strong>” signifies a length of 0.01 meters for the link, while “<strong>radius=”0.2”</strong>” denotes a radius of 0.2 meters, resulting in a cylindrical shape.</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.2/media/image13.png" />
+<p>④ The “<strong>&lt;origin&gt;</strong>” tag is utilized to specify the position of a link, with indentation used to indicate the detailed description of the link’s position. The following example demonstrates the position of a link: “<strong>&lt;origin rpy=”0 0 0” xyz=”0 0 0” /&gt;</strong>”. In this example, “<strong>rpy</strong>” represents the roll, pitch, and yaw angles of the link, while “<strong>xyz</strong>” represents the coordinates of the link’s position. This particular example indicates that the link is positioned at the origin of the coordinate system.</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.2/media/image14.png"/>
+<p>⑤ The “<strong>&lt;material&gt;</strong>” tag is used to define the visual appearance of a link, with indentation used to specify the detailed description of the link’s color. To start describing the color, include “<strong>&lt;material&gt;</strong>”, and end with “<strong>&lt;/material&gt;</strong>” when the description is complete. The following example demonstrates setting a link color to yellow: “<strong>&lt;color rgba=”1 1 0 1” /&gt;</strong>”. In this example, “<strong>rgba=”1 1 0 1”</strong>” represents the color threshold for achieving a yellow color.</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.2/media/image15.png" />
+<p>(3) Set joint</p>
+<p>① To write the first joint, use indentation to indicate that the joint belongs to the current model being set. Then, specify the name and type of the joint as follows: “<strong>&lt;joint name=”joint name” type=”joint type”&gt;</strong>”. Finally, include “<strong>&lt;/joint&gt;</strong>” to indicate the completion of the joint definition.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To learn about the type of the joint, please refer to “<a class="reference internal" href="#anchor_3_Joint"><span class="xref myst"><strong>6.2.3 Basic Syntax of URDF Model -&gt; Joint</strong></span></a>”.</p>
+</div>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.2/media/image16.png" />
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.2/media/image17.png" />
+<p>② Write the description section for the connection between the link and the joint. Use indentation to indicate that it is part of the currently defined joint. The parent parameter and child parameter should be set using the following format: “<strong>&lt;parent link=”parent link”/&gt;</strong>”, and “<strong>&lt;child link=”child link” /&gt;</strong>”. With the parent link serving as the pivot, the joint rotates the child link.</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.2/media/image18.png"  />
+<p>③ “<strong>&lt;origin&gt;</strong>” describes the position of the joint using indention. This example describes the position of the joint: “<strong>&lt;origin xyz=”0 0 0.1” /&gt;</strong>”. xyz is the coordinate of the joint.</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.2/media/image19.png"  />
+<p>④ “<strong>&lt;axis&gt;</strong>” describes the position of the joint adopting indention. “<strong>&lt;axis xyz=”0 0 1” /&gt;</strong>” describes one posture of a joint. xyz specifies the pose of the joint.</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.2/media/image20.png"  />
+<p>⑤ “<strong>&lt;limit&gt;</strong>” imposes restrictions on the joint using indention. The below picture The “<strong>&lt;limit&gt;</strong>” tag is used to restrict the motion of a joint, with indentation indicating the specific description of the joint angle limitations. The following example describes a joint with a maximum force limit of 300 Newtons, an upper limit of 3.14 radians, and a lower limit of -3.14 radians. The settings are defined as follows: “<strong>effort=’joint force (N)’, velocity=’joint motion speed’, lower=’lower limit in radians’, upper=’upper limit in radians’</strong>”.</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.2/media/image21.png"  />
+<p>⑥ “<strong>&lt;dynamics&gt;</strong>” describes the dynamics of the joint using indention. “<strong>&lt;dynamics damping=”50” friction=”1” /&gt;</strong>” describes dynamics parameters of a joint.</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.2/media/image22.png"  />
+<p>The complete codes are as below.</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.2/media/image23.png"  />
+</section>
+</section>
+<section id="ros-robot-urdf-model-instruction">
+<h2>6.3 ROS Robot URDF Model Instruction<a class="headerlink" href="#ros-robot-urdf-model-instruction" title="Link to this heading"></a></h2>
+<section id="getting-ready">
+<h3>6.3.1 Getting Ready<a class="headerlink" href="#getting-ready" title="Link to this heading"></a></h3>
+<p>To grasp the URDF model, check out <a class="reference internal" href="#anchor_6_2"><span class="xref myst">6.2 URDF Model</span></a> for the key syntax. This part quickly breaks down the robot model code and its components.</p>
+</section>
+<section id="check-code-of-robot-model">
+<h3>6.3.2 Check Code of Robot Model<a class="headerlink" href="#check-code-of-robot-model" title="Link to this heading"></a></h3>
+<p>(1) Start the robot, and access the robot system desktop using VNC.</p>
+<p>(2) Click-on <img src="../_static/media/7.Mapping_Lesson/7.3/media/image2.png" style="width:0.50139in;height:0.45556in" /> to create a command-line terminal.</p>
+<p>(3) Run the command and hit Enter to disable the app auto-start service.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>~/.stop_ros.sh
+</pre></div>
+</div>
+<p>(4) Execute the command and hit Enter key to navigate to the folder containing startup programs.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>colcon_cd<span class="w"> </span>mentorpi_description
+</pre></div>
+</div>
+<p>(5) Execute the command to navigate to the robot simulation model folder.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>urdf
+</pre></div>
+</div>
+<p>(6) Execute the command to access the robot simulation model folder.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>vim<span class="w"> </span>mentorpi.xacro
+</pre></div>
+</div>
+<p>(7) Locate the code below:</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.3/media/image7.png"  />
+<p>Determine the current form of the robot by reading the machine variable to load the corresponding URDF model .</p>
+<p>Multiple URDF models are called to compose a complete robot.</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;"><strong>File Name</strong></th>
+<th style="text-align: center;"><strong>Device</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">inertial_matrix</td>
+<td style="text-align: center;">Inertia matrix</td>
+</tr>
+<tr>
+<td style="text-align: center;">mecanum</td>
+<td style="text-align: center;">Mecanum urdf model</td>
+</tr>
+<tr>
+<td style="text-align: center;">ack</td>
+<td style="text-align: center;">Ackerman urdf model</td>
+</tr>
+</tbody>
+</table>
+<p>After experiencing the Lidar game, you can activate the app service either by using a command or restarting the robot. If the app service is not activated, related app functions will be disabled. In the case of a robot restart, the app service will start automatically.</p>
+<p>Click <img src="../_static/media/7.Mapping_Lesson/7.3/media/image8.png" style="width:0.4375in;height:0.35417in" /> and enter the command. Press enter to start the app, and wait for the buzzer to beep.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>please enter the command in the system path, not in the Docker container.</p>
+</div>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>start_node.service
+</pre></div>
+</div>
+</section>
+<section id="brief-analysis-of-robot-s-main-body-model">
+<h3>6.3.3 Brief Analysis of Robot’s Main Body Model<a class="headerlink" href="#brief-analysis-of-robot-s-main-body-model" title="Link to this heading"></a></h3>
+<p>MentorPi has two types of chassis: <strong>Mecanum wheel chassis</strong> and <strong>Ackerman chassis</strong>. Here, we’ll focus on the Mecanum wheel chassis. Although the main model files for the Ackerman chassis are mostly the same, any differences will be explained later in this article.</p>
+<p>Open a new command terminal. Enter the command to access the robot model file, which contains the description of each part of the robot model.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>vim<span class="w"> </span>mecanum.xacro
+</pre></div>
+</div>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; ?&gt;</span>
+
+<span class="nt">&lt;robot</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;mecanum&quot;</span><span class="w"> </span><span class="na">xmlns:xacro=</span><span class="s">&quot;http://ros.org/wiki/xacro&quot;</span><span class="nt">&gt;</span>
+</pre></div>
+</div>
+<p>This is the beginning of the URDF file. It specifies the XML version and encoding, and defines a robot model named “<strong>mecanum</strong>”. The <strong>“xmlns:xacro”</strong> namespace is utilized here to generate URDF using Xacro macro definitions.</p>
+<p>The following line of code defines a Xacro property named “<strong>black</strong>”, which means the black material.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;material</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;black&quot;</span><span class="nt">&gt;</span>
+
+<span class="w">	</span><span class="nt">&lt;color</span><span class="w"> </span><span class="na">rgba=</span><span class="s">&quot;0 0 0 1&quot;</span><span class="nt">/&gt;</span>
+
+<span class="nt">&lt;/material&gt;</span>
+</pre></div>
+</div>
+<p>A joint called “<strong>imu_link</strong>” is defined with a type of “<strong>fixed</strong>”, indicating it’s a stationary joint. It connects the parent link “<strong>base_link</strong>” with the child link “<strong>imu_link</strong>”.</p>
+<p>Then, the values of the joint’s origin and axis are defined.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;link</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;imu_link&quot;</span><span class="nt">/&gt;</span>
+
+<span class="w">  </span><span class="nt">&lt;joint</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;imu_joint&quot;</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;fixed&quot;</span><span class="nt">&gt;</span>
+
+<span class="w">	</span><span class="nt">&lt;parent</span><span class="w"> </span><span class="na">link=</span><span class="s">&quot;base_link&quot;</span><span class="nt">/&gt;</span>
+
+<span class="w">	</span><span class="nt">&lt;child</span><span class="w"> </span><span class="na">link=</span><span class="s">&quot;imu_link&quot;</span><span class="nt">/&gt;</span>
+
+<span class="w">	</span><span class="nt">&lt;origin</span><span class="w"> </span><span class="na">xyz=</span><span class="s">&quot;0 0 0&quot;</span><span class="w"> </span><span class="na">rpy=</span><span class="s">&quot;0 0 -1.57&quot;</span><span class="nt">/&gt;</span>
+
+<span class="nt">&lt;/joint&gt;</span>
+</pre></div>
+</div>
+<p>The link named “<strong>base_footprint</strong>” is defined as the robot’s chassis.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;link</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;base_footprint&quot;</span><span class="nt">/&gt;</span>
+
+<span class="nt">&lt;joint</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;base_footprint_to_base_link&quot;</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;fixed&quot;</span><span class="nt">&gt;</span>
+
+<span class="nt">&lt;parent</span><span class="w"> </span><span class="na">link=</span><span class="s">&quot;base_footprint&quot;</span><span class="nt">/&gt;</span>
+
+<span class="nt">&lt;child</span><span class="w"> </span><span class="na">link=</span><span class="s">&quot;base_link&quot;</span><span class="nt">/&gt;</span>
+
+<span class="nt">&lt;origin</span><span class="w"> </span><span class="na">xyz=</span><span class="s">&quot;0 0 0.07&quot;</span><span class="w"> </span><span class="na">rpy=</span><span class="s">&quot;0 0 0&quot;</span><span class="nt">/&gt;</span>
+
+<span class="nt">&lt;/joint&gt;</span>
+</pre></div>
+</div>
+<p>The following code defines a link named “<strong>base_link</strong>”, including its inertial, visual, and collision properties.</p>
+<p>The &lt;inertial&gt; section specifies the link’s inertial properties, like mass and inertia. It includes the &lt;origin&gt; tag, indicating the position and orientation of the inertial coordinate system relative to the link’s coordinate system. The &lt;mass&gt; tag denotes the link’s mass, and the &lt;inertia&gt; tag defines its moment of inertia about its principal axis.</p>
+<p>The &lt;visual&gt; section determines the visual representation of the link. It includes the &lt;origin&gt; tag for the visualization coordinate system’s position and orientation relative to the link. The &lt;geometry&gt; tag defines the visual shape, here a grid, while the &lt;mesh&gt; tag specifies the file name of the mesh representing the link’s visual appearance. Lastly, the &lt;material&gt; tag specifies the color or texture. The “<strong>base_link.STL</strong>” defines the material.</p>
+<p>The &lt;collision&gt; section specifies the link’s collision properties. It resembles the &lt;visual&gt; section but is for collision detection, not visualization. It includes the &lt;origin&gt; and &lt;geometry&gt; tags for defining position, direction, and shape of the collision representation.</p>
+<p>In summary, this code defines a link in the robot model, detailing its inertial, visual, and collision properties. In simulations or visualizations, the mesh files specified in the &lt;visual&gt; and &lt;collision&gt; sections are utilized for visual representation and collision detection with other links.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;link</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;base_link&quot;</span><span class="nt">&gt;</span>
+
+<span class="nt">&lt;inertial&gt;</span>
+
+<span class="nt">&lt;origin</span><span class="w"> </span><span class="na">rpy=</span><span class="s">&quot;0 0 0&quot;</span><span class="w"> </span><span class="na">xyz=</span><span class="s">&quot;7.82634169708696E-05 3.66518389137982E-05 0.0068167426737893&quot;</span><span class="nt">/&gt;</span>
+
+<span class="nt">&lt;mass</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;0.080358044299185&quot;</span><span class="nt">/&gt;</span>
+
+<span class="nt">&lt;inertia</span><span class="w"> </span><span class="na">ixx=</span><span class="s">&quot;9.92047502462735E-05&quot;</span><span class="w"> </span><span class="na">ixy=</span><span class="s">&quot;3.20099144678921E-08&quot;</span><span class="w"> </span><span class="na">ixz=</span><span class="s">&quot;1.15869166655817E-05&quot;</span><span class="w"> </span><span class="na">iyy=</span><span class="s">&quot;0.000292461515602123&quot;</span><span class="w"> </span><span class="na">iyz=</span><span class="s">&quot;-2.92890751882614E-08&quot;</span><span class="w"> </span><span class="na">izz=</span><span class="s">&quot;0.000367604260834833&quot;</span><span class="nt">/&gt;</span>
+
+<span class="nt">&lt;/inertial&gt;</span>
+
+<span class="nt">&lt;visual&gt;</span>
+
+<span class="nt">&lt;origin</span><span class="w"> </span><span class="na">rpy=</span><span class="s">&quot;0 0 0&quot;</span><span class="w"> </span><span class="na">xyz=</span><span class="s">&quot;0 0 0&quot;</span><span class="nt">/&gt;</span>
+
+<span class="nt">&lt;geometry&gt;</span>
+
+<span class="nt">&lt;mesh</span><span class="w"> </span><span class="na">filename=</span><span class="s">&quot;package://rosmentor_description/meshes/mecanum/base_link.STL&quot;</span><span class="nt">/&gt;</span>
+
+<span class="nt">&lt;/geometry&gt;</span>
+
+<span class="nt">&lt;material</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;&quot;</span><span class="nt">&gt;</span>
+
+<span class="nt">&lt;color</span><span class="w"> </span><span class="na">rgba=</span><span class="s">&quot;1 1 1 1&quot;</span><span class="nt">/&gt;</span>
+
+<span class="nt">&lt;/material&gt;</span>
+
+<span class="nt">&lt;/visual&gt;</span>
+
+<span class="nt">&lt;collision&gt;</span>
+
+<span class="nt">&lt;origin</span><span class="w"> </span><span class="na">rpy=</span><span class="s">&quot;0 0 0&quot;</span><span class="w"> </span><span class="na">xyz=</span><span class="s">&quot;0 0 0&quot;</span><span class="nt">/&gt;</span>
+
+<span class="nt">&lt;geometry&gt;</span>
+
+<span class="nt">&lt;mesh</span><span class="w"> </span><span class="na">filename=</span><span class="s">&quot;package://rosmentor_description/meshes/mecanum/base_link.STL&quot;</span><span class="nt">/&gt;</span>
+
+<span class="nt">&lt;/geometry&gt;</span>
+
+<span class="nt">&lt;/collision&gt;</span>
+
+<span class="nt">&lt;/link&gt;</span>
+</pre></div>
+</div>
+<p>The following code describes a link named “<strong>wheel_lf_Link</strong>”, which represents the left front wheel of the robot.</p>
+<p>The &lt;inertial&gt; tag describes the inertial properties of the link, including its mass and moments of inertia. The mass of the link is set to 0.0378743634664218, and the values of its moments of inertia are specified. The &lt;visual&gt; tag defines the visual appearance of the link, including its geometry and color. The visual appearance of the link uses an STL mesh model located at “<strong>package://rosmentor_description/meshes/mecanum/wheel_lf_Link.STL</strong>”. The color is set to white with an RGBA value of 1 1 1 1, indicating a completely opaque white color.</p>
+<p>The &lt;collision&gt; tag defines the collision properties of the link for collision detection. The collision model also uses an STL mesh model located at “<strong>package://rosmentor_description/meshes/mecanum/wheel_lf_Link.STL</strong>”</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;link</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;wheel_lf_Link&quot;</span><span class="nt">&gt;</span>
+
+<span class="nt">&lt;inertial&gt;</span>
+
+<span class="nt">&lt;origin</span><span class="w"> </span><span class="na">rpy=</span><span class="s">&quot;0 0 0&quot;</span><span class="w"> </span><span class="na">xyz=</span><span class="s">&quot;6.23194347770945E-05 -0.00574614971695361 2.98597149463314E-05&quot;</span><span class="nt">/&gt;</span>
+
+<span class="nt">&lt;mass</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;0.0378743634664218&quot;</span><span class="nt">/&gt;</span>
+
+<span class="nt">&lt;inertia</span><span class="w"> </span><span class="na">ixx=</span><span class="s">&quot;3.67678518315829E-06&quot;</span><span class="w"> </span><span class="na">ixy=</span><span class="s">&quot;-1.42189561270372E-09&quot;</span><span class="w"> </span><span class="na">ixz=</span><span class="s">&quot;-1.20320324868622E-08&quot;</span><span class="w"> </span><span class="na">iyy=</span><span class="s">&quot;5.81008995754212E-06&quot;</span><span class="w"> </span><span class="na">iyz=</span><span class="s">&quot;1.72329758812212E-09&quot;</span><span class="w"> </span><span class="na">izz=</span><span class="s">&quot;3.67939460898329E-06&quot;</span><span class="nt">/&gt;</span>
+
+<span class="nt">&lt;/inertial&gt;</span>
+
+<span class="nt">&lt;visual&gt;</span>
+
+<span class="nt">&lt;origin</span><span class="w"> </span><span class="na">rpy=</span><span class="s">&quot;0 0 0&quot;</span><span class="w"> </span><span class="na">xyz=</span><span class="s">&quot;0 0 0&quot;</span><span class="nt">/&gt;</span>
+
+<span class="nt">&lt;geometry&gt;</span>
+
+<span class="nt">&lt;mesh</span><span class="w"> </span><span class="na">filename=</span><span class="s">&quot;package://rosmentor_description/meshes/mecanum/wheel_lf_Link.STL&quot;</span><span class="nt">/&gt;</span>
+
+<span class="nt">&lt;/geometry&gt;</span>
+
+<span class="nt">&lt;material</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;&quot;</span><span class="nt">&gt;</span>
+
+<span class="nt">&lt;color</span><span class="w"> </span><span class="na">rgba=</span><span class="s">&quot;1 1 1 1&quot;</span><span class="nt">/&gt;</span>
+
+<span class="nt">&lt;/material&gt;</span>
+
+<span class="nt">&lt;/visual&gt;</span>
+
+<span class="nt">&lt;collision&gt;</span>
+
+<span class="nt">&lt;origin</span><span class="w"> </span><span class="na">rpy=</span><span class="s">&quot;0 0 0&quot;</span><span class="w"> </span><span class="na">xyz=</span><span class="s">&quot;0 0 0&quot;</span><span class="nt">/&gt;</span>
+
+<span class="nt">&lt;geometry&gt;</span>
+
+<span class="nt">&lt;mesh</span><span class="w"> </span><span class="na">filename=</span><span class="s">&quot;package://rosmentor_description/meshes/mecanum/wheel_lf_Link.STL&quot;</span><span class="nt">/&gt;</span>
+
+<span class="nt">&lt;/geometry&gt;</span>
+
+<span class="nt">&lt;/collision&gt;</span>
+
+<span class="nt">&lt;/link&gt;</span>
+</pre></div>
+</div>
+<p>The following is the description of the joint:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="nt">&lt;joint</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;wheel_lf_Joint&quot;</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;continuous&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;origin</span><span class="w"> </span><span class="na">rpy=</span><span class="s">&quot;0 0 0&quot;</span><span class="w"> </span><span class="na">xyz=</span><span class="s">&quot;0.067052 0.07591 -0.018408&quot;</span><span class="nt">/&gt;</span>
+<span class="w">    </span><span class="nt">&lt;parent</span><span class="w"> </span><span class="na">link=</span><span class="s">&quot;base_link&quot;</span><span class="nt">/&gt;</span>
+<span class="w">    </span><span class="nt">&lt;child</span><span class="w"> </span><span class="na">link=</span><span class="s">&quot;wheel_lf_Link&quot;</span><span class="nt">/&gt;</span>
+<span class="w">    </span><span class="nt">&lt;axis</span><span class="w"> </span><span class="na">xyz=</span><span class="s">&quot;0.00012228 1 -4.0642E-05&quot;</span><span class="nt">/&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/joint&gt;</span>
+</pre></div>
+</div>
+<p>The above code defines a joint named “<strong>wheel_lf_Joint</strong>” for the left front wheel. The type of this joint is “<strong>continuous</strong>”, indicating that it is a continuously rotating joint used to describe a component that can rotate without limits, such as a wheel.</p>
+<p>The &lt;origin&gt; tag specifies the position and orientation of the joint by <code class="docutils literal notranslate"><span class="pre">xyz='0.067052</span> <span class="pre">0.07591</span> <span class="pre">-0.01'</span></code>.</p>
+<p>The parent and child links of the joint are specified using the &lt;parent&gt; and &lt;child&gt; tags, respectively. The parent link is “<strong>base_link</strong>”, and the child link is “<strong>wheel_lf_Link</strong>”, indicating that the joint connects the base link and the left front wheel link. The &lt;axis&gt; tag is used to define the rotation axis of the joint, with the direction specified by the <code class="docutils literal notranslate"><span class="pre">xyz=&quot;0.00012228</span> <span class="pre">1</span> <span class="pre">-4.0642E-05&quot;</span></code> attribute.</p>
+<p>This code describes a joint in a URDF file that connects the parent link “<strong>base_link</strong>” to the child link “<strong>wheel_lf_Link</strong>”. This joint describes the rotational connection of the left front wheel in the robot model, allowing it to rotate infinitely around the specified axis.</p>
+</section>
+</section>
+<section id="slam-mapping-principle">
+<h2>6.4 SLAM Mapping Principle<a class="headerlink" href="#slam-mapping-principle" title="Link to this heading"></a></h2>
+<section id="slam-introduction">
+<h3>6.4.1 SLAM Introduction<a class="headerlink" href="#slam-introduction" title="Link to this heading"></a></h3>
+<p>SLAM stands for Simultaneous Localization and Mapping.</p>
+<p>Localization involves determining the pose of a robot in a coordinate system. The origin of orientation of the coordinate system can be obtained from the first keyframe, existing global maps, landmarks or GPS data.</p>
+<p>Mapping involves creating a map of the surrounding environment perceived by the robot. The basic geometric elements of the map are points. The main purpose of the map is for localization and navigation. Navigation can be divided into guidance and control. Guidance includes global planning and local planning, while control involves controlling the robot’s motion after the planning is done.</p>
+</section>
+<section id="id1">
+<h3>6.4.2 SLAM Mapping Principle<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<p>① Preprocessing: Optimizing the raw data from the radar point cloud, filtering out problematic data or performing filtering. Using laser as a signal source, pulses of laser emitted by the laser are directed at surrounding obstacles, causing scattering.</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.4/media/image2.jpeg"   />
+<p>Some of the light waves will reflect back to the receiver of the lidar, and then, according to the principle of laser ranging, the distance from the lidar to the target point can be obtained.</p>
+<p>Regarding point clouds: In simple terms, the surrounding environment information obtained by lidar is called a point cloud. It reflects a portion of what the ‘eyes’ of the robot can see in the environment where it is located. The object information collected presents a series of scattered, accurate angle, and distance information.</p>
+<p>② Matching: Matching the point cloud data of the current local environment with the established map to find the corresponding position.</p>
+<p>③ Map Fusion: Integrating new round data from the lidar into the original map, ultimately completing the map update.</p>
+</section>
+<section id="notes">
+<h3>6.4.3 Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h3>
+<p>(1) Begin the mapping process by positioning the robot in front of a straight wall or within an enclosed box. This enhances the Lidar’s capacity to capture a higher density of scanning points.</p>
+<p>(2) Initiate a 360-degree scan of the environment using the Lidar to ensure a comprehensive survey of the surroundings. This step is crucial to guarantee the accuracy and completeness of the resulting map.</p>
+<p>(3) For larger areas, it’s recommended to complete a full mapping loop before focusing on scanning smaller environmental details. This approach enhances the overall efficiency and precision of the mapping process.</p>
+</section>
+<section id="judge-mapping-result">
+<h3>6.4.4 Judge Mapping Result<a class="headerlink" href="#judge-mapping-result" title="Link to this heading"></a></h3>
+<p>Finally, assess the robot’s navigation process against the following criteria once the mapping is complete:</p>
+<p>(1) Ensure that the edges of obstacles within the map are distinctly defined.</p>
+<p>(2) Check for any disparities between the map and the actual environment, such as the presence of closed loops or inconsistencies.</p>
+<p>(3) Verify the absence of gray areas within the robot’s motion area, indicating areas that haven’t been adequately scanned.</p>
+<p>(4) Confirm that the map doesn’t incorporate obstacles that won’t exist during subsequent localization.</p>
+<p>(5) Validate the map’s coverage of the entire extent of the robot’s motion area.</p>
+</section>
+</section>
+<section id="slam-toolbox-mapping-algorithm">
+<h2>6.5 slam_toolbox Mapping Algorithm<a class="headerlink" href="#slam-toolbox-mapping-algorithm" title="Link to this heading"></a></h2>
+<section id="algorithm-definition">
+<h3>6.5.1 Algorithm Definition<a class="headerlink" href="#algorithm-definition" title="Link to this heading"></a></h3>
+<p>Slam Toolbox software package combines information from laser rangefinders in the form of LaserScan messages and performs TF transformation from odom-&gt; base link to create a two-dimensional map of space. This software package allows for fully serialized reloadable data and pose graphs of SLAM maps, used for continuous mapping, localization, merging, or other operations. It allows Slam Toolbox to operate in synchronous (i.e., processing all valid sensor measurements regardless of delay) and asynchronous (i.e., processing valid sensor measurements whenever possible) modes.</p>
+<p>ROS replaces functionalities like gmapping, cartographer, karto, and hector, providing comprehensive SLAM functionality built upon the powerful scan matcher at the core of Karto, widely used and accelerated for this package. It also introduces a new optimization plugin based on Google Ceres. Additionally, it introduces a new localization method called ‘elastic pose-graph localization,’ which takes measured sliding windows and adds them to the graph for optimization and refinement. This allows for tracking changes in local features of the environment instead of considering them as biases, and removes these redundant nodes when leaving an area without affecting the long-term map.</p>
+<p>Slam Toolbox is a suite of tools for 2D Slam, including:</p>
+<p>● Mapping, saving map pgm files</p>
+<p>● Map refinement, remapping, or continuing mapping on saved maps</p>
+<p>● Long-term mapping: loading saved maps to continue mapping while removing irrelevant information from new laser point clouds</p>
+<p>● Optimizing positioning mode on existing maps. Localization mode can also be run without mapping using the ‘laser odometry’ mode</p>
+<p>● Synchronous, asynchronous mapping</p>
+<p>● Dynamic map merging</p>
+<p>● Plugin-based optimization solver, with a new optimization plugin based on Google Ceres</p>
+<p>● Interactive RVIZ plugin</p>
+<p>● RVIZ graphical manipulation tools for manipulating nodes and connections during mapping</p>
+<p>● Map serialization and lossless data storage.</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.5/media/image2.png"   />
+<p>From the above diagram, it can be seen that the process is relatively straightforward. The traditional soft real-time operation mechanism of slam involves processing each frame of data upon entry and then returning.</p>
+<p>Relevant source code and WIKI links for KartoSLAM:</p>
+<ul class="simple">
+<li><p><strong>KartoSLAM ROS Wiki:</strong> <a class="reference external" href="http://wiki.ros.org/slam_karto">http://wiki.ros.org/slam_karto</a></p></li>
+<li><p><strong>slam_karto software package:</strong> <a class="reference external" href="https://github.com/ros-perception/slam_karto">https://github.com/ros-perception/slam_karto</a></p></li>
+<li><p><strong>open_karto open-source algorithm:</strong> <a class="reference external" href="https://github.com/ros-perception/open_karto">https://github.com/ros-perception/open_karto</a></p></li>
+</ul>
+</section>
+<section id="mapping-operation-steps">
+<h3>6.5.2 Mapping Operation Steps<a class="headerlink" href="#mapping-operation-steps" title="Link to this heading"></a></h3>
+<p>ROS2 mapping and navigation utilize virtual machine connectivity to enable mapping and navigation with the robot on the same local network.</p>
+<ul class="simple">
+<li><p><strong>Install Virtual Machine Software and Import the Virtual Machine</strong></p></li>
+</ul>
+<p>(1) Unzip the provided installation files, then click on the installation file to proceed with the installation.</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.5/media/image3.png" />
+<p>(2) Click on <img src="../_static/media/7.Mapping_Lesson/7.5/media/image4.png" /> to open the virtual machine.</p>
+<p>(3) Enter the virtual machine interface and click on <strong>“Open Virtual Machine”</strong>.</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.5/media/image5.png"/>
+<p>(4) Select the image file provided in the tutorial and import it. For specific instructions, please refer to the lesson “<strong><a class="reference internal" href="6.depth_camera_basic_lesson.html#test-and-configure-ros2"><span class="std std-ref">5. Depth Camera Basic Lesson/Test and Configure ROS2</span></a></strong>”.</p>
+<p>(5) After the import is completed, follow the prompts to complete the installation process.</p>
+<ul class="simple">
+<li><p><strong>Copy Robot Files to the Virtual Machine</strong></p></li>
+</ul>
+<p><strong>(1) Export files from the robot</strong></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the folders ros2_ws and src.zip already exist in the Home directory of the virtual machine, please delete them first before proceeding with the following steps in the tutorial.</p>
+</div>
+<p>① Start the robot, and access the robot system desktop using VNC.</p>
+<p>② Click-on <img src="../_static/media/7.Mapping_Lesson/7.5/media/image6.png" /> to open the ROS2 command-line terminal.</p>
+<p>③ Execute the command to disable the app auto-start service.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>~/.stop_ros.sh
+</pre></div>
+</div>
+<p>④ Enter the command to navigate to the ros2_ws/src/ directory:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>ros2_ws/src/
+</pre></div>
+</div>
+<p>⑤ Enter the command to package the three files ‘navigation’, ‘slam’, and ‘simulations’ into a compressed file:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>zip<span class="w"> </span>-r<span class="w"> </span>src.zip<span class="w"> </span>navigation<span class="w"> </span>slam<span class="w"> </span>simulations
+</pre></div>
+</div>
+<p>⑥ Enter the command to move the compressed file to the shared directory:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>mv<span class="w"> </span>src.zip<span class="w"> </span>/home/ubuntu/shared
+</pre></div>
+</div>
+<p>⑦ Run the command and return to ros2_ws directory:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>..
+</pre></div>
+</div>
+<p>⑧ Enter the command to view the .typerc file in this directory:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>ls<span class="w"> </span>-a
+</pre></div>
+</div>
+<p>⑨ Enter the command to move the .typerc file to the shared directory:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>cp<span class="w"> </span>.typerc<span class="w"> </span>/home/ubuntu/shared
+</pre></div>
+</div>
+<p>⑩ Click-on <img src="../_static/media/7.Mapping_Lesson/7.5/media/image14.png"  /> to open the file directory, then navigate to the home/docker/tmp directory:</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.5/media/image15.png" />
+<p>⑪ Use the shortcut <strong>‘Ctrl + H’</strong> to show the hidden .typerc file:</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.5/media/image16.png"  />
+<p>⑫ Refer to the instruction in <strong>“Install WinSCP”</strong> to install and open the WinSCP tool.</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.5/media/image17.png" />
+<p>⑬ Enter the IP address of Raspberry Pi <strong>“192.168.149.1”</strong>, username <strong>“pi”</strong>, and password <strong>“raspberrypi”</strong>. Then click “<strong>Login</strong>”.</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.5/media/image18.png"/>
+<p>⑭ Click <strong>“Accept”</strong> on the pop-up window that appears.</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.5/media/image19.png" />
+<p>⑮ The left side shows the directory of your computer, and the right side shows the root directory of Raspberry Pi.</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.5/media/image20.png"/>
+<p>⑯ Select the folder <strong>“docker-&gt;tmp”</strong> and open the shared folder with Docker.</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.5/media/image21.png"/>
+<p>⑰ In the bottom right corner of WinSCP, there is a number indicating the number of hidden files. Double-click on it to display hidden files.</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.5/media/image22.png"/>
+<p>⑱ Select the “<strong>src</strong>” folder and right-click to choose “<strong>Download</strong>”.</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.5/media/image23.png" />
+<p>⑲ Select the path where you want to save the file and click “<strong>OK</strong>”.</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.5/media/image24.png" />
+<p>⑳ Follow step ⑱ to save the .typerc file.</p>
+<p><strong>(2) Import files into the virtual machine</strong></p>
+<p>① Click-on <img src="../_static/media/7.Mapping_Lesson/7.5/media/image25.png" /> to navigate to the home directory.</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.5/media/image26.png" />
+<p>② Drag and drop the .typerc and src.zip files from the computer desktop into the virtual machine:</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.5/media/image27.png" />
+<p><strong>5.2.3 Create and Compile the Workspace</strong></p>
+<p>(1) Click-on <img src="../_static/media/7.Mapping_Lesson/7.5/media/image28.png" style="width:0.41042in;height:0.34514in" /> to start the virtual machine command-line terminal.</p>
+<p>(2) Enter the command to create the ros2_ws/src directory:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>-p<span class="w"> </span>ros2_ws/src
+</pre></div>
+</div>
+<p>(3) Extract the file “<strong>src.zip</strong>” to the directory “<strong>home/ubuntu</strong>”.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>unzip<span class="w"> </span>src.zip
+</pre></div>
+</div>
+<p>(4) Move the simulations, slam, and navigation files to the ros2_ws/src directory:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>mv<span class="w"> </span>simulations<span class="w"> </span>slam<span class="w"> </span>navigation<span class="w"> </span>/home/ubuntu/ros2_ws/src/
+</pre></div>
+</div>
+<p>(5) Move the .typerc file to the ros2_ws directory:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>mv<span class="w"> </span>.typerc<span class="w"> </span>ros2_ws/
+</pre></div>
+</div>
+<p>(6) Navigate to the ros2_ws directory:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>ros2_ws/
+</pre></div>
+</div>
+<p>(7) Enter the command to check if .typerc has been moved to the ros2_ws directory:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>ls<span class="w"> </span>-a
+</pre></div>
+</div>
+<p>(8) Input the following command to compile the workspace:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>colcon<span class="w"> </span>build
+</pre></div>
+</div>
+<p>(9) Change the .bashrc file, and input the following command:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>gedit<span class="w"> </span>~/.bashrc
+</pre></div>
+</div>
+<p>Copy the content below to the file .bashrc.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>/home/ubuntu/ros2_ws/.typerc
+<span class="nb">source</span><span class="w"> </span>/home/ubuntu/ros2_ws/install/setup.bash
+</pre></div>
+</div>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.5/media/image37.png" />
+<p>(10) After finishing writing, use the shortcut <strong>Ctrl + S</strong> or click the <strong>Save</strong> button in the upper right corner to save and exit.</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.5/media/image38.png" />
+<p>(11) Run the command below to refresh the environment configuration.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>~/.bashrc
+</pre></div>
+</div>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.5/media/image39.png" />
+<ul class="simple">
+<li><p><strong>Set the Robot to LAN Mode</strong></p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>When MentorPi starts up in LAN mode, it will automatically search for the preset network. During this process, LED2 on the Raspberry Pi expansion board will flash rapidly, indicating that it is searching. If the target network is not found after three attempts, MentorPi will automatically switch to Direct Connection mode (LED2 flashes slowly). In this mode, you can connect directly to the hotspot provided by MentorPi.</p></li>
+<li><p>If MentorPi has been set to connect in LAN mode to a specific device’s hotspot, but that device is temporarily unavailable, you may use another device. Simply configure the new device’s hotspot with the same name and password as the original one, and MentorPi will be able to connect automatically.</p></li>
+<li><p>When MentorPi is in LAN mode, it will not create its own hotspot.</p></li>
+</ul>
+</div>
+<p>(1) Click-on <img src="../_static/media/7.Mapping_Lesson/7.5/media/image40.png" style="width:0.32292in;height:0.29167in" /> to open the command line terminal.</p>
+<p>(2) Enter the command to open the WiFi configuration file.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>vim<span class="w"> </span>hiwonder-toolbox/wifi_conf.py
+</pre></div>
+</div>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.5/media/image42.png" />
+<p>(3) Press “<strong>i</strong>” key to enter the editing mode. Change the WiFi configuration file to LAN mode, and modify your own WiFi name and password.</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.5/media/image43.png" />
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When MentorPi fails to find the target network in LAN mode and automatically switches back to Direct Connection mode, the content of wifi_conf.py will not be modified automatically. It will still retain the LAN configuration. If no changes are made, MentorPi will continue to start in LAN mode by default the next time it is powered on.</p>
+</div>
+<p>(4) After finishing writing, press “<strong>Esc</strong>” and enter the command to save and exit.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>:wq
+</pre></div>
+</div>
+<p>(5) Enter the command to restart the network, or reboot the system. It is recommended to reboot the system.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>wifi.service
+</pre></div>
+</div>
+<p>(6) Refer to <a class="reference internal" href="1.getting_ready.html#app-control"><span class="std std-ref">1.Getting Ready -&gt; 1.6 APP Control</span></a> to obtain the robot’s LAN IP address through the app connection.</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.5/media/image46.png" style="width:600px" />
+<p>(7) It is important to note that the virtual machine and the robot are connected to the same LAN, and their IP addresses should be within the same subnet:</p>
+<p>① Virtual Machine:</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.5/media/image47.png" />
+<p>② Robot:</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.5/media/image48.png" />
+<p>(8) After rebooting, click on <img src="../_static/media/7.Mapping_Lesson/7.5/media/image6.png" style="width:0.44792in;height:0.35417in" /> to open the robot’s ROS2 command line terminal. You will notice that the ROS_DOMAIN_ID is 0, which is the same as on the virtual machine.</p>
+<p>① Robot:</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.5/media/image49.png"/>
+<p>② Virtual Machine:</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.5/media/image50.png" />
+</section>
+<section id="slam-mapping-instructions">
+<h3>6.5.3 slam Mapping Instructions<a class="headerlink" href="#slam-mapping-instructions" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Robot operations</strong></p></li>
+</ul>
+<p>(1) Click-on <img src="../_static/media/7.Mapping_Lesson/7.5/media/image6.png" style="width:0.44792in;height:0.35417in" /> to open the command-line terminal.</p>
+<p>(2) Execute the following command to disable the app auto-start service.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>~/.stop_ros.sh
+</pre></div>
+</div>
+<p>(3) Run the command to initiate mapping:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>slam<span class="w"> </span>slam.launch.py
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><strong>Virtual Machine instructions</strong></p></li>
+</ul>
+<p>(1) Click-on <img src="../_static/media/7.Mapping_Lesson/7.5/media/image53.png" style="width:0.47917in;height:0.40625in" /> to open the command line terminal of the virtual machine system.</p>
+<p>(2) Enter the command to open the RViz tool and display the mapping results.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>slam<span class="w"> </span>rviz_slam.launch.py
+</pre></div>
+</div>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.5/media/image55.png" />
+<ul class="simple">
+<li><p><strong>Enable keyboard control</strong></p></li>
+</ul>
+<p>(1) Click-on <img src="../_static/media/7.Mapping_Lesson/7.5/media/image6.png" style="width:0.44792in;height:0.35417in" /> to open the command-line terminal.</p>
+<p>(2) Enter the command to start the keyboard control node, and press “<strong>Enter</strong>”.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>peripherals<span class="w"> </span>teleop_key_control.launch.py
+</pre></div>
+</div>
+<p>If you see the prompt as shown in the following image, it means the keyboard control service has been successfully started.</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.5/media/image57.png"  />
+<p>(3) Control the robot to move in the current space to build a more complete map. The table below lists the keyboard keys available for controlling robot movement and their corresponding functions:</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;"><strong>Key</strong></th>
+<th style="text-align: center;"><strong>Robot Action</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">W</td>
+<td style="text-align: center;">Short press to switch to forward state and continuously move forward</td>
+</tr>
+<tr>
+<td style="text-align: center;">S</td>
+<td style="text-align: center;">Short press to switch to backward state and continuously move backward</td>
+</tr>
+<tr>
+<td style="text-align: center;">A</td>
+<td style="text-align: center;">Long press to interrupt the forward or backward state and turn left</td>
+</tr>
+<tr>
+<td style="text-align: center;">D</td>
+<td style="text-align: center;">Long press to interrupt the forward or backward state and turn right</td>
+</tr>
+</tbody>
+</table>
+<p>(4) When controlling the robot’s movement with the keyboard to map, it’s advisable to reduce the robot’s movement speed appropriately. The slower the robot’s speed, the smaller the odometry relative error, leading to better mapping results. As the robot moves, the map displayed in RVIZ will continuously expand until the entire environment scene’s map construction is completed.</p>
+</section>
+<section id="save-map">
+<h3>6.5.4 Save Map<a class="headerlink" href="#save-map" title="Link to this heading"></a></h3>
+<p>(1) Click-on <img src="../_static/media/7.Mapping_Lesson/7.5/media/image6.png" style="width:0.44792in;height:0.35417in" /> to open the command-line terminal.</p>
+<p>(2) Run the following command to save the map.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>~/ros2_ws/src/slam/maps<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>ros2<span class="w"> </span>run<span class="w"> </span>nav2_map_server<span class="w"> </span>map_saver_cli<span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;map_01&quot;</span><span class="w"> </span>--ros-args<span class="w"> </span>-p<span class="w"> </span>map_subscribe_transient_local:<span class="o">=</span><span class="nb">true</span>
+</pre></div>
+</div>
+<p>(3) If you want to exit the game, press “<strong>Ctrl+C</strong>” in the terminal interface.</p>
+<p>After experiencing the game, you can enable the app service through commands or by restarting the robot. If the app is not enabled, the related app functions will not work. If the robot is restarted, the app will be automatically enabled.</p>
+<p>Click <img src="../_static/media/7.Mapping_Lesson/7.5/media/image59.png" style="width:0.4375in;height:0.35417in" /> and enter the command. Press enter to start the app, and wait for the buzzer to beep.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>please enter the command in the system path, not in the Docker container.</p>
+</div>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>start_node.service
+</pre></div>
+</div>
+</section>
+<section id="effect-optimization">
+<h3>6.5.5 Effect Optimization<a class="headerlink" href="#effect-optimization" title="Link to this heading"></a></h3>
+<p>If you desire a more precise mapping outcome, optimizing the odometry can be beneficial. Mapping with the robot requires the use of odometry, which in turn relies on the IMU.</p>
+<p>The robot itself comes with pre-calibrated IMU data loaded, enabling it to perform mapping and navigation functions effectively. However, calibrating the IMU can still enhance accuracy further. The calibration method and steps for the IMU can be found in the “<a class="reference internal" href="4.motion_control_lesson.html#imu-linear-velocity-and-angular-velocity-calibration"><span class="std std-ref"><strong>3. Motion Control Lesson -&gt; 3.3 IMU, Linear Velocity and Angular Velocity Calibration</strong></span></a>” section.</p>
+</section>
+<section id="parameter-explanation">
+<h3>6.5.6 Parameter Explanation<a class="headerlink" href="#parameter-explanation" title="Link to this heading"></a></h3>
+<p>The parameter file can be found in the “<strong>ros2_ws\src\slam\config\slam.yaml</strong>” directory.</p>
+<p>For more detailed information about the parameters, please refer to the official documentation: <a class="reference external" href="https://wiki.ros.org/slam_toolbox">https://wiki.ros.org/slam_toolbox</a></p>
+</section>
+<section id="launch-file-analysis">
+<h3>6.5.7 Launch File Analysis<a class="headerlink" href="#launch-file-analysis" title="Link to this heading"></a></h3>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.5/media/image61.png"   />
+<p>The launch file is located at: <a class="reference download internal" download="" href="../_downloads/e8ce1f3469023f5ade836a4447e21095/slam.zip"><span class="xref download myst">/home/ubuntu/ros2_ws/src/slam/launch/slam.launch.py</span></a></p>
+<ul class="simple">
+<li><p><strong>Import Library</strong></p></li>
+</ul>
+<p>The launch library can be explored in detail in the official ROS documentation:</p>
+<p><a class="reference external" href="https://docs.ros.org/en/humble/How-To-Guides/Launching-composable-nodes.html">https://docs.ros.org/en/humble/How-To-Guides/Launching-composable-nodes.html</a></p>
+<div class="highlight-python notranslate"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span></pre></div></td><td class="code"><div><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">ament_index_python.packages</span> <span class="kn">import</span> <span class="n">get_package_share_directory</span>
+
+<span class="kn">from</span> <span class="nn">launch_ros.actions</span> <span class="kn">import</span> <span class="n">PushRosNamespace</span>
+<span class="kn">from</span> <span class="nn">launch</span> <span class="kn">import</span> <span class="n">LaunchDescription</span><span class="p">,</span> <span class="n">LaunchService</span>
+<span class="kn">from</span> <span class="nn">launch.substitutions</span> <span class="kn">import</span> <span class="n">LaunchConfiguration</span>
+<span class="kn">from</span> <span class="nn">launch.launch_description_sources</span> <span class="kn">import</span> <span class="n">PythonLaunchDescriptionSource</span>
+<span class="kn">from</span> <span class="nn">launch.actions</span> <span class="kn">import</span> <span class="n">DeclareLaunchArgument</span><span class="p">,</span> <span class="n">IncludeLaunchDescription</span><span class="p">,</span> <span class="n">GroupAction</span><span class="p">,</span> <span class="n">OpaqueFunction</span><span class="p">,</span> <span class="n">TimerAction</span>
+</pre></div></td></tr></table></div>
+</div>
+<ul class="simple">
+<li><p><strong>Set the Storage Path</strong></p></li>
+</ul>
+<p>Use the <code class="docutils literal notranslate"><span class="pre">get_package_share_directory</span></code> function to obtain the path of the slam package.</p>
+<div class="highlight-python notranslate"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span></pre></div></td><td class="code"><div><pre><span></span>    <span class="k">if</span> <span class="n">compiled</span> <span class="o">==</span> <span class="s1">&#39;True&#39;</span><span class="p">:</span>
+        <span class="n">slam_package_path</span> <span class="o">=</span> <span class="n">get_package_share_directory</span><span class="p">(</span><span class="s1">&#39;slam&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">slam_package_path</span> <span class="o">=</span> <span class="s1">&#39;/home/ubuntu/ros2_ws/src/slam&#39;</span>
+</pre></div></td></tr></table></div>
+</div>
+<ul class="simple">
+<li><p><strong>Initiate Other Launch File</strong></p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span></pre></div></td><td class="code"><div><pre><span></span>    <span class="n">base_launch</span> <span class="o">=</span> <span class="n">IncludeLaunchDescription</span><span class="p">(</span>
+        <span class="n">PythonLaunchDescriptionSource</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">slam_package_path</span><span class="p">,</span> <span class="s1">&#39;launch/include/robot.launch.py&#39;</span><span class="p">)),</span>
+        <span class="n">launch_arguments</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;sim&#39;</span><span class="p">:</span> <span class="n">sim</span><span class="p">,</span>
+            <span class="s1">&#39;master_name&#39;</span><span class="p">:</span> <span class="n">master_name</span><span class="p">,</span>
+            <span class="s1">&#39;robot_name&#39;</span><span class="p">:</span> <span class="n">robot_name</span>
+        <span class="p">}</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span>
+    <span class="p">)</span>
+
+    <span class="n">slam_launch</span> <span class="o">=</span> <span class="n">IncludeLaunchDescription</span><span class="p">(</span>
+        <span class="n">PythonLaunchDescriptionSource</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">slam_package_path</span><span class="p">,</span> <span class="s1">&#39;launch/include/slam_base.launch.py&#39;</span><span class="p">)),</span>
+        <span class="n">launch_arguments</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;use_sim_time&#39;</span><span class="p">:</span> <span class="n">use_sim_time</span><span class="p">,</span>
+            <span class="s1">&#39;map_frame&#39;</span><span class="p">:</span> <span class="n">map_frame</span><span class="p">,</span>
+            <span class="s1">&#39;odom_frame&#39;</span><span class="p">:</span> <span class="n">odom_frame</span><span class="p">,</span>
+            <span class="s1">&#39;base_frame&#39;</span><span class="p">:</span> <span class="n">base_frame</span><span class="p">,</span>
+            <span class="s1">&#39;scan_topic&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">frame_prefix</span><span class="si">}</span><span class="s1">scan_raw&#39;</span><span class="p">,</span>  <span class="c1"># Using scan_raw topic</span>
+            <span class="s1">&#39;enable_save&#39;</span><span class="p">:</span> <span class="n">enable_save</span>
+        <span class="p">}</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">slam_method</span> <span class="o">==</span> <span class="s1">&#39;slam_toolbox&#39;</span><span class="p">:</span>
+        <span class="n">bringup_launch</span> <span class="o">=</span> <span class="n">GroupAction</span><span class="p">(</span>
+            <span class="n">actions</span><span class="o">=</span><span class="p">[</span>
+                <span class="n">PushRosNamespace</span><span class="p">(</span><span class="n">robot_name</span><span class="p">),</span>
+                <span class="n">base_launch</span><span class="p">,</span>
+                <span class="n">TimerAction</span><span class="p">(</span>
+                    <span class="n">period</span><span class="o">=</span><span class="mf">6.0</span><span class="p">,</span>
+                    <span class="n">actions</span><span class="o">=</span><span class="p">[</span><span class="n">slam_launch</span><span class="p">],</span>
+                <span class="p">),</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+</pre></div></td></tr></table></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">base_launch</span></code>: Launch for hardware initialization</p>
+<p><code class="docutils literal notranslate"><span class="pre">slam_launch</span></code>: Launch for basic mapping</p>
+<p><code class="docutils literal notranslate"><span class="pre">bringup_launch</span></code>: Launch for initial pose setup</p>
+</section>
+</section>
+<section id="rtab-vslam-3d-mapping">
+<h2>6.6 RTAB-VSLAM 3D Mapping<a class="headerlink" href="#rtab-vslam-3d-mapping" title="Link to this heading"></a></h2>
+<section id="rtab-vslam-description">
+<h3>6.6.1 RTAB-VSLAM Description<a class="headerlink" href="#rtab-vslam-description" title="Link to this heading"></a></h3>
+<p>RTAB-VSLAM is a appearance-based real-time 3D mapping system, it’s an open-source library that achieves loop closure detection through memory management methods. It limits the size of the map to ensure that loop closure detection is always processed within a fixed time limit, thus meeting the requirements for long-term and large-scale environment online mapping.</p>
+</section>
+<section id="rtab-vslam-working-principle">
+<h3>6.6.2 RTAB-VSLAM Working Principle<a class="headerlink" href="#rtab-vslam-working-principle" title="Link to this heading"></a></h3>
+<p>RTAB-VSLAM 3D mapping employs feature mapping, offering the advantage of rich feature points in general scenes, good scene adaptability, and the ability to use feature points for localization. However, it has drawbacks, such as a time-consuming feature point calculation method, limited information usage leading to loss of image details, diminished effectiveness in weak-texture areas, and susceptibility to feature point matching errors, impacting results significantly.</p>
+<p>After extracting features from images, the algorithm proceeds to match features at different timestamps, leading to loop detection. Upon completion of matching, data is categorized into long-term memory and short-term memory. Long-term memory data is utilized for matching future data, while short-term memory data is employed for matching current time-continuous data.</p>
+<p>During the operation of the RTAB-VSLAM algorithm, it initially uses short-term memory data to update positioning points and build maps. As data from a specific future timestamp matches long-term memory data, the corresponding long-term memory data is integrated into short-term memory data for updating positioning and map construction.</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.6/media/image2.png"   />
+<p>RTAB-VSLAM software package link: <a class="reference external" href="https://github.com/introlab/rtabmap">https://github.com/introlab/rtabmap</a></p>
+</section>
+<section id="rtab-vslam-3d-mapping-instructions">
+<h3>6.6.3 RTAB-VSLAM 3D Mapping Instructions<a class="headerlink" href="#rtab-vslam-3d-mapping-instructions" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Robot Operations</strong></p></li>
+</ul>
+<p>(1) Click on <img src="../_static/media/7.Mapping_Lesson/7.6/media/image3.png" style="width:0.44792in;height:0.35417in" /> on the system desktop to open the command-line terminal.</p>
+<p>(2) Run the command to disable the app auto-start service:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>~/.stop_ros.sh
+</pre></div>
+</div>
+<p>(3) Execute the command to start mapping:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>slam<span class="w"> </span>rtabmap_slam.launch.py
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><strong>Virtual Machine Operation</strong></p></li>
+</ul>
+<p>(1) Click-on <img src="../_static/media/7.Mapping_Lesson/7.6/media/image6.png" style="width:0.41042in;height:0.34514in" /> to open the command-line terminal.</p>
+<p>(2) Enter the command to open the RViz tool and display the mapping effect:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>slam<span class="w"> </span>rviz_rtabmap.launch.py
+</pre></div>
+</div>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.6/media/image8.png"  />
+<ul class="simple">
+<li><p><strong>Enable Keyboard Control</strong></p></li>
+</ul>
+<p>(1) Click-on <img src="../_static/media/7.Mapping_Lesson/7.6/media/image3.png" style="width:0.44792in;height:0.35417in" /> to open the command-line terminal.</p>
+<p>(2) Enter the command to start the keyboard control node, and press “<strong>Enter</strong>”.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>peripherals<span class="w"> </span>teleop_key_control.launch.py
+</pre></div>
+</div>
+<p>If you encounter the prompt as shown in the figure below, it means that the keyboard control service has been successfully activated.</p>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.6/media/image10.png"  />
+<p>(3) Control the robot to move in the current space to build a more complete map. The table below shows the keyboard keys available for controlling robot movement and their corresponding functions:</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;"><strong>Key</strong></th>
+<th style="text-align: center;"><strong>Robot Action</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">W</td>
+<td style="text-align: center;">Short press to switch to the forward state and continuously move forward</td>
+</tr>
+<tr>
+<td style="text-align: center;">S</td>
+<td style="text-align: center;">Short press to switch to the backward state and continuously move backward</td>
+</tr>
+<tr>
+<td style="text-align: center;">A</td>
+<td style="text-align: center;">Long press to interrupt the forward or backward state and turn left</td>
+</tr>
+<tr>
+<td style="text-align: center;">D</td>
+<td style="text-align: center;">Long press to interrupt the forward or backward state and turn right</td>
+</tr>
+</tbody>
+</table>
+<p>When controlling the robot’s movement for mapping using the keyboard, it’s advisable to appropriately reduce the robot’s movement speed. The smaller the robot’s running speed, the smaller the relative error of the odometry, resulting in a better mapping effect. As the robot moves, the map displayed in RVIZ will continuously expand until the entire environmental scene’s map construction is completed.</p>
+<ul class="simple">
+<li><p><strong>Map Saving</strong></p></li>
+</ul>
+<p>After mapping is completed, you can use the shortcut “<strong>Ctrl+C</strong>” in each command-line terminal window to close the currently running program.</p>
+<p>After experiencing the game, you can enable the app service through commands or by restarting the robot. If the app is not enabled, the related app functions will not work. If the robot is restarted, the app will be automatically enabled.</p>
+<p>Click <img src="../_static/media/4.MotionControlLesson/4.3/media/image21.png" /> and enter the command. Press enter to start the app, and wait for the buzzer to beep. Please enter the command in the system path, not in the Docker container.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>start_node.service
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For 3D mapping, there’s no need to manually save the map. When you use “<strong>Ctrl+C</strong>” to close the mapping command, the map will be automatically saved.</p>
+</div>
+<ul class="simple">
+<li><p><strong>Launch File Analysis</strong></p></li>
+</ul>
+<img class="common_img" src="../_static/media/7.Mapping_Lesson/7.6/media/image13.png"   />
+<p>The launch file is located at: <a class="reference download internal" download="" href="../_downloads/e8ce1f3469023f5ade836a4447e21095/slam.zip"><span class="xref download myst">/home/ubuntu/ros2_ws/src/slam/launch/rtabmap_slam.launch.py</span></a></p>
+<p>(1) Import Library:</p>
+<p>You can refer to the ROS official documentation for detailed analysis of the launch library:</p>
+<p>“<a class="reference external" href="https://docs.ros.org/en/humble/How-To-Guides/Launching-composable-nodes.html"><strong>https://docs.ros.org/en/humble/How-To-Guides/Launching-composable-nodes.html</strong></a>”</p>
+<div class="highlight-python notranslate"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span></pre></div></td><td class="code"><div><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">ament_index_python.packages</span> <span class="kn">import</span> <span class="n">get_package_share_directory</span>
+<span class="kn">from</span> <span class="nn">launch_ros.actions</span> <span class="kn">import</span> <span class="n">PushRosNamespace</span>
+<span class="kn">from</span> <span class="nn">launch</span> <span class="kn">import</span> <span class="n">LaunchDescription</span>
+<span class="kn">from</span> <span class="nn">launch.substitutions</span> <span class="kn">import</span> <span class="n">LaunchConfiguration</span>
+<span class="kn">from</span> <span class="nn">launch.launch_description_sources</span> <span class="kn">import</span> <span class="n">PythonLaunchDescriptionSource</span>
+<span class="kn">from</span> <span class="nn">launch.actions</span> <span class="kn">import</span> <span class="n">DeclareLaunchArgument</span><span class="p">,</span> <span class="n">IncludeLaunchDescription</span><span class="p">,</span> <span class="n">GroupAction</span><span class="p">,</span> <span class="n">OpaqueFunction</span><span class="p">,</span> <span class="n">TimerAction</span>
+</pre></div></td></tr></table></div>
+</div>
+<p>(2) Set the Storage Path</p>
+<p>Use <code class="docutils literal notranslate"><span class="pre">get_package_share_directory</span></code> to obtain the path of the slam package.</p>
+<div class="highlight-python notranslate"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span></pre></div></td><td class="code"><div><pre><span></span>    <span class="k">if</span> <span class="n">compiled</span> <span class="o">==</span> <span class="s1">&#39;True&#39;</span><span class="p">:</span>
+        <span class="n">slam_package_path</span> <span class="o">=</span> <span class="n">get_package_share_directory</span><span class="p">(</span><span class="s1">&#39;slam&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">slam_package_path</span> <span class="o">=</span> <span class="s1">&#39;/home/ubuntu/ros2_ws/src/slam&#39;</span>
+</pre></div></td></tr></table></div>
+</div>
+<p>(3) Initiate Other Launch File</p>
+<div class="highlight-python notranslate"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span></pre></div></td><td class="code"><div><pre><span></span>    <span class="n">base_launch</span> <span class="o">=</span> <span class="n">IncludeLaunchDescription</span><span class="p">(</span>
+        <span class="n">PythonLaunchDescriptionSource</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">slam_package_path</span><span class="p">,</span> <span class="s1">&#39;launch/include/robot.launch.py&#39;</span><span class="p">)),</span>
+        <span class="n">launch_arguments</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;sim&#39;</span><span class="p">:</span> <span class="n">sim</span><span class="p">,</span>
+            <span class="s1">&#39;master_name&#39;</span><span class="p">:</span> <span class="n">master_name</span><span class="p">,</span>
+            <span class="s1">&#39;robot_name&#39;</span><span class="p">:</span> <span class="n">robot_name</span><span class="p">,</span>
+            <span class="s1">&#39;action_name&#39;</span><span class="p">:</span> <span class="s1">&#39;horizontal&#39;</span><span class="p">,</span>
+        <span class="p">}</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span>
+    <span class="p">)</span>    
+    
+
+    <span class="n">rtabmap_launch</span> <span class="o">=</span> <span class="n">IncludeLaunchDescription</span><span class="p">(</span>
+        <span class="n">PythonLaunchDescriptionSource</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">slam_package_path</span><span class="p">,</span> <span class="s1">&#39;launch/include/rtabmap.launch.py&#39;</span><span class="p">)),</span>
+        <span class="n">launch_arguments</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;use_sim_time&#39;</span><span class="p">:</span> <span class="n">use_sim_time</span><span class="p">,</span> 
+        <span class="p">}</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span>
+    <span class="p">)</span>
+    
+    <span class="n">bringup_launch</span> <span class="o">=</span> <span class="n">GroupAction</span><span class="p">(</span>
+     <span class="n">actions</span><span class="o">=</span><span class="p">[</span>
+         <span class="n">PushRosNamespace</span><span class="p">(</span><span class="n">robot_name</span><span class="p">),</span>
+         <span class="n">base_launch</span><span class="p">,</span>
+         <span class="n">TimerAction</span><span class="p">(</span>
+             <span class="n">period</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> 
+             <span class="n">actions</span><span class="o">=</span><span class="p">[</span><span class="n">rtabmap_launch</span><span class="p">],</span>
+         <span class="p">),</span>
+      <span class="p">]</span>
+    <span class="p">)</span>
+</pre></div></td></tr></table></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">base_launch</span></code>: Launch for hardware initialization</p>
+<p><code class="docutils literal notranslate"><span class="pre">slam_launch</span></code>: Basic mapping launch</p>
+<p><code class="docutils literal notranslate"><span class="pre">rtabmap_launch</span></code>: RTAB mapping launch</p>
+<p><code class="docutils literal notranslate"><span class="pre">bringup_launch</span></code>: Initial pose launch</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="6.depth_camera_basic_lesson.html" class="btn btn-neutral float-left" title="5. Depth Camera Basic Lesson" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="8.navigation_lesson.html" class="btn btn-neutral float-right" title="7. Navigation Lesson" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Hiwonder.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

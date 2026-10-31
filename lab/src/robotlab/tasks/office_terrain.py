@@ -123,9 +123,17 @@ class OfficeTerrainCfg(SubTerrainCfg):
     def box(center, half, rgba, solid=True) -> None:
       add(mujoco.mjtGeom.mjGEOM_BOX, center, half, rgba, solid)
 
+    # The wheels touch the floor through one ground plane (top surface z = 0) shared by all patches. The
+    # carpet boxes are visual only. Reason: MuJoCo Warp has no analytic cylinder-box collider; it sends
+    # tyre-on-box through float32 convex CCD, which for a grazing tyre on a 14 m box sometimes returns a
+    # contact metres away with a horizontal normal, and the step goes NaN (CPU MuJoCo is correct on the same
+    # state; still in mujoco-warp 3.17). Plane-cylinder has an exact primitive collider on both.
+    if not any(g.name == "ground" for g in body.geoms):
+      body.add_geom(name="ground", type=mujoco.mjtGeom.mjGEOM_PLANE, size=(0, 0, 1), rgba=(0, 0, 0, 0))
     carpet = _CARPETS[rng.integers(len(_CARPETS))]
     floor = body.add_geom(type=mujoco.mjtGeom.mjGEOM_BOX, size=(PATCH_SIZE / 2, PATCH_SIZE / 2, 0.05),
                           pos=(PATCH_SIZE / 2, PATCH_SIZE / 2, -0.05), rgba=carpet)
+    floor.contype, floor.conaffinity = 0, 0
     geoms.append(TerrainGeometry(geom=floor, color=carpet))
 
     adj = _random_halls(rng, self.extra_loops)

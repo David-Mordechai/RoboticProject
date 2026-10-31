@@ -1,0 +1,359 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="readthedocs-addons-api-version" content="1"><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>12. Master Slave And Group Control &mdash; MentorPi v2.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=7ab3649f" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/style.css?v=f476ad27" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=731f67d5"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script src="../_static/custom.js?v=fd93d8dd"></script>
+    <script src="../_static/js/theme.js"></script>
+    <script src="../_static/js/versions.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="13. Robot Network Configuration" href="14.Robot%20Network%20Configuration.html" />
+    <link rel="prev" title="11. Autonomous Driving Lesson" href="12.autonomous_driving_lesson.html" /> 
+<script async type="text/javascript" src="/_/static/javascript/readthedocs-addons.js"></script><meta name="readthedocs-project-slug" content="mentorpi" /><meta name="readthedocs-version-slug" content="latest" /><meta name="readthedocs-resolver-filename" content="/docs/13.MasterSlaveAndGroupControl.html" /><meta name="readthedocs-http-status" content="200" /></head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #f98800" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            MentorPi
+          </a>
+              <div class="switch-menus">
+                <div class="version-switch"></div>
+                <div class="language-switch"></div>
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">MentorPi</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="1.getting_ready.html">1. Getting Ready</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.set_development_environment.html">2. Set Development Environment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.motion_control_lesson.html">3. Motion Control Lesson</a></li>
+<li class="toctree-l1"><a class="reference internal" href="5.lidar_lesson.html">4. Lidar Lesson</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.depth_camera_basic_lesson.html">5. Depth Camera Basic Lesson</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.mapping_lesson.html">6. Mapping Lesson</a></li>
+<li class="toctree-l1"><a class="reference internal" href="8.navigation_lesson.html">7. Navigation Lesson</a></li>
+<li class="toctree-l1"><a class="reference internal" href="9.ros%2Bopencv_lesson.html">8. ROS+OpenCV Lesson</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10.mediapipe_human_robot_interaction.html">9. MediaPipe Human-robot Interaction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11.machine_learning.html">10. Machine Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="12.autonomous_driving_lesson.html">11. Autonomous Driving Lesson</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">12. Master Slave And Group Control</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#master-slave-and-environment-variable-configuration">12.1 Master-Slave and Environment Variable Configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#preparation">12.1.1 Preparation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#program-logic">12.1.2 Program Logic</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#network-configuration">12.1.3 Network Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configure-environment-variable">12.1.4 Configure Environment Variable</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#group-control">12.2 Group Control</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#time-synchronization">12.2.1 Time Synchronization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#program-execution">12.2.2 Program Execution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#group-control-operation">12.2.3 Group Control Operation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="14.Robot%20Network%20Configuration.html">13. Robot Network Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15.Large_AI_Model_Course.html">14. Large AI Model Course</a></li>
+<li class="toctree-l1"><a class="reference internal" href="resources_download.html">Appendix</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://drive.google.com/drive/folders/1P00n6IemouAnga8EjpO7suF3Mou8zv4K?usp=sharing">Download</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #f98800" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MentorPi</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">12. Master Slave And Group Control</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/docs/13.MasterSlaveAndGroupControl.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="master-slave-and-group-control">
+<h1>12. Master Slave And Group Control<a class="headerlink" href="#master-slave-and-group-control" title="Link to this heading"></a></h1>
+<section id="master-slave-and-environment-variable-configuration">
+<h2>12.1 Master-Slave and Environment Variable Configuration<a class="headerlink" href="#master-slave-and-environment-variable-configuration" title="Link to this heading"></a></h2>
+<section id="preparation">
+<h3>12.1.1 Preparation<a class="headerlink" href="#preparation" title="Link to this heading"></a></h3>
+<p>(1) Prepare at least two devices (this lesson uses two MentorPi units as an example).</p>
+<p>(2) Set up the development environment by referring to <a class="reference internal" href="3.set_development_environment.html#vnc-installation-and-connection"><span class="std std-ref">“<strong>2. Set Development Enviroment -&gt; 2.1 VNC Installation and Connection</strong>”</span></a>, and download and install the remote access tool <strong>VNC</strong>.</p>
+</section>
+<section id="program-logic">
+<h3>12.1.2 Program Logic<a class="headerlink" href="#program-logic" title="Link to this heading"></a></h3>
+<p>By connecting the master and slave devices to the same network and assigning different namespaces, the broadcast program can send velocity commands to the slave devices, enabling coordinated multi-device control. In this example, a hotspot created by a Raspberry Pi is used for the network connection.</p>
+<p id="anchor_12_1_3"></p>
+</section>
+<section id="network-configuration">
+<h3>12.1.3 Network Configuration<a class="headerlink" href="#network-configuration" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Configure Host Network</strong></p></li>
+</ul>
+<p>(1) Power on one MentorPi device and designate it as the master. Once it has booted, remotely access its desktop.</p>
+<p>(2) Open a terminal and navigate to the project directory by entering the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">hiwonder</span><span class="o">-</span><span class="n">toolbox</span>
+</pre></div>
+</div>
+<p>(3) Open the Wi-Fi configuration file using the Vim editor:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">vim</span> <span class="n">wifi_conf</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<p>(4) Press the <code class="docutils literal notranslate"><span class="pre">i</span></code> key to enter <strong>edit mode</strong>. Locate the two lines of code related to the hotspot password (as shown in the reference image), and update the password as needed.</p>
+<img src="../_static/media/13.group_control_lessson/section_1/01/media/image4.png" class="common_img" />
+<p>(5) After making the changes, press <code class="docutils literal notranslate"><span class="pre">Esc</span></code> to exit <strong>edit mode</strong>, then type <code class="docutils literal notranslate"><span class="pre">:wq</span></code> and press <code class="docutils literal notranslate"><span class="pre">Enter</span></code> to save and exit the file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">:</span><span class="n">wq</span>
+</pre></div>
+</div>
+<p>(6) Reboot the master device by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">reboot</span>
+</pre></div>
+</div>
+<p>(7) Once the device has restarted, connect to the master’s Wi-Fi using the updated password. The default password is <strong>“hiwonder”</strong> unless you specified a different one during configuration.</p>
+<ul class="simple">
+<li><p><strong>Configure Slave Network</strong></p></li>
+</ul>
+<p>(1) Power on the slave device and remotely access its desktop environment.</p>
+<p>(2) Open a terminal and navigate to the project directory with the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">hiwonder</span><span class="o">-</span><span class="n">toolbox</span>
+</pre></div>
+</div>
+<p>(3) Use the Vim editor to open the Wi-Fi configuration file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">vim</span> <span class="n">wifi_conf</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<p>(4) Press <code class="docutils literal notranslate"><span class="pre">i</span></code> to enter <strong>“edit mode”</strong>. Locate the three lines of code shown in the reference image and modify the Wi-Fi name and password as indicated.</p>
+<p>Located the indicated codes.</p>
+<img src="../_static/media/13.group_control_lessson/section_1/01/media/image7.png" class="common_img" />
+<p>Set the <strong>network mode to “2”</strong> to enable <strong>“LAN mode”</strong>. Use <strong>“HW-123”</strong> as the Wi-Fi name and <strong>“hiwonder”</strong> as the password—these should match the hotspot settings configured on the master device in <a class="reference internal" href="#anchor_12_1_3"><span class="xref myst">12.1.3 Network Configuration</span></a>.</p>
+<p>(5) Once editing is complete, press <code class="docutils literal notranslate"><span class="pre">Esc</span></code> to exit <strong>edit mode</strong>, then type <code class="docutils literal notranslate"><span class="pre">:wq</span></code> and press <code class="docutils literal notranslate"><span class="pre">Enter</span></code> to save and close the file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">:</span><span class="n">wq</span>
+</pre></div>
+</div>
+<p>(6) Reboot the device by entering the following command (this step is <strong>required</strong>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">reboot</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>When MentorPi starts in <strong>“LAN mode”</strong>, it will first attempt to automatically connect to the predefined network. During this process, <code class="docutils literal notranslate"><span class="pre">LED2</span></code> on the Raspberry Pi expansion board will flash rapidly, indicating that the device is actively searching for the network.</p></li>
+<li><p>If the target network cannot be found after <strong>three consecutive search attempts</strong>, MentorPi will automatically switch to <strong>“Direct Connection mode”</strong> (indicated by <code class="docutils literal notranslate"><span class="pre">LED2</span></code> flashing slowly).</p></li>
+<li><p>Please note that when MentorPi switches back to <strong>“Direct Connection mode”</strong> due to a failed LAN connection, the settings in the <code class="docutils literal notranslate"><span class="pre">wifi_conf.py</span></code> file <strong>will not be updated automatically</strong>—they will still reflect the LAN configuration. Therefore, unless the file is manually modified, MentorPi will continue to attempt <strong>“LAN mode”</strong> first on the next startup.</p></li>
+</ul>
+</div>
+<p id="anchor_12_1_4"></p>
+</section>
+<section id="configure-environment-variable">
+<h3>12.1.4 Configure Environment Variable<a class="headerlink" href="#configure-environment-variable" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Configuring Environment Variables on the Master Device</strong></p></li>
+</ul>
+<p>(1) Select one MentorPi vehicle as the master and power it on. Use VNC to remotely connect to the Raspberry Pi desktop.</p>
+<p>(2) Click <img src="../_static/media/13.group_control_lessson/section_1/01/media/image9.png"  /> in the top-left corner of the desktop to open the Terminator terminal.</p>
+<p>(3) Ensure the master device is connected to the USB game controller receiver.</p>
+<p>(4) Enter the command to disable automatic startup of the gameplay and press Enter:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">~/.</span><span class="n">stop_ros</span><span class="o">.</span><span class="n">sh</span>
+</pre></div>
+</div>
+<p>(5) Open the <code class="docutils literal notranslate"><span class="pre">.typerc</span></code> file to configure environment variables for the master device by entering:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vim</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">ubuntu</span><span class="o">/</span><span class="n">ros2_ws</span><span class="o">/.</span><span class="n">typerc</span>
+</pre></div>
+</div>
+<p>(6) Press the <code class="docutils literal notranslate"><span class="pre">i</span></code> key to enter <strong>edit mode</strong>. Enable the master-slave settings by setting the master to <code class="docutils literal notranslate"><span class="pre">robot_1/</span></code>.</p>
+<img src="../_static/media/13.group_control_lessson/section_1/01/media/image14.png" class="common_img" />
+<p>(7) After making the changes, press <code class="docutils literal notranslate"><span class="pre">Esc</span></code>, then type <code class="docutils literal notranslate"><span class="pre">:wq</span></code> and press <code class="docutils literal notranslate"><span class="pre">Enter</span></code> to save and exit.</p>
+<p>(8) Finally, enter the following command to apply the master configuration:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">source</span> <span class="o">~/.</span><span class="n">zshrc</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><strong>Configuring Environment Variables on the Slave Device</strong></p></li>
+</ul>
+<p>(1) Connect your mobile app to the Wi-Fi network generated by the master device. Perform a search, and you will see two car icons displayed. Long-press the icon representing the slave device to reveal its <code class="docutils literal notranslate"><span class="pre">IP</span></code> address. Use this <code class="docutils literal notranslate"><span class="pre">IP</span></code> to follow the instructions in <a class="reference internal" href="3.set_development_environment.html#vnc-installation-and-connection"><span class="std std-ref">“<strong>2. Set Development Environment -&gt; 2.1 VNC Installation and Connection</strong>”</span></a>.</p>
+<img src="../_static/media/13.group_control_lessson/section_1/01/media/image16.png" class="common_img" style="width:700px;"/>
+<img src="../_static/media/13.group_control_lessson/section_1/01/media/image17.png" class="common_img" style="width:700px;"/>
+<p>(2) After accessing the device, follow the steps in <a class="reference internal" href="#anchor_12_1_4"><span class="xref myst">12.1.4 Configure Environment Variable-&gt; Configuring Environment Variables on the Master Device</span></a> First, open the <code class="docutils literal notranslate"><span class="pre">.typerc</span></code> file and set the slave device’s environment variable <code class="docutils literal notranslate"><span class="pre">HOST</span></code> to <code class="docutils literal notranslate"><span class="pre">robot_2</span></code>. Then save and exit the file. Finally, run the command <code class="docutils literal notranslate"><span class="pre">source</span> <span class="pre">~/.zshrc</span></code> to refresh the environment variables.</p>
+<img src="../_static/media/13.group_control_lessson/section_1/01/media/image18.png" class="common_img" />
+<img src="../_static/media/13.group_control_lessson/section_1/01/media/image19.png" class="common_img" />
+</section>
+</section>
+<section id="group-control">
+<h2>12.2 Group Control<a class="headerlink" href="#group-control" title="Link to this heading"></a></h2>
+<section id="time-synchronization">
+<h3>12.2.1 Time Synchronization<a class="headerlink" href="#time-synchronization" title="Link to this heading"></a></h3>
+<p>(1) On the master device’s terminal, check the current system time by entering the command below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">date</span>
+</pre></div>
+</div>
+<p>(2) On the slave device, synchronize its system time with the master’s time by entering:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">date</span> <span class="o">-</span><span class="n">s</span> <span class="s2">&quot;2024-10-29 22:46:31&quot;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>If you experience noticeable desynchronization during joystick control between the master and slave devices, it is likely caused by inconsistent system times. In such cases, please repeat the synchronization process.</p></li>
+<li><p>Updating the slave’s system time based on the master’s reported time takes some time to execute, meaning the master’s actual time will have advanced by the time the update is applied. To minimize this discrepancy, start a stopwatch or manually count seconds after retrieving the master’s time. Then, add this elapsed time to the master’s reported time when setting the slave’s time.</p></li>
+<li><p>After synchronizing, verify by quickly running the <code class="docutils literal notranslate"><span class="pre">date</span></code> command on both master and slave terminals. If their system times closely match, the synchronization is successful.</p></li>
+</ul>
+</div>
+</section>
+<section id="program-execution">
+<h3>12.2.2 Program Execution<a class="headerlink" href="#program-execution" title="Link to this heading"></a></h3>
+<p><a class="reference download internal" download="" href="../_downloads/f4e772e0c4c3f544672358f2a548b822/multi.zip"><span class="xref download myst">Source Code</span></a></p>
+<p>(1) On the master device, open three terminal windows and run the following programs in each:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">multi_controller.launch.py</span></code>: controls the chassis</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">joystick_control_multi.py</span></code>: manages joystick input</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">joy_node</span></code>: starts the joystick communication node</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ros2</span> <span class="n">launch</span> <span class="n">multi</span> <span class="n">multi_controller</span><span class="o">.</span><span class="n">launch</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python3</span> <span class="n">ros2_ws</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">multi</span><span class="o">/</span><span class="n">launch</span><span class="o">/</span><span class="n">joystick_control_multi</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ros2</span> <span class="n">run</span> <span class="n">joy</span> <span class="n">joy_node</span>
+</pre></div>
+</div>
+<p>(2) On the slave device, enter the following command to run the program.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ros2</span> <span class="n">launch</span> <span class="n">multi</span> <span class="n">multi_controller</span><span class="o">.</span><span class="n">launch</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For every subsequent startup when you want to use multi-device control, you must first disable the auto-start services on both the master and slave devices, and synchronize their system times.</p>
+</div>
+</section>
+<section id="group-control-operation">
+<h3>12.2.3 Group Control Operation<a class="headerlink" href="#group-control-operation" title="Link to this heading"></a></h3>
+<p>(1) Turn ON the controller. Both the red and green <code class="docutils literal notranslate"><span class="pre">LEDs</span></code> on the controller will start blinking simultaneously.</p>
+<p>(2) Wait a few seconds for the robot and controller to pair automatically. Once paired successfully, the green LED will remain solid while the red <code class="docutils literal notranslate"><span class="pre">LED</span></code> turns off.</p>
+<p>(3) When the controller connects to the master device, pressing the Start button will trigger a beep from the buzzers on both vehicles.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Gently pushing the joystick in any direction will result in slow-speed movement.</p>
+</div>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th style="text-align: center;">Key</th>
+<th style="text-align: center;">Function</th>
+<th style="text-align: center;">Operation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">START</td>
+<td style="text-align: center;">Stop and reset the robot</td>
+<td style="text-align: center;">Press</td>
+</tr>
+<tr>
+<td style="text-align: center;">Left joystick up</td>
+<td style="text-align: center;">Move forward</td>
+<td style="text-align: center;">Push</td>
+</tr>
+<tr>
+<td style="text-align: center;">Left joystick down</td>
+<td style="text-align: center;">Move backward</td>
+<td style="text-align: center;">Push</td>
+</tr>
+<tr>
+<td style="text-align: center;">Left joystick left</td>
+<td style="text-align: center;">Turn left (mecanum wheel chassis only)</td>
+<td style="text-align: center;">Push</td>
+</tr>
+<tr>
+<td style="text-align: center;">Left joystick right</td>
+<td style="text-align: center;">Turn right (mecanum wheel chassis only)</td>
+<td style="text-align: center;">Push</td>
+</tr>
+<tr>
+<td style="text-align: center;">Right joystick left</td>
+<td style="text-align: center;">Turn left (Ackermann steering—front wheels only)</td>
+<td style="text-align: center;">Push</td>
+</tr>
+<tr>
+<td style="text-align: center;">Right joystick right</td>
+<td style="text-align: center;">Turn right (Ackermann steering—front wheels only)</td>
+<td style="text-align: center;">Push</td>
+</tr>
+</tbody>
+</table></section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="12.autonomous_driving_lesson.html" class="btn btn-neutral float-left" title="11. Autonomous Driving Lesson" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="14.Robot%20Network%20Configuration.html" class="btn btn-neutral float-right" title="13. Robot Network Configuration" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Hiwonder.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
