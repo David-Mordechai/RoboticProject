@@ -23,7 +23,7 @@ Local copies of manuals, datasheets and product images are in [`docs/vendor/hiwo
 - **Two computers.** The Pi 5 runs ROS 2 and AI. An **RRC Lite** board (STM32F407) runs the motors, steering servo, IMU, buzzer, LEDs and battery monitor. It talks to the Pi over **USB serial at 1 Mbaud** (`/dev/rrc`).
 - **Car-like chassis.** Two rear drive motors with encoders, and one LD-1501MG servo that steers both front wheels in parallel. It **can't turn in place or strafe**. Navigation needs a car-like planner.
 - **Real sensors in the box.** A 360° 2D LiDAR, an **Angstrong HP60C** depth camera (RGB-D), the IMU on the RRC Lite, and wheel encoders. The **WonderEcho Pro** voice box (mic and speaker) is the only Advanced-kit extra.
-- **The Pi is powered properly.** The RRC Lite supplies **5V/5A over USB-C with PD**, so the Pi 5 gets full USB current. This removes the brownout risk we had with the Adeept HAT.
+- **The Pi is powered properly.** The RRC Lite supplies **5V/5A over USB-C with PD**, so the Pi 5 gets full USB current.
 - **Biggest gap: odometry.** The encoders close the speed loop *inside* the STM32. The stock host protocol **never sends encoder counts to the Pi**, and stock `/odom` is dead-reckoned from the *commanded* velocity. See §4.
 - **Check on each car.** Which LiDAR is fitted (the model has changed three times), which steering revision we have (29° or 40°), and the real motor gear ratio.
 
