@@ -39,6 +39,9 @@ Manual: https://docs.hiwonder.com/projects/MentorPi/en/latest/ (the same content
 | Wi-Fi config | `~/hiwonder-toolbox/wifi_conf.py`: `HW_WIFI_MODE` 1 = AP, 2 = STA, 3 = direct; plus the `HW_WIFI_AP_*` and `HW_WIFI_STA_*` keys. Apply with `sudo systemctl restart wifi.service`. If the robot fails to join an STA network 3 times, it falls back to AP. **NetworkManager is not used** | Ch.13 |
 | Autostart | systemd `start_app_node.service` runs `ros2 launch bringup bringup.launch.py`: controller, camera, LiDAR, **rosbridge (:9090)**, **web_video_server (:8080)**, apps, joystick. Stop it with `~/.stop_ros.sh` before running your own code | [GH bringup](https://github.com/Hiwonder/MentorPi/tree/MentorPi-A1/bringup), Ch.5 |
 | Container sudo password | Not documented | – |
+| Hotspot security (measured, car #1) | **WPA (v1)-PSK**, not WPA2; 5 GHz, ch 36. A Windows profile set to `WPA2PSK` fails with "network not available", so use `WPAPSK` | Measured 2026-11-01 |
+| Ethernet (measured, car #1) | `eth0` uses DHCP on a wired LAN. Its MAC is **`98:FE:54:…`, not a Raspberry Pi vendor prefix**, so scans that filter by Pi MAC prefix miss the car. The wlan0 MAC is the eth0 MAC + 1 | Measured 2026-11-01 |
+| Autostart unit name (measured) | On the shipped image it's `start_node.service`, which runs `~/mentorpi/start_node.sh`, not `start_app_node.service` | Measured 2026-11-01 |
 
 ### Switching to Ackermann (known gotcha)
 - On the VNC desktop, open the **system configuration tool**:
@@ -46,7 +49,10 @@ Manual: https://docs.hiwonder.com/projects/MentorPi/en/latest/ (the same content
   - Set **Camera Type = `ascamera`** (the depth camera).
   - Click **Save → Apply → Quit**, then wait for the beep.
 - The tool writes environment variables into `.typerc`: `MACHINE_TYPE`, `DEPTH_CAMERA_TYPE`, `LIDAR_TYPE` (`MS200`/`LD19`/…), `HOST`, `MASTER`, `need_compile`.
-- The URDF, odom node, launches and apps all read `MACHINE_TYPE`. **If it's wrong, the steering servo is driven as if the car were a mecanum base.** One review says the image ships set to mecanum **[unverified]**.
+- The URDF, odom node, launches and apps all read `MACHINE_TYPE`. **If it's wrong, the steering servo is driven as if the car were a mecanum base.**
+  - **Verified on car #1 (2026-11-01):** the stock image shipped with `MentorPi_Mecanum`.
+  - Without VNC, edit `/home/ubuntu/ros2_ws/.typerc` inside the container: `export MACHINE_TYPE=MentorPi_Acker`. Then restart with `sudo systemctl restart start_node.service`.
+  - Check it with `ros2 param get /odom_publisher machine_type`.
 - In the WonderPi app, choose **MentorPi-A1**.
 - To calibrate steering trim, run `./Servo.sh` (Ch.2 §2.5).
 - The A1 doesn't support the "LiDAR guarding" demo.
@@ -81,6 +87,7 @@ Manual: https://docs.hiwonder.com/projects/MentorPi/en/latest/ (the same content
 |---|---|---|
 | Board → ROS | `/ros_robot_controller/imu_raw`, `/joy`, `/sbus`, `/button`, `/battery` | `/battery` is UInt16 in mV |
 | ROS → board | `~/set_motor` (MotorsState, rev/s per motor), `~/pwm_servo/set_state`, `~/bus_servo/*`, `~/set_led`, `~/set_buzzer`, `~/set_oled`, `~/set_rgb` | – |
+| Board → ROS (service) | `~/pwm_servo/get_state` | **⚠ Calling it kills the board driver.** See the bug note below |
 | Velocity input | **`/controller/cmd_vel`** (Twist, uncapped; used by Nav2 and the apps) | – |
 | Velocity input | `/cmd_vel` (app input) | Clamped to 0.2 m/s, 0.5 rad/s |
 | Pose reset | `set_odom` (Pose2D) | – |
@@ -97,6 +104,14 @@ Manual: https://docs.hiwonder.com/projects/MentorPi/en/latest/ (the same content
 - Servo pulse = 1500 + 2000·deg/180, sent to PWM servo id 3.
 - Rear wheels get v ± ω·track/2, sent as rev/s to motors 2 and 4.
 - **Bug:** when the steering clamp saturates, the odom node still integrates the un-clamped ω.
+
+**Bug: `pwm_servo/get_state` crashes the board driver** (found on car #1, 2026-11-01).
+- **Cause:** in `ros_robot_controller_node.py`, `get_pwm_servo_state` assigns the scalar returned by `pwm_servo_read_position()` / `pwm_servo_read_offset()` to `PWMServoState.position` / `.offset`. Those fields are `uint16[]` / `int16[]`.
+- **Effect:** the assignment raises, and the exception escapes `rclpy.spin()`. `ros_robot_controller` exits with code 1, and the launch doesn't respawn it. Motors and steering then stop responding, with no visible error.
+- **Evidence:** the launch log showed "process has died … exit code 1" 1.4 s after one service call.
+- **Exposure:** the stock stack never calls this service. Don't call it from our tools.
+- **Recover:** `sudo systemctl restart start_node.service`.
+- **Fix (not applied; it's a change to Hiwonder code):** wrap the values, e.g. `data.position = [state]`.
 
 **URDF.** `ack.xacro` makes all four wheels plain `continuous` joints, with **no steering joint**. The community repo [ViktorNfa/mentorpia1_simulator](https://github.com/ViktorNfa/mentorpia1_simulator) (MIT) has a corrected Ackermann Gazebo model.
 

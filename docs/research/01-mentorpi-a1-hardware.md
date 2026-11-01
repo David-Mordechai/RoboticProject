@@ -121,7 +121,12 @@ All dimensions marked *estimate* or "not published" must be measured on a real c
   | Speed | 0.16 s/60° |
   | Current | 2.4–3 A stall |
   | Size, weight | 54.4×20×45.5 mm, 61 g |
-  | Wiring | RRC port J5. Software uses PWM servo id 3, 1500 µs centre, ~11.1 µs/° |
+  | Wiring | Plug into the RRC header labelled **S5**; the assembly guide calls it "J5". Software uses PWM servo id 3, 1500 µs centre, ~11.1 µs/° |
+
+  **Measured on car #1 (2026-11-01): the board's S-labels don't match the PWM ids, so check the plug.**
+  - The PWM header silkscreen reads `J7 · S6 · S5 · S4 · S3 · J2`. J7 and J2 are the servo power jumpers; both are fitted from the factory.
+  - **S6 = id 4** and **S5 = id 3** were confirmed by moving one id at a time. This suggests S3 = id 1 and S4 = id 2 *(inferred, not tested)*.
+  - Car #1 was assembled with the servo on S6. It drove but never steered, because the stock driver sends steering to id 3. Moving the plug to S5 fixed it, and steering centre needed no trim.
 
   STEP and DXF drawings are in `vendor/hiwonder/cad/`. Per-unit trim is set with the servo-deviation tool (`./Servo.sh`).
 - **⚠ Stock odometry is not real odometry.** `odom_publisher_node.py` integrates the **commanded** v/ω at 50 Hz. The RRC host protocol has **no encoder-count or wheel-speed upload**; it uploads only battery, keys, IMU, gamepad, SBUS and servo readback. The encoders close only the STM32's internal speed PID. The EKF partly rescues this by fusing the IMU and rf2o laser odometry.
