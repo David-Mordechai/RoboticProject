@@ -183,7 +183,7 @@ Sources: [HW-A1], [hiwonder.com/products/ros-real-sense-depth-camera](https://ww
 
 | Where | What's free |
 |---|---|
-| RRC Lite | Motor ports M1/M3; 3 PWM servo ports; 2 bus-servo ports; I2C; GPIO/SWD |
+| RRC Lite | Motor ports M2/M4 (rear left/right; `docs-images/assembly-step10.jpg`); 3 PWM servo ports; 2 bus-servo ports; I2C; GPIO/SWD |
 | Pi 5 | Full 40-pin GPIO; the PCIe FFC (AI HAT+ or NVMe, if it fits) |
 | USB | The RRC, LiDAR, depth camera, gamepad dongle and WonderEcho add up to **5 devices against 4 USB-A ports**. Check how Hiwonder wires this; one may go through the RRC or a hub |
 | Top deck | Slot and hole patterns. **No hole drawing is published; measure it** |
