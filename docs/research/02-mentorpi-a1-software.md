@@ -95,7 +95,7 @@ Manual: https://docs.hiwonder.com/projects/MentorPi/en/latest/ (the same content
 | Odometry | `/odom_rf2o` from rf2o laser odometry | Where it gets launched is unclear |
 | IMU | `/imu` | Madgwick filter |
 | LiDAR | `/scan_raw` → `laser_filters` → `/scan` | – |
-| Depth camera | `/ascamera/camera_publisher/rgb0/image`, `.../depth0/points` | Launched by `hp60c.launch.py` |
+| Depth camera | `/ascamera/camera_publisher/rgb0/image`, `.../depth0/points` | Launched by `hp60c.launch.py` (the live image uses `include/ascamera.launch.py`). **Stock rate is poor**: the camera publishes at 12.4 fps and readers get 5–6 fps. With the fix (Fast DDS shared-memory profile, joystick busy-loop fix, `fps: 30`, `color_pcl: False`), readers get 24.8 fps. See `docs/measurements/car1-2026-11-02.md` §3 |
 | TF tree | `map → odom → base_footprint → base_link → {imu_link, lidar_frame, camera, wheels}` | Multi-robot prefixes frames with `robot_N/` |
 
 **Ackermann kinematics** ([ackermann.py](https://github.com/Hiwonder/MentorPi/blob/MentorPi-A1/driver/controller/controller/ackermann.py)):

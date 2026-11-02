@@ -1,0 +1,318 @@
+{
+ "/ros_robot_controller/imu_raw": {
+  "count": 962,
+  "hz": 48.08,
+  "dt_ms_p50": 20.6,
+  "dt_ms_p95": 22.6
+ },
+ "odom": {
+  "count": 580,
+  "hz": 30.04,
+  "dt_ms_p50": 33.3,
+  "dt_ms_p95": 35.7
+ },
+ "/imu_corrected": {
+  "count": 926,
+  "hz": 48.09,
+  "dt_ms_p50": 20.6,
+  "dt_ms_p95": 23.2
+ },
+ "scan_raw": {
+  "count": 184,
+  "hz": 10.05,
+  "dt_ms_p50": 99.4,
+  "dt_ms_p95": 102.0
+ },
+ "odom_raw": {
+  "count": 888,
+  "hz": 48.53,
+  "dt_ms_p50": 20.5,
+  "dt_ms_p95": 22.2
+ },
+ "/imu": {
+  "count": 879,
+  "hz": 48.07,
+  "dt_ms_p50": 20.6,
+  "dt_ms_p95": 23.5
+ },
+ "/ascamera/camera_publisher/rgb0/camera_info": {
+  "count": 171,
+  "hz": 9.54,
+  "dt_ms_p50": 81.2,
+  "dt_ms_p95": 242.4
+ },
+ "/ascamera/camera_publisher/depth0/camera_info": {
+  "count": 206,
+  "hz": 11.51,
+  "dt_ms_p50": 80.9,
+  "dt_ms_p95": 160.3
+ },
+ "/ascamera/camera_publisher/rgb0/image": {
+  "count": 148,
+  "hz": 8.29,
+  "dt_ms_p50": 81.2,
+  "dt_ms_p95": 323.1
+ },
+ "/ascamera/camera_publisher/depth0/image_raw": {
+  "count": 163,
+  "hz": 9.13,
+  "dt_ms_p50": 81.1,
+  "dt_ms_p95": 163.8
+ },
+ "lidar": {
+  "frame": "lidar_frame",
+  "n_rays": 449,
+  "angle_min_deg": 0.63,
+  "angle_max_deg": 359.49,
+  "increment_deg": 0.801,
+  "range_min": 0.05000000074505806,
+  "range_max": 12.0,
+  "scan_time": 0.10178947448730469,
+  "time_increment": 0.00022720864217262715,
+  "has_intensities": true,
+  "scans_used": 89,
+  "n_rays_hist": {
+   "448": 32,
+   "449": 89,
+   "450": 43,
+   "451": 19,
+   "452": 1
+  },
+  "valid_fraction": 0.992,
+  "flicker_fraction": 0.065,
+  "std_mm_median_by_range_and_nrays": {
+   "0-0.5m": [
+    1.4,
+    128
+   ],
+   "0.5-1m": [
+    3.2,
+    111
+   ],
+   "1-2m": [
+    4.5,
+    104
+   ],
+   "2-4m": [
+    3.7,
+    77
+   ],
+   "4-12m": [
+    NaN,
+    0
+   ]
+  },
+  "nearest_mean_m": 0.265
+ },
+ "imu /ros_robot_controller/imu_raw": {
+  "mean": [
+   0.1383,
+   0.6231,
+   10.0447,
+   0.0015,
+   0.0044,
+   -0.0011
+  ],
+  "std": [
+   0.01009,
+   0.00828,
+   0.0086,
+   0.0016,
+   0.00191,
+   0.00157
+  ],
+  "acc_norm": 10.0649
+ },
+ "imu /imu_corrected": {
+  "mean": [
+   -0.0609,
+   0.0037,
+   10.0907,
+   -0.0002,
+   0.0023,
+   -0.0001
+  ],
+  "std": [
+   0.01015,
+   0.00834,
+   0.00865,
+   0.00162,
+   0.00189,
+   0.00158
+  ],
+  "acc_norm": 10.0909
+ },
+ "imu /imu": {
+  "mean": [
+   -0.0609,
+   0.0037,
+   10.0908,
+   -0.0003,
+   0.0023,
+   -0.0001
+  ],
+  "std": [
+   0.01018,
+   0.00833,
+   0.0086,
+   0.00163,
+   0.00189,
+   0.00158
+  ],
+  "acc_norm": 10.091
+ },
+ "info": {
+  "/ascamera/camera_publisher/rgb0/camera_info": {
+   "w": 640,
+   "h": 480,
+   "K": [
+    594.8914794921875,
+    0.0,
+    343.3500671386719,
+    0.0,
+    595.1544799804688,
+    232.3182373046875,
+    0.0,
+    0.0,
+    1.0
+   ],
+   "D": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "model": "plumb_bob",
+   "frame": "ascamera_color_0"
+  },
+  "/ascamera/camera_publisher/depth0/camera_info": {
+   "w": 640,
+   "h": 480,
+   "K": [
+    594.8914794921875,
+    0.0,
+    343.3500671386719,
+    0.0,
+    595.1544799804688,
+    232.3182373046875,
+    0.0,
+    0.0,
+    1.0
+   ],
+   "D": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "model": "plumb_bob",
+   "frame": "ascamera_color_0"
+  },
+  "/ascamera/camera_publisher/rgb0/image": {
+   "w": 640,
+   "h": 480,
+   "enc": "bgr8",
+   "frame": "ascamera_color_0"
+  },
+  "/ascamera/camera_publisher/depth0/image_raw": {
+   "w": 640,
+   "h": 480,
+   "enc": "16UC1",
+   "frame": "ascamera_color_0"
+  }
+ },
+ "tf_static": [
+  {
+   "parent": "depth_cam",
+   "child": "ascamera_color_0",
+   "xyz": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "q": [
+    -0.5,
+    0.4996,
+    -0.5,
+    0.5004
+   ]
+  },
+  {
+   "parent": "base_footprint",
+   "child": "base_link",
+   "xyz": [
+    0.0,
+    0.0,
+    0.07
+   ],
+   "q": [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  },
+  {
+   "parent": "base_link",
+   "child": "depth_cam",
+   "xyz": [
+    0.064,
+    -0.0001,
+    0.0512
+   ],
+   "q": [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  },
+  {
+   "parent": "base_link",
+   "child": "imu_link",
+   "xyz": [
+    0.0,
+    0.0,
+    0.1116
+   ],
+   "q": [
+    0.0,
+    0.0,
+    -0.7071,
+    0.7071
+   ]
+  },
+  {
+   "parent": "base_link",
+   "child": "lidar_frame",
+   "xyz": [
+    -0.0096,
+    -0.0001,
+    0.0925
+   ],
+   "q": [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  },
+  {
+   "parent": "depth_cam",
+   "child": "ascamera_camera_link_0",
+   "xyz": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "q": [
+    -0.5,
+    0.4996,
+    -0.5,
+    0.5004
+   ]
+  }
+ ]
+}

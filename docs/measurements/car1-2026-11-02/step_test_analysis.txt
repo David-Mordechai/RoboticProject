@@ -1,0 +1,20 @@
+  1.73s steer     0  imu onset 1446 ms  last>6sd 1446 ms  peak z   34.8  tail med z   1.6  ros->set_motor None ms
+  3.73s steer    30  imu onset 61 ms  last>6sd 910 ms  peak z   94.0  tail med z   3.6  ros->set_motor None ms
+  4.93s steer     0  imu onset 62 ms  last>6sd 493 ms  peak z   98.9  tail med z   2.6  ros->set_motor None ms
+  6.13s steer   -30  imu onset 56 ms  last>6sd 385 ms  peak z   56.5  tail med z   2.9  ros->set_motor None ms
+  7.34s steer     0  imu onset 46 ms  last>6sd 892 ms  peak z   96.0  tail med z   4.5  ros->set_motor None ms
+  8.54s steer    30  imu onset 36 ms  last>6sd 466 ms  peak z  107.5  tail med z   3.0  ros->set_motor None ms
+  9.75s steer     0  imu onset 62 ms  last>6sd 617 ms  peak z   82.0  tail med z   2.6  ros->set_motor None ms
+ 10.95s steer   -30  imu onset 51 ms  last>6sd 422 ms  peak z   76.1  tail med z   3.0  ros->set_motor None ms
+ 12.16s steer     0  imu onset 46 ms  last>6sd 668 ms  peak z  100.6  tail med z   3.6  ros->set_motor None ms
+ 13.36s drive   0.2  imu onset 68 ms  last>6sd 1502 ms  peak z  160.2  tail med z  16.0  ros->set_motor 1.3 ms
+ 14.86s drive   0.0  imu onset 21 ms  last>6sd 1486 ms  peak z  325.4  tail med z   9.0  ros->set_motor 0.8 ms
+ 16.36s drive   0.4  imu onset 5 ms  last>6sd 1485 ms  peak z   57.5  tail med z  11.9  ros->set_motor 0.9 ms
+ 17.86s drive   0.0  imu onset 5 ms  last>6sd 1487 ms  peak z   65.5  tail med z   9.1  ros->set_motor 0.8 ms
+ 19.37s drive   0.2  imu onset 5 ms  last>6sd 1505 ms  peak z   28.2  tail med z  10.7  ros->set_motor 1.5 ms
+ 20.87s drive   0.0  imu onset 20 ms  last>6sd 1499 ms  peak z   16.3  tail med z   8.6  ros->set_motor 1.6 ms
+ 22.37s drive   0.4  imu onset 15 ms  last>6sd 1499 ms  peak z   75.9  tail med z  11.4  ros->set_motor 1.8 ms
+ 23.88s drive   0.0  imu onset 15 ms  last>6sd 1495 ms  peak z   54.0  tail med z   9.0  ros->set_motor 1.9 ms
+ 25.38s drive   0.0  imu onset None ms  last>6sd None ms  peak z    0.0  tail med z   0.0  ros->set_motor 1.9 ms
+ 25.38s steer     0  imu onset 10 ms  last>6sd 279 ms  peak z   11.9  tail med z   7.8  ros->set_motor None ms
+motor msgs 9 [[13.361, 0.0, 0.95, 0.0, -0.95], [14.863, 0.0, 0.0, 0.0, 0.0]]

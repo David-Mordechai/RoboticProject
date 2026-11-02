@@ -11,7 +11,9 @@ depth image (docs/vendor/hiwonder/code: example/.../body_track.py). Modelled as 
 within detection range, not hidden behind walls, with missed detections, position noise and a per-car frame rate.
 
 Sources: HP60C depth FOV H73.8 x V58.8 deg, range 0.2-4 m, accuracy < 2 mm at 1 m, RGB FOV H80.9 deg (Hiwonder product
-page, research/03 §1.2); stock driver at 15 fps (ascamera.launch.py). NO SOURCE (estimates, measure on the car): the
+page, research/03 §1.2); 24.8 fps delivered on car #1 after the camera fix (docs/measurements/car1-2026-11-02.md
+§3; stock config gave 12.4 fps, 5-6 fps to readers). The aligned depth image's intrinsics give a 56.6 x 43.9 deg FOV,
+not the product page's 73.8 x 58.8: conflict, open-issues #3. NO SOURCE (estimates, measure on the car): the
 distance-squared growth of depth noise, depth dropouts, YOLO rate / recall / range on a Pi 5 (research/03 G9).
 """
 
@@ -37,7 +39,7 @@ FLOOR_Z = 0.02                           # m: lower hits are floor
 BAND_TOP = 0.20                          # m: above the car's 157 mm height plus margin (research/01 §2)
 DEPTH_STD_1M = 0.002                     # m at 1 m (spec upper bound); grows with distance^2 (ESTIMATE)
 DEPTH_DROPOUT = (0.0, 0.05)              # per ray: ESTIMATE
-DEPTH_FRESH_P = 15.0 / 20.0              # 15 fps camera at a 20 Hz policy
+DEPTH_FRESH_P = 1.0                      # 24.8 fps camera (measured, car #1 with the fix) > 20 Hz policy: fresh every step
 
 RGB_HALF_HFOV = math.radians(80.9 / 2)
 DETECT_RANGE = (0.5, 4.0)                # m: closer, too little of the body is in frame (camera ~0.12 m up): ESTIMATE

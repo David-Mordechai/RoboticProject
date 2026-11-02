@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Fast DDS (ROS 2 Humble default RMW): shared-memory segment large enough for 640x480 camera frames
+     (~0.9 MB each; the default segment is 512 KB, so frames fell back to fragmented UDP). UDP kept for the LAN. -->
+<profiles xmlns="http://www.eprosima.com/XMLSchemas/fastRTPS_Profiles">
+  <transport_descriptors>
+    <transport_descriptor>
+      <transport_id>shm_big</transport_id>
+      <type>SHM</type>
+      <segment_size>8388608</segment_size>
+    </transport_descriptor>
+    <transport_descriptor>
+      <transport_id>udp</transport_id>
+      <type>UDPv4</type>
+    </transport_descriptor>
+  </transport_descriptors>
+  <participant profile_name="shm_big_participant" is_default_profile="true">
+    <rtps>
+      <userTransports>
+        <transport_id>shm_big</transport_id>
+        <transport_id>udp</transport_id>
+      </userTransports>
+      <useBuiltinTransports>false</useBuiltinTransports>
+    </rtps>
+  </participant>
+</profiles>

@@ -59,22 +59,24 @@ DRIVE_GAIN_SCALE_RANGE = (0.5, 2.0)
 STEER_DEADTIME_RANGE_S = (0.0, 0.020)
 STEER_RATE_SCALE_RANGE = (0.6, 1.0)
 
-# Policy output -> motors. NO SOURCE for the end-to-end value: the serial link itself is fast (1 Mbaud,
-# a motor packet is ~20 bytes = 0.2 ms; research/01 §1.2), the rest is ROS 2 scheduling and the RRC
-# firmware loop, both unmeasured. 0-40 ms is an estimate; measure with a step command on the real car.
-LATENCY_RANGE_S = (0.0, 0.040)
+# Policy output -> motors. Measured on car #1 (docs/measurements/car1-2026-11-02.md §4, wheels up): cmd_vel ->
+# board message 1-2 ms; command -> first IMU-visible motion 36-73 ms (steering) and 51-71 ms (motor start). The IMU
+# samples every 20.6 ms, so true motion starts up to ~21 ms earlier: about 15-73 ms. Steering adds the servo dead
+# time below on top, so steering spans 20-90 ms and motors 20-70 ms.
+LATENCY_RANGE_S = (0.020, 0.070)
 
-# LiDAR. LD19 datasheet v2.5: ranging standard deviation 10 mm and average accuracy ±45 mm (0.3-12 m, 70%
-# reflectivity); 10 Hz scan (LD19 development manual §1, docs/vendor/hiwonder/datasheets/). Which LiDAR our
-# cars carry is unresolved (LD19 / MS200 / COIN-D6, research/01 §5), so the noise std spans 0.5-2x the
-# LD19 figure. Dropout rate: NO SOURCE (dark and glass surfaces, open-issues #11); 0-5% per ray is an estimate.
+# LiDAR. Car #1 runs the stock Oradar MS200 driver (node /MS200; docs/measurements/car1-2026-11-02.md §1):
+# 10.0 Hz, ~449 points at 0.80 deg, 0.05-12 m. Measured static noise std 1.4-4.5 mm out to 4 m (bench scene,
+# ordinary surfaces) and 0.8% invalid readings; the LD19 datasheet v2.5 gives std 10 mm, accuracy ±45 mm. The
+# sim keeps the wider LD19-based range on purpose: dark and glass surfaces are untested (open-issues #11).
 LIDAR_BIAS_M = 0.045
 LIDAR_STD_RANGE_M = (0.005, 0.020)
 LIDAR_DROPOUT_RANGE = (0.0, 0.05)
 LIDAR_REFRESH_STEPS = 2          # 10 Hz scan / 20 Hz policy: each scan is seen for two policy steps
-# Scan rate per car for the navigation tasks: LD19 defaults to 10 Hz, Hiwonder's stock MS200 launch spins it at
-# 15 Hz (research/03 §1.1). At a 20 Hz policy a fresh scan arrives with probability rate / 20 per step.
-LIDAR_SCAN_HZ_RANGE = (10.0, 15.0)
+# Scan rate per car for the navigation tasks: measured 10.0-10.1 Hz on car #1 with the stock MS200 launch
+# (docs/measurements/car1-2026-11-02.md §1; research/03 §1.1 had read 15 Hz from the launch file). At a 20 Hz
+# policy a fresh scan arrives with probability rate / 20 per step.
+LIDAR_SCAN_HZ_RANGE = (9.5, 10.5)
 
 # Own speed reading (car_motion vx, vy): per-car scale error. Stock speed is the commanded one (open-loop,
 # research/03 §1.4); wheel diameter 65 vs 67 mm alone is ±3% (research/01 §3; research/03 §4.3, derived).

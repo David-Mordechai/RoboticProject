@@ -78,6 +78,19 @@ Steering randomization (29–37°) stays in `mdp.AckermannAction`.
 - the steering randomization is narrowed to the measured build
 - the sim turning circle matches the measured one
 
+**Status (2026-11-02), car #1 wheels-up** (`docs/measurements/car1-2026-11-02.md`):
+- **Measured and fed into the sim:**
+  - LiDAR model: MS200
+  - LiDAR rate 10 Hz and noise
+  - IMU noise
+  - camera intrinsics and rate
+  - command latency 15–73 ms (`randomization.py`, `camera.py`)
+- **Camera fps fix applied to car #1:** readers now get 24.8 fps, up from 5–6. Apply it to car #2 too.
+- **New conflict:** the depth image's FOV is 56.6° × 43.9° (from its intrinsics), not the product page's 73.8° × 58.8°. The sim still uses 73.8°. Verify with a tape measure, then change `camera.py`.
+- **Still open:**
+  - hand measurements (wheels, wheelbase, track, mass, sensor heights, full-lock angle)
+  - floor tests (top speed, acceleration, turning circle)
+
 ## 4. Retrain the follow task
 `Robotlab-Follow-MentorPiA1` (`logs/rsl_rl/follow/2026-10-30_09-23-00`) was trained before the steering fix, with the car steering about 5°. That checkpoint is invalid.
 
@@ -158,7 +171,7 @@ An AprilTag on each car's rear, seen by the follower's HP60C, is the cross-check
 **Done when:** we have a chosen and tested source of relative pose, with its noise level fed back into #1.
 
 ## 8. LiDAR fidelity
-**The model is still unresolved:** the product page lists both the MS200 and the COIN-D6, and the stock code drives the MS200 or LD19 only (`docs/research/03` §1.1).
+**Model: MS200 on car #1** (stock driver node `/MS200`, 10.0 Hz, 449 points at 0.80°; `docs/measurements/car1-2026-11-02.md` §1). Check car #2.
 **Problem:** the sim gives 36 rays, clipped at 3 m, refreshed every policy step (20 Hz). The real LD19 (or MS200 / COIN-D6) spins at about 10 Hz, ranges about 12 m, and has noise and dropouts.
 
 **Do:** model the scan rate, the downsampling and the noise from the sensor datasheet (`docs/vendor/hiwonder/datasheets/LDROBOT_LD19_Development_Manual_EN_v2.4.pdf`).
