@@ -1,0 +1,47 @@
+<!--
+  Phase A, tree B (2026-11-09 night). Based on Nav2 Humble's
+  navigate_w_recovery_and_replanning_only_if_path_becomes_invalid.xml (Apache-2.0), changed for the Ackermann A1:
+  - replan ONLY when the path becomes invalid (IsPathValid) or the goal changes. Trial a_c3_1: with a 1 Hz replan, 39 of
+    40 Smac paths with a reverse cusp had it 8-16 cm from the start: the car dithered back and forth at the U-turn
+    (22 reverse segments of 1-17 cm in ~40 s; 26 of 27 left/right steering flips happened while reversing).
+  - no Spin (a car cannot turn in place). Recoveries take turns (RoundRobin): clear both costmaps, wait 2 s, and only
+    on the third failure a short straight BackUp (0.15 m at 0.08 m/s; Humble BackUp keeps the wheels straight).
+    Trial a_c2_1: the BackUp-first recovery was the "reversing for no reason" the user saw.
+-->
+<root main_tree_to_execute="MainTree">
+  <BehaviorTree ID="MainTree">
+    <RecoveryNode number_of_retries="6" name="NavigateRecovery">
+      <PipelineSequence>
+        <RateController hz="1.0" name="RateControllerComputePathToPose">
+          <RecoveryNode number_of_retries="1" name="RecoveryComputePathToPose">
+            <Fallback name="FallbackComputePathToPose">
+              <ReactiveSequence name="CheckIfNewPathNeeded">
+                <Inverter>
+                  <GlobalUpdatedGoal/>
+                </Inverter>
+                <IsPathValid path="{path}"/>
+              </ReactiveSequence>
+              <ComputePathToPose goal="{goal}" path="{path}" planner_id="GridBased"/>
+            </Fallback>
+            <ClearEntireCostmap name="ClearGlobalCostmap-Context" service_name="global_costmap/clear_entirely_global_costmap"/>
+          </RecoveryNode>
+        </RateController>
+        <RecoveryNode number_of_retries="1" name="RecoveryFollowPath">
+          <FollowPath path="{path}" controller_id="FollowPath"/>
+          <ClearEntireCostmap name="ClearLocalCostmap-Context" service_name="local_costmap/clear_entirely_local_costmap"/>
+        </RecoveryNode>
+      </PipelineSequence>
+      <ReactiveFallback name="FallbackRecoveries">
+        <GoalUpdated/>
+        <RoundRobin name="RecoveryActions">
+          <Sequence name="ClearingActions">
+            <ClearEntireCostmap name="ClearLocalCostmap-Subtree" service_name="local_costmap/clear_entirely_local_costmap"/>
+            <ClearEntireCostmap name="ClearGlobalCostmap-Subtree" service_name="global_costmap/clear_entirely_global_costmap"/>
+          </Sequence>
+          <Wait name="WaitRecovery" wait_duration="2"/>
+          <BackUp name="BackUpRecovery" backup_dist="0.15" backup_speed="0.08"/>
+        </RoundRobin>
+      </ReactiveFallback>
+    </RecoveryNode>
+  </BehaviorTree>
+</root>

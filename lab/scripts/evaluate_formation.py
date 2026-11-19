@@ -90,6 +90,14 @@ for i, name in enumerate(names):
 r = lambda j: (outcome == j).float().mean().item()
 print(f"{'ALL':16s} {n:5d} {r(0):10.1%} {r(1):6.1%} {r(2):7.1%} {r(3):6.1%} "
       f"{(err_sum.sum() / steps.sum()).item() * 100:7.1f}cm {(in_slot.sum() / steps.sum()).item():8.1%}")
+width = s.maps.hall_width[s.layout]
+print("completed by hallway width (m):")
+for lo, hi in ((0.0, 1.6), (1.6, 2.0), (2.0, 9.0)):
+  wm = (width >= lo) & (width < hi)
+  side = wm & (slot >= 3)                                    # row_left / row_right (side-by-side)
+  if wm.any():
+    print(f"  {lo:.1f}-{min(hi, 2.4):.1f}: all {(outcome[wm] == 0).float().mean().item():6.1%} ({int(wm.sum())} runs)"
+          f"   side-by-side {(outcome[side] == 0).float().mean().item() if side.any() else float('nan'):6.1%} ({int(side.sum())} runs)")
 print(f"person contacts: {int((outcome == 2).sum())}, of which with a STANDING person: {int(person_standing.sum())}")
 print(f"time with a person inside 0.45 m: {(close.sum() / steps.sum()).item():.2%}")
 env.close()

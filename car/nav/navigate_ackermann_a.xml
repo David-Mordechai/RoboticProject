@@ -1,0 +1,35 @@
+<!--
+  Phase A (2026-11-09, docs/research/deep-2026-11-09/01): as navigate_ackermann.xml plus one short straight BackUp
+  (0.2 m at 0.1 m/s; Humble BackUp keeps the wheels straight) after clearing, before waiting. No Spin.
+  Nav2 (Humble) navigate-to-pose tree for the Ackermann MentorPi A1: replan at 1 Hz and follow; on failure clear the
+  costmaps and wait, then try again (4 times). Based on Nav2's navigate_to_pose_w_replanning_and_recovery.xml
+  (Apache-2.0) with the Spin and BackUp recoveries removed: the car cannot turn in place, and repeated back-ups were
+  the "only driving backward" behaviour seen on 2026-11-02.
+-->
+<root main_tree_to_execute="MainTree">
+  <BehaviorTree ID="MainTree">
+    <RecoveryNode number_of_retries="4" name="NavigateRecovery">
+      <PipelineSequence name="NavigateWithReplanning">
+        <RateController hz="1.0">
+          <RecoveryNode number_of_retries="1" name="ComputePathToPose">
+            <ComputePathToPose goal="{goal}" path="{path}" planner_id="GridBased"/>
+            <ClearEntireCostmap name="ClearGlobalCostmap-Context" service_name="global_costmap/clear_entirely_global_costmap"/>
+          </RecoveryNode>
+        </RateController>
+        <RecoveryNode number_of_retries="1" name="FollowPath">
+          <FollowPath path="{path}" controller_id="FollowPath"/>
+          <ClearEntireCostmap name="ClearLocalCostmap-Context" service_name="local_costmap/clear_entirely_local_costmap"/>
+        </RecoveryNode>
+      </PipelineSequence>
+      <ReactiveFallback name="RecoveryFallback">
+        <GoalUpdated/>
+        <Sequence name="RecoveryActions">
+          <ClearEntireCostmap name="ClearLocalCostmap-Subtree" service_name="local_costmap/clear_entirely_local_costmap"/>
+          <ClearEntireCostmap name="ClearGlobalCostmap-Subtree" service_name="global_costmap/clear_entirely_global_costmap"/>
+          <BackUp backup_dist="0.2" backup_speed="0.1"/>
+          <Wait wait_duration="2"/>
+        </Sequence>
+      </ReactiveFallback>
+    </RecoveryNode>
+  </BehaviorTree>
+</root>

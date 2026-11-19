@@ -46,6 +46,8 @@ p.add_argument("--distance", type=float, default=None, help="camera distance (m)
 p.add_argument("--elevation", type=float, default=None, help="camera elevation above the ground (deg)")
 p.add_argument("--seed", type=int, default=1)
 p.add_argument("--chase", action="store_true", help="camera behind the car, turning with it (smoothed)")
+p.add_argument("--carskill", action="store_true", help="goto: the car's skill layer on top of the model "
+               "(robotlab/tasks/carskill.py, = the car node with --kturn); the status line shows who drives")
 args = p.parse_args()
 
 torch.manual_seed(args.seed)
@@ -69,6 +71,10 @@ if args.checkpoint:
   policy = runner.get_inference_policy(device="cuda:0")
 else:
   policy = lambda obs: torch.zeros(venv.num_envs, venv.num_actions, device="cuda:0")
+KS = None
+if args.carskill:
+  from robotlab.tasks import carskill as _CS
+  policy, KS = _CS.make_policy(env, policy)
 
 fps = round(1.0 / env.step_dt)
 out = Path(args.out)
@@ -176,6 +182,12 @@ def nav_overlay(frame: np.ndarray) -> np.ndarray:
   clear = float(T.person_clearance(env)[0])
   status = (f"goals reached: {int(nv.goals_reached[0])}    speed: {v:.2f} m/s    "
             f"nearest person: {'-' if clear > 50 else f'{clear:.2f} m'}")
+  if KS is not None:
+    drv = env.action_manager.get_term("drive")
+    who = ("multi-point turn" if bool(KS["on"][0]) else "steer-around" if float(KS["av"][0]) > 0
+           else "scripted back-up" if bool(drv.backing[0]) else "STOP holds" if bool(drv.shielded[0])
+           else "model drives")
+    status += f"    {who}"
   pad = args.height // 36
   w = d.textlength(status, font=font_small) + 2 * pad
   y0 = args.height - pad - font_small.size - 2 * pad

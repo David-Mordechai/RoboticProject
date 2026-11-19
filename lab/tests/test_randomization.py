@@ -66,7 +66,7 @@ def test_commands_arrive_late(env):
   a[:, 1] = 1.0
   env.step(a)
   moved = drive._steer_now[:, 0]
-  slow, fast = steer_lag_s > 0.03, steer_lag_s < 0.01
+  slow, fast = steer_lag_s > 0.045, steer_lag_s < 0.03   # LATENCY_RANGE_S + dead time span 20-90 ms
   assert slow.any() and fast.any()
   assert moved[slow].mean() < moved[fast].mean()
 

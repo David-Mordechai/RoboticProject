@@ -52,6 +52,7 @@ REMAIN_CLIP = 3.0                # m, remaining route length is clipped to this 
 GOAL_RADIUS = 0.35               # m: goal reached
 MAX_SEGMENTS = 2 * NODES * NODES # longest shortest path is far shorter; padding bound
 PATH_POINTS = 1 + 3 * (MAX_SEGMENTS + 1)
+MAX_ADVANCE = 1.0                # m, see _project
 PROJ_WINDOW = 6                  # segments searched ahead of the current one for the progress point
 # Personal space: Hall (1966) intimate zone < 0.45 m; robot studies use Hall's zones as reference and find
 # many people accept a robot at personal distance 0.45-1.2 m (Huettenrauch et al. 2006; Walters et al. 2009).
@@ -164,6 +165,9 @@ def _project(nv: Nav, ids: torch.Tensor, xy: torch.Tensor) -> torch.Tensor:
   ab = b - a
   t = (((xy[:, None] - a) * ab).sum(-1) / (ab * ab).sum(-1).clamp(min=1e-9)).clamp(0, 1)
   dist = torch.linalg.norm(a + t[..., None] * ab - xy[:, None], dim=-1)
+  # only segments starting within MAX_ADVANCE of the progress point (goto v5): on an out-and-back route both legs lie on
+  # one line and the projection could jump to the way back (car/policy/explore_policy.py has the same rule, goto3)
+  dist = torch.where(torch.gather(nv.cum[ids], 1, i) > nv.s[ids, None] + MAX_ADVANCE, torch.inf, dist)
   k = dist.argmin(-1)
   kk = k[:, None]
   seg = torch.gather(i, 1, kk)[:, 0]

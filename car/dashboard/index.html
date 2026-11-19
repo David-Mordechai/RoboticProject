@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Car Dashboard</title>
+<!--
+  Live dashboard for the MentorPi A1 cars. Open this file directly in a browser (file://) on a PC that is on the
+  cars' network. It talks to each car's stock rosbridge server (ws://<car>:9090, rosbridge v2 JSON protocol) and its
+  stock web_video_server (http://<car>:8080). Nothing is installed on the cars. Read-only: it never publishes.
+  It must be a local file, not an https page: browsers block ws:// and http:// from https pages.
+-->
+<style>
+:root {
+  --bg: #f4f5f7; --panel: #ffffff; --text: #1d2330; --muted: #677085; --line: #dde1e8;
+  --ok: #1f8a4c; --warn: #b7791f; --bad: #c53030; --grid: #e7eaf0; --free: #ffffff; --unknown: #c9ced8; --wall: #1d2330;
+  --car1: #2563eb; --car2: #d9480f; --scan: rgba(197, 48, 48, .65);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12151b; --panel: #1b2029; --text: #e6e9ef; --muted: #98a1b3; --line: #2c3340;
+    --grid: #232a35; --free: #222833; --unknown: #151920; --wall: #e6e9ef; --car1: #6ea0ff; --car2: #ff8a4c;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12151b; --panel: #1b2029; --text: #e6e9ef; --muted: #98a1b3; --line: #2c3340;
+  --grid: #232a35; --free: #222833; --unknown: #151920; --wall: #e6e9ef; --car1: #6ea0ff; --car2: #ff8a4c;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; }
+header { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--line); background: var(--panel); flex-wrap: wrap; }
+header h1 { font-size: 16px; margin: 0 8px 0 0; }
+header .hint { color: var(--muted); font-size: 12px; }
+main { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 12px; padding: 12px 16px; }
+@media (max-width: 1000px) { main { grid-template-columns: 1fr; } }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
+.panel h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 0 0 8px; }
+#mapwrap { position: relative; height: calc(100vh - 120px); min-height: 420px; }
+#map { width: 100%; height: 100%; display: block; border-radius: 6px; background: var(--unknown); cursor: grab; }
+#maptools { position: absolute; top: 8px; right: 8px; display: flex; gap: 6px; }
+#mapinfo { position: absolute; left: 8px; bottom: 8px; font-size: 12px; color: var(--muted); background: var(--panel); padding: 4px 8px; border-radius: 6px; border: 1px solid var(--line); }
+button, select, input { font: inherit; color: var(--text); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; }
+button { cursor: pointer; }
+#cars { display: flex; flex-direction: column; gap: 12px; }
+.car .top { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.car .swatch { width: 12px; height: 12px; border-radius: 50%; }
+.car .name { font-weight: 600; }
+.car .host { width: 130px; margin-left: auto; }
+.dot { width: 9px; height: 9px; border-radius: 50%; background: var(--bad); display: inline-block; }
+.dot.ok { background: var(--ok); }
+.video { width: 100%; aspect-ratio: 4 / 3; background: var(--unknown); border-radius: 6px; object-fit: contain; display: block; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 8px; }
+.stat { border: 1px solid var(--line); border-radius: 6px; padding: 5px 7px; }
+.stat .k { font-size: 11px; color: var(--muted); }
+.stat .v { font-size: 15px; font-variant-numeric: tabular-nums; }
+.bar { height: 6px; background: var(--grid); border-radius: 3px; overflow: hidden; margin-top: 4px; }
+.bar > div { height: 100%; background: var(--ok); width: 0; }
+.warn { color: var(--warn); } .bad { color: var(--bad); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Car Dashboard</h1>
+  <label>Map from <select id="mapsrc"></select></label>
+  <label><input type="checkbox" id="showscan" checked> LiDAR</label>
+  <span class="hint">Read-only. Pose = map→odom (slam_toolbox / AMCL) × odom→base_footprint (/odom). Without a map: odom frame of the map car.</span>
+</header>
+<main>
+  <section class="panel">
+    <h2>Map</h2>
+    <div id="mapwrap">
+      <canvas id="map"></canvas>
+      <div id="maptools"><button id="fit">Fit</button><button id="follow">Follow: off</button></div>
+      <div id="mapinfo">no map yet</div>
+    </div>
+  </section>
+  <section id="cars"></section>
+</main>
+
+<script>
+// Cars: edit the address in the page (saved in this browser). The phone hotspot hands out addresses by DHCP.
+const DEFAULT_CARS = [
+  { id: 'car1', name: 'Car #1', host: '10.71.88.196', color: '--car1' },
+  { id: 'car2', name: 'Car #2', host: '10.71.88.121', color: '--car2' },
+];
+// Battery: 7.4 V 2S 2200 mAh LiPo (research/01 sec. 5). The board alarm is set at 6.9 V by the stock driver
+// (ros_robot_controller_node.py: set_battery_level(0x1af4) = 6900 mV); Hiwonder's docs say charge below 6.4 V.
+// The car has no fuel gauge, only voltage, so percent is an ESTIMATE: a typical LiPo resting-voltage curve per cell
+// (common hobby table, not a Hiwonder spec), with 0% at 3.2 V/cell = 6.4 V. Under load the voltage sags and the
+// estimate reads low; the last 10 readings (~10 s) are averaged.
+const BATT_ALARM = 6.9;
+const LIPO_CELL = [[3.20, 0], [3.61, 5], [3.69, 10], [3.71, 15], [3.73, 20], [3.75, 25], [3.77, 30], [3.79, 35],
+  [3.80, 40], [3.82, 45], [3.84, 50], [3.85, 55], [3.87, 60], [3.91, 65], [3.95, 70], [3.98, 75], [4.02, 80],
+  [4.08, 85], [4.11, 90], [4.15, 95], [4.20, 100]];
+function battPercent(v) {
+  const c = v / 2;
+  if (c <= LIPO_CELL[0][0]) return 0;
+  for (let i = 1; i < LIPO_CELL.length; i++) {
+    const [v1, p1] = LIPO_CELL[i], [v0, p0] = LIPO_CELL[i - 1];
+    if (c <= v1) return p0 + (p1 - p0) * (c - v0) / (v1 - v0);
+  }
+  return 100;
+}
+// What the page shows: charge left until the next charge is due. 100% = full, 0% = the board's 6.9 V low-battery
+// alarm (it beeps there and the car should be charged), rescaled on the same LiPo curve.
+const ALARM_PCT = battPercent(BATT_ALARM);
+const untilCharge = (v) => Math.max(0, Math.min(100, (battPercent(v) - ALARM_PCT) / (100 - ALARM_PCT) * 100));
+// Time left: linear fit of that percent over the last 5 min of readings; shown once 3 min of data exist.
+function minutesLeft(hist) {
+  if (hist.length < 2 || hist[hist.length - 1][0] - hist[0][0] < 180) return null;
+  const n = hist.length, mt = hist.reduce((a, h) => a + h[0], 0) / n, mp = hist.reduce((a, h) => a + h[1], 0) / n;
+  let num = 0, den = 0;
+  for (const [t, q] of hist) { num += (t - mt) * (q - mp); den += (t - mt) ** 2; }
+  const slope = num / den;                                     // % per second
+  return slope < -1e-4 ? hist[n - 1][1] / -slope / 60 : Infinity;
+}
+// Throttles (ms) keep the car's rosbridge light: it serialises every message to JSON on the Pi. Unthrottled LiDAR and
+// /tf kept rosbridge at ~55% of a core on car #2 for 40 min and drained its battery (2026-11-02).
+const TOPICS = {
+  battery: ['/ros_robot_controller/battery', 'std_msgs/msg/UInt16', 1000],
+  odom: ['/odom', 'nav_msgs/msg/Odometry', 200],
+  scan: ['/scan_raw', 'sensor_msgs/msg/LaserScan', 200],
+  tf: ['/tf', 'tf2_msgs/msg/TFMessage', 200],
+  motor: ['/ros_robot_controller/set_motor', 'ros_robot_controller_msgs/msg/MotorsState', 500],
+  map: ['/map', 'nav_msgs/msg/OccupancyGrid', 3000],
+  plan: ['/plan', 'nav_msgs/msg/Path', 1000],                 // Nav2's planned path
+  route: ['/drive_to/path', 'nav_msgs/msg/Path', 1000],        // car/nav/drive_to.py waypoints
+};
+const VIDEO = (h) => `http://${h}:8080/stream?topic=/ascamera/camera_publisher/rgb0/image&type=mjpeg&quality=50&width=320&height=240`;
+
+function load(key, dflt) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : dflt; } catch { return dflt; } }
+function save(key, v) { try { localStorage.setItem(key, JSON.stringify(v)); } catch {} }
+const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
+// 2D pose helpers: [x, y, yaw]
+const compose = (a, b) => [a[0] + Math.cos(a[2]) * b[0] - Math.sin(a[2]) * b[1],
+                           a[1] + Math.sin(a[2]) * b[0] + Math.cos(a[2]) * b[1], a[2] + b[2]];
+const fmt = (v, d) => (Math.abs(v) < 0.5 * 10 ** -d ? 0 : v).toFixed(d);
+const yawOf = (q) => Math.atan2(2 * (q.w * q.z + q.x * q.y), 1 - 2 * (q.y * q.y + q.z * q.z));
+
+class Car {
+  constructor(cfg) {
+    Object.assign(this, cfg);
+    this.host = load('host_' + cfg.id, cfg.host);
+    this.ws = null; this.connected = false;
+    this.odomPose = null; this.mapToOdom = null; this.speed = 0; this.yawRate = 0;
+    this.batt = null; this.scan = null; this.motor = null; this.map = null;
+    this.scanTimes = []; this.last = 0; this.battHist = []; this.pctHist = []; this.trail = []; this.route = null;
+    this.buildCard();
+    this.connect();
+  }
+  buildCard() {
+    const el = document.createElement('div');
+    el.className = 'panel car';
+    el.innerHTML = `
+      <div class="top"><span class="swatch" style="background:var(${this.color})"></span><span class="name">${this.name}</span>
+        <span class="dot"></span><input class="host" value="${this.host}" title="Car address (Enter to reconnect)"></div>
+      <img class="video" alt="camera off: click to show (the video stream loads the car)" title="click to start / stop video">
+      <div class="stats">
+        <div class="stat"><div class="k">Battery until charge</div><div class="v b">–</div><div class="bar"><div></div></div><div class="k bv"></div></div>
+        <div class="stat"><div class="k">Speed</div><div class="v s">–</div></div>
+        <div class="stat"><div class="k">Turn rate</div><div class="v w">–</div></div>
+        <div class="stat"><div class="k">Motors (rev/s)</div><div class="v m">–</div></div>
+        <div class="stat"><div class="k">LiDAR</div><div class="v l">–</div></div>
+        <div class="stat"><div class="k">Pose (map)</div><div class="v p">–</div></div>
+      </div>`;
+    document.getElementById('cars').appendChild(el);
+    this.el = el;
+    const q = (s) => el.querySelector(s);
+    this.ui = { dot: q('.dot'), video: q('.video'), b: q('.b'), bv: q('.bv'), bar: q('.bar > div'), s: q('.s'), w: q('.w'), m: q('.m'),
+                l: q('.l'), p: q('.p') };
+    q('.host').addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter') return;
+      this.host = e.target.value.trim(); save('host_' + this.id, this.host); this.connect();
+    });
+    this.videoOn = false;
+    this.ui.video.addEventListener('click', () => { this.videoOn = !this.videoOn; this.videoOn ? this.startVideo() : this.stopVideo(); });
+    this.ui.video.addEventListener('error', () => { if (this.videoOn) setTimeout(() => this.startVideo(), 3000); });
+  }
+  startVideo() { if (this.videoOn) this.ui.video.src = VIDEO(this.host) + '&t=' + Date.now(); }
+  stopVideo() { this.ui.video.removeAttribute('src'); }
+  connect() {
+    if (this.ws) { this.ws.onclose = null; this.ws.close(); }
+    this.connected = false; this.map = null; this.mapToOdom = null; this.odomPose = null;
+    let ws;
+    try { ws = new WebSocket(`ws://${this.host}:9090`); } catch { return; }
+    this.ws = ws;
+    ws.onopen = () => {
+      this.connected = true;
+      for (const [key, [topic, type, throttle]] of Object.entries(TOPICS)) {
+        ws.send(JSON.stringify({ op: 'subscribe', id: `${this.id}_${key}`, topic, type, throttle_rate: throttle, queue_length: 1 }));
+      }
+      this.startVideo();
+    };
+    ws.onmessage = (ev) => { const m = JSON.parse(ev.data); if (m.op === 'publish') this.onMsg(m.topic, m.msg); };
+    ws.onclose = () => { this.connected = false; setTimeout(() => { if (this.ws === ws) this.connect(); }, 3000); };
+    ws.onerror = () => {};
+  }
+  onMsg(topic, msg) {
+    this.last = performance.now();
+    if (topic === TOPICS.battery[0]) {
+      this.battHist.push(msg.data / 1000); if (this.battHist.length > 10) this.battHist.shift();
+      this.batt = this.battHist.reduce((a, b) => a + b) / this.battHist.length;
+      const t = performance.now() / 1000;
+      this.pctHist.push([t, untilCharge(this.batt)]);
+      while (this.pctHist.length && t - this.pctHist[0][0] > 300) this.pctHist.shift();
+    }
+    else if (topic === TOPICS.odom[0]) {
+      const p = msg.pose.pose;
+      this.odomPose = [p.position.x, p.position.y, yawOf(p.orientation)];
+      this.speed = msg.twist.twist.linear.x; this.yawRate = msg.twist.twist.angular.z;
+    } else if (topic === TOPICS.scan[0]) {
+      this.scan = msg; const t = performance.now();
+      this.scanTimes.push(t); while (this.scanTimes.length && t - this.scanTimes[0] > 2000) this.scanTimes.shift();
+    } else if (topic === TOPICS.tf[0]) {
+      for (const tr of msg.transforms) {
+        if (tr.header.frame_id.replace(/^\//, '') === 'map' && tr.child_frame_id.replace(/^\//, '') === 'odom') {
+          const t = tr.transform; this.mapToOdom = [t.translation.x, t.translation.y, yawOf(t.rotation)];
+        }
+      }
+    } else if (topic === TOPICS.motor[0]) { this.motor = msg.data.map((d) => d.rps); this.motorT = performance.now(); }
+    else if (topic === TOPICS.map[0]) this.map = msg;
+    else if (topic === TOPICS.plan[0] || topic === TOPICS.route[0]) {
+      this.route = msg.poses.map((p) => [p.pose.position.x, p.pose.position.y]); this.routeT = performance.now();
+    }
+  }
+  // Pose in the map frame when the car localizes in a map, else in its odom frame.
+  pose() {
+    if (!this.odomPose) return null;
+    return this.mapToOdom ? compose(this.mapToOdom, this.odomPose) : this.odomPose;
+  }
+  refresh() {
+    const live = this.connected && performance.now() - this.last < 3000;
+    this.motorLive = this.motorT && performance.now() - this.motorT < 1000;
+    this.ui.dot.classList.toggle('ok', live);
+    if (this.batt != null) {
+      const pct = untilCharge(this.batt), frac = pct / 100, mins = minutesLeft(this.pctHist);
+      this.ui.b.textContent = `≈${pct.toFixed(0)}% left`;
+      this.ui.bv.textContent = `${this.batt.toFixed(2)} V · ` + (mins == null ? 'time left: measuring…'
+        : mins === Infinity ? 'not draining' : `≈${mins.toFixed(0)} min to charge`);
+      this.ui.b.className = 'v b ' + (this.batt < BATT_ALARM ? 'bad' : pct < 25 ? 'warn' : '');
+      this.ui.bar.style.width = (frac * 100).toFixed(0) + '%';
+      this.ui.bar.style.background = css(this.batt < BATT_ALARM ? '--bad' : pct < 25 ? '--warn' : '--ok');
+    }
+    this.ui.s.textContent = this.odomPose ? fmt(this.speed, 2) + ' m/s' : '–';
+    this.ui.w.textContent = this.odomPose ? fmt(this.yawRate * 180 / Math.PI, 0) + ' °/s' : '–';
+    // M2 = left rear, M4 = right rear (car #1 wiring test 2026-11-02); the board only gets messages while something drives.
+    this.ui.m.textContent = this.motor && this.motorLive ? this.motor.filter((_, i) => i === 1 || i === 3).map((v) => fmt(v, 2)).join(' / ') : 'idle';
+    // Scans arrive throttled to 5 Hz here, so show whether the LiDAR is live, not its rate (the car's is 10 Hz).
+    this.ui.l.textContent = this.scanTimes.length && performance.now() - this.scanTimes[this.scanTimes.length - 1] < 1500 ? 'live' : '–';
+    const p = this.pose();
+    this.ui.p.textContent = p && this.mapToOdom ? `${p[0].toFixed(2)}, ${p[1].toFixed(2)}` : (p ? 'no map' : '–');
+  }
+}
+
+const cars = DEFAULT_CARS.map((c) => new Car(c));
+const mapsrc = document.getElementById('mapsrc');
+for (const c of cars) mapsrc.add(new Option(c.name, c.id));
+mapsrc.value = load('mapsrc', 'car1');
+mapsrc.onchange = () => { save('mapsrc', mapsrc.value); fitNext = true; };
+const showscan = document.getElementById('showscan');
+
+// Map view: world metres -> canvas pixels. view = { cx, cy (world centre), s (px per m) }.
+const canvas = document.getElementById('map'), ctx = canvas.getContext('2d');
+let view = { cx: 0, cy: 0, s: 60 }, fitNext = true, follow = false;
+let mapImg = null, mapImgFor = null;
+const toPx = (x, y) => [canvas.width / 2 + (x - view.cx) * view.s, canvas.height / 2 - (y - view.cy) * view.s];
+
+function mapBitmap(m) {
+  const w = m.info.width, h = m.info.height, img = new ImageData(w, h);
+  const hex = (n) => { const c = css(n); const v = parseInt(c.slice(1), 16); return [v >> 16 & 255, v >> 8 & 255, v & 255]; };
+  const free = hex('--free'), wall = hex('--wall'), unk = hex('--unknown');
+  for (let r = 0; r < h; r++) for (let c = 0; c < w; c++) {
+    const v = m.data[r * w + c], col = v < 0 ? unk : v > 50 ? wall : free, i = ((h - 1 - r) * w + c) * 4;
+    img.data[i] = col[0]; img.data[i + 1] = col[1]; img.data[i + 2] = col[2]; img.data[i + 3] = 255;
+  }
+  const off = document.createElement('canvas'); off.width = w; off.height = h; off.getContext('2d').putImageData(img, 0, 0);
+  return off;
+}
+
+function drawLine(pts, col, w, dash, dots) {
+  if (pts.length < 2) return;
+  ctx.save(); ctx.strokeStyle = col; ctx.lineWidth = w; ctx.setLineDash(dash); ctx.globalAlpha = dash.length ? 0.9 : 0.55;
+  ctx.beginPath(); pts.forEach(([x, y], i) => { const [px, py] = toPx(x, y); i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); });
+  ctx.stroke();
+  if (dots) { ctx.setLineDash([]); ctx.fillStyle = col; for (const [x, y] of pts.slice(1)) { const [px, py] = toPx(x, y); ctx.beginPath(); ctx.arc(px, py, 4, 0, 7); ctx.fill(); } }
+  ctx.restore();
+}
+
+function drawCar(c, p) {
+  const [x, y] = toPx(p[0], p[1]), col = css(c.color), L = Math.max(10, 0.213 * view.s), W = Math.max(7, 0.159 * view.s);
+  ctx.save(); ctx.translate(x, y); ctx.rotate(-p[2]);
+  ctx.fillStyle = col; ctx.strokeStyle = css('--panel'); ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.rect(-L / 2, -W / 2, L, W); ctx.fill(); ctx.stroke();       // footprint 213 x 159 mm (research/01 §2)
+  ctx.beginPath(); ctx.moveTo(L / 2 + 10, 0); ctx.lineTo(L / 2, -W / 2); ctx.lineTo(L / 2, W / 2); ctx.closePath(); ctx.fill();
+  ctx.restore();
+  ctx.fillStyle = col; ctx.font = '12px system-ui'; ctx.fillText(c.name, x + 12, y - 12);
+}
+
+function draw() {
+  const r = canvas.getBoundingClientRect();
+  if (canvas.width !== Math.round(r.width) || canvas.height !== Math.round(r.height)) { canvas.width = r.width; canvas.height = r.height; }
+  const src = cars.find((c) => c.id === mapsrc.value) || cars[0];
+  const m = src.map;
+  if (m && mapImgFor !== m) { mapImg = mapBitmap(m); mapImgFor = m; }
+  if (!m) { mapImg = null; mapImgFor = null; }
+  if (fitNext) fit();
+  if (follow) { const p = src.pose(); if (p) { view.cx = p[0]; view.cy = p[1]; } }
+  ctx.fillStyle = css('--unknown'); ctx.fillRect(0, 0, canvas.width, canvas.height);
+  if (mapImg) {
+    const res = m.info.resolution, o = m.info.origin.position, [x0, y1] = toPx(o.x, o.y + m.info.height * res);
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(mapImg, x0, y1, m.info.width * res * view.s, m.info.height * res * view.s);
+  }
+  // 1 m grid
+  ctx.strokeStyle = css('--grid'); ctx.lineWidth = 1; ctx.globalAlpha = .6;
+  const xs = Math.floor(view.cx - canvas.width / 2 / view.s), xe = Math.ceil(view.cx + canvas.width / 2 / view.s);
+  const ys = Math.floor(view.cy - canvas.height / 2 / view.s), ye = Math.ceil(view.cy + canvas.height / 2 / view.s);
+  for (let gx = xs; gx <= xe; gx++) { const [px] = toPx(gx, 0); ctx.beginPath(); ctx.moveTo(px, 0); ctx.lineTo(px, canvas.height); ctx.stroke(); }
+  for (let gy = ys; gy <= ye; gy++) { const [, py] = toPx(0, gy); ctx.beginPath(); ctx.moveTo(0, py); ctx.lineTo(canvas.width, py); ctx.stroke(); }
+  ctx.globalAlpha = 1;
+  // Cars: in the map frame if they localize in a map; without a map only the map car is drawn (odom frame).
+  for (const c of cars) {
+    const p = c.pose();
+    if (!p || (!m && c !== src) || (m && !c.mapToOdom && c !== src)) continue;
+    if (showscan.checked && c.scan) {
+      const s = c.scan; ctx.fillStyle = css('--scan');
+      for (let i = 0; i < s.ranges.length; i++) {
+        const d = s.ranges[i]; if (!(d > s.range_min && d < s.range_max)) continue;
+        const a = s.angle_min + i * s.angle_increment;
+        const w = compose(p, [d * Math.cos(a), d * Math.sin(a), 0]);       // LiDAR at the base origin (TF: 10 mm behind, ignored)
+        const [px, py] = toPx(w[0], w[1]); ctx.fillRect(px - 1, py - 1, 2, 2);
+      }
+    }
+    // Driven trail (map frame only) and the current planned route (shown for 30 s after its last update).
+    if (c.mapToOdom) {
+      const t = c.trail, l = t[t.length - 1];
+      if (!l || Math.hypot(p[0] - l[0], p[1] - l[1]) > 0.03) { t.push([p[0], p[1]]); if (t.length > 5000) t.shift(); }
+      drawLine(t, css(c.color), 2, []);
+    }
+    if (c.route && performance.now() - c.routeT < 30000) drawLine(c.route, css(c.color), 2, [6, 5], true);
+    drawCar(c, p);
+  }
+  document.getElementById('mapinfo').textContent = m
+    ? `map ${m.info.width}×${m.info.height} @ ${m.info.resolution.toFixed(2)} m from ${src.name} · 1 m grid`
+    : `no map from ${src.name} (start slam or navigation on it) · odom frame · 1 m grid`;
+  for (const c of cars) c.refresh();
+  requestAnimationFrame(draw);
+}
+
+function fit() {
+  const src = cars.find((c) => c.id === mapsrc.value) || cars[0], m = src.map;
+  if (m) {
+    const res = m.info.resolution, o = m.info.origin.position, W = m.info.width * res, H = m.info.height * res;
+    view = { cx: o.x + W / 2, cy: o.y + H / 2, s: Math.min(canvas.width / W, canvas.height / H) * 0.95 };
+    fitNext = false;
+  } else {
+    const p = src.pose(); if (p) { view = { cx: p[0], cy: p[1], s: 60 }; fitNext = false; }
+  }
+}
+
+document.getElementById('fit').onclick = () => { fitNext = true; };
+document.getElementById('follow').onclick = (e) => { follow = !follow; e.target.textContent = 'Follow: ' + (follow ? 'on' : 'off'); };
+canvas.addEventListener('wheel', (e) => {
+  e.preventDefault(); const k = e.deltaY < 0 ? 1.15 : 1 / 1.15; view.s = Math.max(5, Math.min(800, view.s * k));
+}, { passive: false });
+let drag = null;
+canvas.addEventListener('pointerdown', (e) => { drag = [e.clientX, e.clientY]; canvas.setPointerCapture(e.pointerId); });
+canvas.addEventListener('pointermove', (e) => {
+  if (!drag) return; view.cx -= (e.clientX - drag[0]) / view.s; view.cy += (e.clientY - drag[1]) / view.s; drag = [e.clientX, e.clientY];
+});
+canvas.addEventListener('pointerup', () => { drag = null; });
+requestAnimationFrame(draw);
+</script>
+</body>
+</html>

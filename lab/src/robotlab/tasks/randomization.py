@@ -273,14 +273,21 @@ def reset_ray_noise(env: ManagerBasedRlEnv, env_ids: torch.Tensor, num_rays: int
 
 def noisy_rays(env: ManagerBasedRlEnv, dist: torch.Tensor, max_range: float) -> torch.Tensor:
   """dist [N, R] in m, max_range where nothing was hit. Bias + per-ray noise + dropouts, then sample-and-hold
-  at the car's scan rate."""
+  at the car's scan rate: at random (fresh_p) or, when the task casts the LiDAR only every other step
+  (tasks/lidar_rate.py), exactly when a new scan was cast. Until the first scan of an episode the car sees nothing."""
   s = ray_noise_state(env, dist.shape[1])
   hit = dist < max_range
   d = dist + s.bias[:, None] + s.std[:, None] * torch.randn_like(dist)
   d = torch.where(hit, d.clamp(0.0, max_range), max_range)
   d = torch.where(torch.rand_like(dist) < s.drop[:, None], max_range, d)
-  fresh = (torch.rand(env.num_envs, device=env.device) < s.fresh_p) | (s.held[:, 0] < 0)
-  s.held = torch.where(fresh[:, None], d, s.held)
+  cast = getattr(env, "_robotlab_lidar_cast", None)
+  if cast is None:
+    fresh = (torch.rand(env.num_envs, device=env.device) < s.fresh_p) | (s.held[:, 0] < 0)
+    s.held = torch.where(fresh[:, None], d, s.held)
+  elif cast:
+    s.held = d
+  else:                            # the raw rays are the previous cast; a car reset since then has no scan yet
+    s.held = torch.where(s.held[:, :1] < 0, max_range, s.held)
   return s.held.clone()
 
 

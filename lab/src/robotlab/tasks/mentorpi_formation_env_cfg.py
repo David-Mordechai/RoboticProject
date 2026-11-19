@@ -9,11 +9,16 @@ two-car case of its triangle). The slot is defined along the leader's driven pat
 
 The follower sees people three ways: legs in the LiDAR plane, everything low (feet, boxes) in the depth sectors, and
 the stock YOLO person detections. v1 of the navigate policy clipped people's feet because the LiDAR can't see them.
+
+Map and map sharing (T2, 2026-11-02, `tasks/localization.py`): both cars localize in one shared saved map with stock
+AMCL. The follower's actor sees a crop of that map around its estimated pose, and the leader's pose and path through
+the shared map (both cars' localization errors, 0-150 ms old). The critic sees the true values.
 """
 
 from __future__ import annotations
 
 import math
+import os
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
@@ -36,6 +41,8 @@ from mjlab.viewer import ViewerConfig
 
 from robotlab.robot.mentorpi_a1_constants import STEER_2024, STEER_CODE, car_cfg, leader_cfg, person_cfg
 from robotlab.tasks import camera as C
+from robotlab.tasks import localization as Lz
+from robotlab.tasks.lidar_rate import cast_lidar_every_other_step
 from robotlab.tasks import randomization as R
 from robotlab.tasks.mdp import LidarPatternCfg, AckermannActionCfg, car_motion, car_pose, place_car, to_frame, wrap
 from robotlab.tasks.mentorpi_navigate_env_cfg import LIDAR_RAYS, LIDAR_RANGE, CAR_RADIUS, PERSON_RADIUS, \
@@ -67,8 +74,8 @@ LOST_DIST = 1.5
 LEADER_CRUISE = (0.2, 0.6)
 # Adaptive slot: where a side slot has no room, the rewarded target slides behind the leader (toward the column slot)
 # and back out when the hallway opens. Room = free space beside the leader's path on the slot side (ground-truth
-# occupancy of walls and clutter) minus SIDE_CLEAR. The policy only sees the commanded slot and its sensors, so it
-# learns to judge the room itself, as it must on the real car (no map needed).
+# occupancy of walls and clutter) minus SIDE_CLEAR. The policy sees the commanded slot, its sensors and the saved map
+# (which may miss moved obstacles), so it learns to judge the room itself.
 SIDE_CLEAR = 0.25                # m: car half-diagonal 0.133 (213 x 159 mm, research/01 §2) + 0.12 margin (our design)
 SIDE_ALONG = (-0.15, 0.0, 0.15)  # m along the path: the car is 0.213 m long, so check room over its whole length
 ADAPT_RATE = 0.5                 # m/s: how fast the adapted slot moves (no jumps)
@@ -78,6 +85,13 @@ COLUMN_BACK = SLOTS["column"][0]
 # cross there. Side slots fall back while the leader is within this distance of an intersection (our design rule).
 NODE_SINGLE_FILE = 0.9           # m: the leader turns from 0.45 m before to 0.55 m past a crossing centre (office task)
 OFFICE_ROWS = OFFICE_COLS = 4
+# Hallway width per office floor. NO SOURCE for our office yet (open-issues #4b: user to measure). 1.2 m is just above
+# the common 44 in (1.12 m) minimum corridor width (IBC §1020.2); 2.4 m is a wide main corridor. ESTIMATE range.
+HALL_WIDTH_RANGE = (1.2, 2.4)
+# Fine-tuning override, e.g. ROBOTLAB_HALL_WIDTH=1.2,2.0 (the train CLI rejects a tuple inside the terrain dict).
+if os.environ.get("ROBOTLAB_HALL_WIDTH"):
+  HALL_WIDTH_RANGE = tuple(float(x) for x in os.environ["ROBOTLAB_HALL_WIDTH"].split(","))
+LEADER_MSG_LAG_STEPS = (0, 3)    # 0-150 ms at 20 Hz: pose message over Wi-Fi + AMCL stamp age (estimate)
 
 
 @dataclass
@@ -204,8 +218,14 @@ def leader_step(env: ManagerBasedRlEnv) -> None:
     f.trail[ar, f.head] = torch.where(moved[:, None], new, f.trail[ar, f.head])
     f.last = torch.where(moved[:, None], s.xy, f.last)
   update_adaptive_slot(env)
-  car_xy, _ = car_pose(env)
+  car_xy, car_yaw = car_pose(env)
+  Lz.step_localization(env, _poses(car_xy, car_yaw, s.xy, s.yaw))
   step_walkers(env, w, torch.stack([car_xy, s.xy], 1))
+
+
+def _poses(car_xy, car_yaw, l_xy, l_yaw) -> torch.Tensor:
+  """[N, 2, 3]: agent 0 = follower, 1 = leader."""
+  return torch.stack([torch.cat([car_xy, car_yaw[:, None]], -1), torch.cat([l_xy, l_yaw[:, None]], -1)], 1)
 
 
 # Events.
@@ -235,7 +255,9 @@ def reset_formation(env: ManagerBasedRlEnv, env_ids: torch.Tensor) -> None:
   r = 0.15 * torch.rand(n, device=dev)
   phi = 2 * math.pi * torch.rand(n, device=dev)
   start = t_xy[env_ids] + torch.stack([r * torch.cos(phi), r * torch.sin(phi)], -1)
-  place_car(env, env_ids, start, t_yaw[env_ids] + 0.3 * (2 * torch.rand(n, device=dev) - 1))
+  start_yaw = t_yaw[env_ids] + 0.3 * (2 * torch.rand(n, device=dev) - 1)
+  place_car(env, env_ids, start, start_yaw)
+  Lz.reset_localization(env, env_ids, _poses(start, start_yaw, xy, yaw))
   car_xy = torch.zeros(env.num_envs, 2, device=dev)
   car_xy[env_ids] = start
   w = walkers(env, s.maps, s.layout)
@@ -249,18 +271,46 @@ def reset_formation(env: ManagerBasedRlEnv, env_ids: torch.Tensor) -> None:
 # Observations (car frame).
 
 
-def slot_error(env: ManagerBasedRlEnv) -> torch.Tensor:
+def own_pose(env: ManagerBasedRlEnv, est: bool) -> tuple[torch.Tensor, torch.Tensor]:
+  """Follower pose: true, or its map estimate (est)."""
   xy, yaw = car_pose(env)
+  return Lz.estimated(env, 0, xy, yaw) if est else (xy, yaw)
+
+
+def leader_shift(env: ManagerBasedRlEnv, est: bool) -> torch.Tensor:
+  """Offset of the leader's shared path in the map: its current localization error (0 if not est)."""
+  return Lz.localization(env).err[:, 1, :2] if est else 0.0
+
+
+def slot_error(env: ManagerBasedRlEnv, est: bool = False) -> torch.Tensor:
+  xy, yaw = own_pose(env, est)
   t_xy, t_yaw = slot_target(env)
+  t_xy = t_xy + leader_shift(env, est)
   e = wrap(t_yaw - yaw)
   return torch.cat([to_frame(t_xy - xy, yaw), torch.sin(e)[:, None], torch.cos(e)[:, None]], -1)
 
 
-def path_preview(env: ManagerBasedRlEnv) -> torch.Tensor:
+def path_preview(env: ManagerBasedRlEnv, est: bool = False) -> torch.Tensor:
   """Two points of the leader's recent path (0.4 and 0.2 m behind it): shows a turn the follower is about to take."""
-  xy, yaw = car_pose(env)
+  xy, yaw = own_pose(env, est)
   pts, _ = path_point(env, torch.tensor([[0.4, 0.2]], device=env.device).expand(env.num_envs, 2))
-  return torch.cat([to_frame(pts[:, i] - xy, yaw) for i in range(2)], -1)
+  shift = leader_shift(env, est)
+  return torch.cat([to_frame(pts[:, i] + shift - xy, yaw) for i in range(2)], -1)
+
+
+def leader_map(env: ManagerBasedRlEnv, est: bool = False) -> torch.Tensor:
+  """The leader's shared message: its map pose in the follower's frame (4), speed and steering."""
+  s = office_leader(env)
+  xy, yaw = own_pose(env, est)
+  l_xy, l_yaw = Lz.estimated(env, 1, s.xy, s.yaw) if est else (s.xy, s.yaw)
+  return torch.cat([Lz.relative_pose(xy, yaw, l_xy, l_yaw), s.speed[:, None], (s.steer / LEADER_STEER)[:, None]], -1)
+
+
+def saved_map(env: ManagerBasedRlEnv, est: bool = False) -> torch.Tensor:
+  """Crop of the saved map around the follower's estimated pose; the critic gets the current map at the true pose."""
+  s, loc = office_leader(env), Lz.localization(env)
+  xy, yaw = own_pose(env, est)
+  return Lz.map_crop(s.maps, s.layout, loc.keep, xy, yaw, current=not est)
 
 
 def slot_command(env: ManagerBasedRlEnv) -> torch.Tensor:
@@ -345,11 +395,13 @@ def as_float(func):
 
 def make_mentorpi_formation_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
   actor_terms = {
-    "slot_error": ObservationTermCfg(func=slot_error),
-    "path_preview": ObservationTermCfg(func=path_preview),
+    "slot_error": ObservationTermCfg(func=slot_error, params={"est": True}),
+    "path_preview": ObservationTermCfg(func=path_preview, params={"est": True}),
     "slot": ObservationTermCfg(func=slot_command),
     "car_motion": ObservationTermCfg(func=car_motion),
-    "leader": ObservationTermCfg(func=leader_relative),
+    "leader_map": ObservationTermCfg(func=leader_map, params={"est": True}, delay_min_lag=LEADER_MSG_LAG_STEPS[0],
+                                     delay_max_lag=LEADER_MSG_LAG_STEPS[1], delay_hold_prob=0.5),
+    "map": ObservationTermCfg(func=saved_map, params={"est": True}),
     "lidar_sectors": ObservationTermCfg(func=lidar_sectors, params={"noisy": True}),
     "depth": ObservationTermCfg(func=depth, params={"noisy": True}),
     "people_camera": ObservationTermCfg(func=people_camera, params={"noisy": True}),
@@ -359,7 +411,8 @@ def make_mentorpi_formation_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
     "path_preview": ObservationTermCfg(func=path_preview),
     "slot": ObservationTermCfg(func=slot_command),
     "car_motion": ObservationTermCfg(func=car_motion),
-    "leader": ObservationTermCfg(func=leader_relative),
+    "leader_map": ObservationTermCfg(func=leader_map),
+    "map": ObservationTermCfg(func=saved_map),
     "lidar_sectors": ObservationTermCfg(func=lidar_sectors),
     "depth": ObservationTermCfg(func=depth),
     "people_camera": ObservationTermCfg(func=people_camera),
@@ -390,7 +443,7 @@ def make_mentorpi_formation_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
         terrain_type="generator",
         terrain_generator=TerrainGeneratorCfg(
           size=(PATCH_SIZE, PATCH_SIZE), num_rows=OFFICE_ROWS, num_cols=OFFICE_COLS, seed=13,
-          sub_terrains={"office": OfficeTerrainCfg()}, color_scheme="height",
+          sub_terrains={"office": OfficeTerrainCfg(hall_width=HALL_WIDTH_RANGE)}, color_scheme="height",
         ),
       ),
       entities={"car": car_cfg(), "leader": leader_cfg(), **{f"person{k}": person_cfg() for k in range(MAX_PEOPLE)}},
@@ -408,6 +461,7 @@ def make_mentorpi_formation_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
         func=reset_joints_by_offset, mode="reset",
         params={"position_range": (0.0, 0.0), "velocity_range": (0.0, 0.0), "asset_cfg": SceneEntityCfg("car")},
       ),
+      "lidar_rate": EventTermCfg(func=cast_lidar_every_other_step, mode="startup"),   # real MS200: 10 Hz
       "reset_office": EventTermCfg(func=reset_office, mode="reset"),
       "reset_formation": EventTermCfg(func=reset_formation, mode="reset"),
       **people_size_events(),
@@ -455,7 +509,7 @@ MentorPiFormationRlCfg = RslRlOnPolicyRunnerCfg(
     num_learning_epochs=5, num_mini_batches=4, learning_rate=1.0e-3, schedule="adaptive",
     gamma=0.99, lam=0.95, desired_kl=0.01, max_grad_norm=1.0,
   ),
-  experiment_name="formation",
+  experiment_name="formation_map",
   logger="tensorboard",
   save_interval=50,
   num_steps_per_env=32,

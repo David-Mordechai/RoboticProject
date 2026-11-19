@@ -15,3 +15,10 @@ logs/
 
 # One-off diagnostic scripts
 lab/scratch/
+
+# Large car recordings (keep local / on the car; too big for git): bag archives and per-drive log arrays
+car/maps/phase_a_runs/phase_a_runs.tgz
+car/maps/office_goto/*_log.npz
+
+# Local PC network/process watch log (office network details, private)
+docs/pc-ethernet-watch.log

@@ -26,6 +26,7 @@ import torch
 from mjlab.envs import ManagerBasedRlEnv
 from mjlab.rl import MjlabOnPolicyRunner, RslRlVecEnvWrapper
 from mjlab.rl.exporter_utils import attach_metadata_to_onnx
+from robotlab.tasks import mentorpi_explore_env_cfg as X
 from mjlab.tasks.registry import load_env_cfg, load_rl_cfg
 
 import robotlab.tasks  # noqa: F401
@@ -61,6 +62,15 @@ meta = {   # mjlab's get_base_metadata is for legged robots (entity "robot", joi
   "task": args.task, "checkpoint": str(ckpt), "control_hz": round(1.0 / env.step_dt),
   "obs_layout": ";".join(layout), "obs_dim": off,
   "action_layout": "speed:[-1,1] (>=0 forward up to V_MAX, <0 reverse up to v_reverse);steer:[-1,1] x car steer limit",
+  # The car-side node scales actions with these (m/s); it refuses a model without them.
+  "v_max": cfg.actions["drive"].v_max, "v_reverse": cfg.actions["drive"].v_reverse,
+  "steer_cmd_rate": cfg.actions["drive"].steer_cmd_rate,   # per policy step; the car-side node applies the same limit
+  # goto v7: depth hits in the built map (s, m) and back-up escalation; the car-side node switches them on from these
+  "depth_map": f"{X.DEPTH_MAP_S},{X.DEPTH_MAP_RANGE}" if "depth_map" in cfg.events else "",
+  "unstick_escalate": int(bool(getattr(cfg.actions["drive"], "unstick_escalate", False))),
+  # 2026-11-08: output conditioning the model was checked / trained with (car node: V_DEAD, STEER_EMA)
+  "v_dead": cfg.actions["drive"].v_dead, "steer_ema": getattr(cfg.actions["drive"], "steer_ema", 0.0),
+  "forward_only": int(bool(getattr(cfg.actions["drive"], "forward_only", False))),
 }
 attach_metadata_to_onnx(str(out), meta)
 onnx.checker.check_model(onnx.load(str(out)))

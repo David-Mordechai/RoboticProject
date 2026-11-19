@@ -35,6 +35,11 @@ DEPTH_MIN, DEPTH_MAX = 0.2, 4.0          # m, HP60C operating range
 DEPTH_CLIP = 3.0                         # m, clipped like the LiDAR
 DEPTH_COLUMNS = 12                       # 6.15 deg each
 DEPTH_ELEVATIONS = tuple(math.radians(e) for e in (0.0, -3.0, -6.0, -10.0, -15.0, -21.0, -29.4))  # down to FOV bottom
+# Measured FOV of the aligned depth image on car #1 (intrinsics fx 594.9, fy 595.2 at 640 x 480: 56.6 x 43.9 deg,
+# docs/measurements/car1-2026-11-02.md). Measurements outrank the product page (CLAUDE.md), and the car-side depth
+# sector node bands the REAL image width, so tasks trained from 2026-11-03 on use these (formation keeps the old ones).
+MEASURED_HFOV = math.radians(56.6)
+MEASURED_ELEVATIONS = tuple(math.radians(e) for e in (0.0, -3.0, -6.0, -9.0, -13.0, -17.0, -21.95))  # to FOV bottom
 FLOOR_Z = 0.02                           # m: lower hits are floor
 BAND_TOP = 0.20                          # m: above the car's 157 mm height plus margin (research/01 §2)
 DEPTH_STD_1M = 0.002                     # m at 1 m (spec upper bound); grows with distance^2 (ESTIMATE)
@@ -51,12 +56,18 @@ DETECTIONS = 2
 
 @dataclass
 class DepthFanPatternCfg:
-  """Rays from the camera origin: DEPTH_COLUMNS bands across DEPTH_HFOV, each at every DEPTH_ELEVATIONS angle."""
+  """Rays from the camera origin: DEPTH_COLUMNS bands across hfov, each sub columns wide, each column at every elevation
+  angle. sub > 1 (goto v7): thin chair legs fall between 12 columns (4.7 deg apart, 8 cm at 1 m); the car's depth_scan
+  takes every 4th image column, so a band is a minimum over many columns there too."""
+  hfov: float = DEPTH_HFOV
+  elevations: tuple[float, ...] = DEPTH_ELEVATIONS
+  sub: int = 1
 
   def generate_rays(self, mj_model: mujoco.MjModel | None, device: str) -> tuple[torch.Tensor, torch.Tensor]:
     del mj_model
-    az = (torch.arange(DEPTH_COLUMNS, device=device, dtype=torch.float32) + 0.5) / DEPTH_COLUMNS * DEPTH_HFOV - DEPTH_HFOV / 2
-    el = torch.tensor(DEPTH_ELEVATIONS, device=device, dtype=torch.float32)
+    nc = DEPTH_COLUMNS * self.sub
+    az = (torch.arange(nc, device=device, dtype=torch.float32) + 0.5) / nc * self.hfov - self.hfov / 2
+    el = torch.tensor(self.elevations, device=device, dtype=torch.float32)
     a, e = torch.meshgrid(az, el, indexing="ij")                        # [C, E], column-major for pooling
     dirs = torch.stack([torch.cos(e) * torch.cos(a), torch.cos(e) * torch.sin(a), torch.sin(e)], -1).reshape(-1, 3)
     return torch.zeros_like(dirs), dirs
@@ -94,20 +105,23 @@ def _noisy(env: ManagerBasedRlEnv) -> bool:
   return env.cfg.observations["actor"].enable_corruption
 
 
-def depth_sectors(env: ManagerBasedRlEnv, noisy: bool = False) -> torch.Tensor:
-  """Nearest obstacle per column band (horizontal distance), normalized to [0, 1] (1 = nothing within DEPTH_CLIP)."""
+def depth_sectors(env: ManagerBasedRlEnv, noisy: bool = False,
+                  elevations: tuple[float, ...] = DEPTH_ELEVATIONS) -> torch.Tensor:
+  """Nearest obstacle per column band (horizontal distance), normalized to [0, 1] (1 = nothing within DEPTH_CLIP).
+  elevations must match the depth sensor's DepthFanPatternCfg."""
   data = env.scene["depth"].data
   d = data.distances                                                     # [N, C*E], -1 = no hit
   z = data.hit_pos_w[..., 2]
   hit = (d >= DEPTH_MIN) & (d <= DEPTH_MAX) & (z > FLOOR_Z) & (z < BAND_TOP)
-  el = torch.tensor(DEPTH_ELEVATIONS, device=env.device).repeat(DEPTH_COLUMNS)
+  sub = d.shape[1] // (DEPTH_COLUMNS * len(elevations))                  # columns per band (DepthFanPatternCfg.sub)
+  el = torch.tensor(elevations, device=env.device).repeat(DEPTH_COLUMNS * sub)
   horiz = d * torch.cos(el)
   if noisy and _noisy(env):
     s = camera_state(env)
     horiz = horiz + DEPTH_STD_1M * d * d * torch.randn_like(horiz)
     hit = hit & (torch.rand_like(horiz) >= s.depth_drop[:, None])
   horiz = torch.where(hit, horiz, DEPTH_CLIP).clamp(0.0, DEPTH_CLIP)
-  cols = horiz.view(env.num_envs, DEPTH_COLUMNS, len(DEPTH_ELEVATIONS)).amin(-1)
+  cols = horiz.view(env.num_envs, DEPTH_COLUMNS, sub * len(elevations)).amin(-1)
   if noisy and _noisy(env):
     s = camera_state(env)
     fresh = (torch.rand(env.num_envs, device=env.device) < DEPTH_FRESH_P) | (s.depth_held[:, 0] < 0)

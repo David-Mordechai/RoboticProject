@@ -4,6 +4,16 @@ Each env has up to MAX_PEOPLE walkers. At every reset a random number of them is
 parked far outside the office. A walker follows hallway routes (the clutter-free lane the generator
 writes, plus its own lateral offset), picks a random onward hallway at each intersection (no U-turns),
 stops while a car is close in front of it, and turns back if it has waited YIELD_PATIENCE.
+With pass_by (explore, v4e): the car must not rely on people to avoid it. A walker never slows or stops for a car
+COMING TOWARD it (closing faster than CAR_STILL); an attentive one (ATTENTIVE_PROB) steps aside (PASS_SIDESTEP) while
+walking on, the others keep their lane. A car that is not approaching (stopped, or moving away / across) is an
+obstacle like any other: people don't walk into what is in front of them, so the walker steps around it and only stops
+(and later turns back) when it is within PASS_STOP_DIST ahead. So the car has to slow down and go around, or stop and
+wait until the person has passed. (v4d treated only a stopped car as an obstacle: people overtaking a slow car walked
+into it from behind, 59% of person contacts in the goal check.) A DISTRACTED walker (DISTRACTED_PROB, e.g. on the phone)
+does not avoid the car at all and only stops at the last moment (DISTRACTED_STOP_DIST): the car meets people walking
+at it from the sides and from behind and has to get out of their way when it can (explore v5). Without pass_by the explore policy learned to wait for people to freeze and leave (sim, v4: 82% of
+stops near a person were at a standing one); v4b (walkers always yielded) taught it to brush past yielding people.
 """
 
 from __future__ import annotations
@@ -30,11 +40,25 @@ MAX_PEOPLE = 4
 # of 41 studies, n = 23,111; Murtagh et al. 2021, outdoor usual pace 1.31 m/s). The lower end covers slower
 # strolling in an office: ESTIMATE (no indoor-corridor source found).
 WALK_SPEED = (0.6, 1.4)
+# explore v7g: share of people who stand still for the whole episode (talking in the hallway, waiting at a door): the
+# car has to pass them with room for their feet (below the LiDAR plane). v7f: ~6% of runs ended with the car's corner
+# hitting a standing person's feet at 45-90 deg; walkers only stood briefly while yielding, so it rarely practised it.
+STAND_PROB = 0.25               # ESTIMATE (no source)
 TURN_RATE = 4.0                  # rad/s, heading change toward the next route point: ESTIMATE (no source)
 LANE_OFFSET = 0.12               # m, max lateral offset from the free-lane centre: keeps feet clear of clutter
 YIELD_DIST = 0.9                 # m: a walker stops while the car is this close ahead: ESTIMATE (no source)
 YIELD_HALF_ANGLE = math.radians(60.0)
 YIELD_PATIENCE = 3.0             # s a walker waits for a car before turning back: ESTIMATE (no source)
+PASS_SIDESTEP = 0.40            # m, extra lateral offset away from the car while passing it: ESTIMATE (no source)
+PASS_SPEED = 0.5                # m/s while passing a car close ahead: ESTIMATE (no source)
+PASS_STOP_DIST = 0.5            # m: a walker stops while a STOPPED car is this close ahead: ESTIMATE
+ATTENTIVE_PROB = 0.5            # share of walkers that step aside for a moving car: ESTIMATE (no source)
+DISTRACTED_PROB = 0.3           # share of walkers that ignore the car until the last moment: ESTIMATE (no source)
+DISTRACTED_STOP_DIST = 0.55     # m, car centre ahead at which a distracted walker stops: ESTIMATE. 0.4 left the toes (up to
+                                # ~0.2 m ahead of the legs, person.xml) touching the car: 40% of contacts were standing people
+# m/s: a car closing slower than this counts as not approaching. v5w (0.05): people at 1.2-1.35 m/s walked into cars
+# creeping at 0.06-0.15 m/s; a person treats a robot ~10x slower than them as a standing obstacle: ESTIMATE.
+CAR_STILL = 0.15
 SWITCH_DIST = 0.3                # m: next route point once this close
 TURN_EXIT = 0.55                 # m past an intersection centre: first point of every segment (as the leader)
 PARK = (-100.0, -100.0)          # env frame, outside every office patch
@@ -62,6 +86,9 @@ class Walkers:
   lane: torch.Tensor       # [N, K] lateral offset
   active: torch.Tensor     # [N, K] bool
   waited: torch.Tensor     # [N, K] s spent yielding
+  side: torch.Tensor       # [N, K] current side-step offset (pass_by)
+  attentive: torch.Tensor  # [N, K] bool, steps aside for a moving car (pass_by)
+  distracted: torch.Tensor # [N, K] bool, ignores the car until DISTRACTED_STOP_DIST (pass_by)
 
 
 def walkers(env: ManagerBasedRlEnv, maps: LayoutTensors, layout: torch.Tensor) -> Walkers:
@@ -69,7 +96,7 @@ def walkers(env: ManagerBasedRlEnv, maps: LayoutTensors, layout: torch.Tensor) -
     n, k, dev = env.num_envs, MAX_PEOPLE, env.device
     z = lambda *s, dt=torch.float32: torch.zeros(n, k, *s, device=dev, dtype=dt)
     env._robotlab_walkers = Walkers(maps, layout, z(dt=torch.long), z(dt=torch.long), z(dt=torch.long),
-                                    z(dt=torch.long), z(2), z(), z(), z(2), z(), z(dt=torch.bool), z())
+                                    z(dt=torch.long), z(2), z(), z(), z(2), z(), z(dt=torch.bool), z(), z(), z(dt=torch.bool), z(dt=torch.bool))
   return env._robotlab_walkers
 
 
@@ -82,11 +109,13 @@ def _target(w: Walkers) -> torch.Tensor:
   exit_ = w.maps.node_xy[lay, w.prev] + TURN_EXIT * dvec
   node = w.maps.node_xy[lay, w.node]
   t = torch.where((w.stage == 0)[..., None], exit_, torch.where((w.stage == 3)[..., None], node, point))
-  return t + w.lane[..., None] * torch.stack([-dvec[..., 1], dvec[..., 0]], -1)
+  return t + (w.lane + w.side)[..., None] * torch.stack([-dvec[..., 1], dvec[..., 0]], -1)
 
 
-def step_walkers(env: ManagerBasedRlEnv, w: Walkers, car_xy: torch.Tensor) -> None:
-  """car_xy [N, 2] or [N, M, 2]: every car a walker yields to (env frame)."""
+def step_walkers(env: ManagerBasedRlEnv, w: Walkers, car_xy: torch.Tensor, pass_by: bool = False,
+                 car_vel: torch.Tensor | None = None) -> None:
+  """car_xy [N, 2] or [N, M, 2]: every car a walker yields to (env frame). pass_by: see the module docstring; it needs
+  car_vel, same shape as car_xy (m/s, world frame)."""
   dt, dev = env.step_dt, env.device
   cars = car_xy if car_xy.dim() == 3 else car_xy[:, None]
   stage = w.stage + (torch.linalg.norm(_target(w) - w.xy, dim=-1) < SWITCH_DIST).long()
@@ -109,7 +138,26 @@ def step_walkers(env: ManagerBasedRlEnv, w: Walkers, car_xy: torch.Tensor) -> No
   rel = cars[:, None] - w.xy[:, :, None]                              # [N, K, M, 2]
   dist = torch.linalg.norm(rel, dim=-1)
   ahead = (rel * heading[:, :, None]).sum(-1) > dist * math.cos(YIELD_HALF_ANGLE)
-  blocked = ((dist < YIELD_DIST) & ahead).any(-1)
+  near = (dist < YIELD_DIST) & ahead
+  blocked = near.any(-1)
+  slow = torch.zeros_like(blocked)
+  if pass_by:
+    # Step to the side away from the nearest close car (left of the segment direction = +lane): always around a
+    # car that is not approaching, around an approaching one only if attentive. Never stop for an approaching car.
+    cv = car_vel if car_vel.dim() == 3 else car_vel[:, None]                    # [N, M, 2]
+    closing = -(cv[:, None] * rel).sum(-1) / dist.clamp(min=1e-6)               # [N, K, M], car toward walker
+    still = closing < CAR_STILL
+    dvec = torch.tensor(_DIR_VEC, device=dev)[w.dir]
+    left = torch.stack([-dvec[..., 1], dvec[..., 0]], -1)
+    k = torch.where(near, dist, 1e3).argmin(-1, keepdim=True)
+    car_left = (torch.gather(rel, 2, k[..., None].expand(*k.shape, 2))[:, :, 0] * left).sum(-1) > 0
+    near_still = (near & still).any(-1) & ~w.distracted
+    step = near_still | (blocked & w.attentive & ~w.distracted)
+    goal = torch.where(step, torch.where(car_left, -PASS_SIDESTEP, PASS_SIDESTEP), 0.0)
+    w.side = w.side + (goal - w.side).clamp(-PASS_SPEED * dt, PASS_SPEED * dt)
+    slow = near_still
+    blocked = ((dist < PASS_STOP_DIST) & ahead & still).any(-1) & ~w.distracted
+    blocked |= ((dist < DISTRACTED_STOP_DIST) & ahead & still).any(-1) & w.distracted
   w.waited = torch.where(blocked, w.waited + dt, 0.0)
   # Waited long enough: turn back (the reversed segment; head for the point now in front).
   back = blocked & (w.waited > YIELD_PATIENCE)
@@ -121,7 +169,7 @@ def step_walkers(env: ManagerBasedRlEnv, w: Walkers, car_xy: torch.Tensor) -> No
     w.waited = torch.where(back, 0.0, w.waited)
     blocked = blocked & ~back
     heading = torch.stack([torch.cos(w.yaw), torch.sin(w.yaw)], -1)
-  speed = torch.where(blocked, 0.0, w.speed) * w.active
+  speed = torch.where(blocked, 0.0, torch.where(slow, w.speed.clamp(max=PASS_SPEED), w.speed)) * w.active
   w.vel = speed[..., None] * heading
   w.xy = w.xy + w.vel * dt
   write_walkers(env, w, torch.arange(env.num_envs, device=dev))
@@ -136,8 +184,9 @@ def write_walkers(env: ManagerBasedRlEnv, w: Walkers, env_ids: torch.Tensor) -> 
 
 
 def reset_walkers(env: ManagerBasedRlEnv, w: Walkers, env_ids: torch.Tensor, car_xy: torch.Tensor,
-                  keep_clear: float = 1.5) -> None:
-  """New walkers: random count, random hallway positions; none within keep_clear of the car's start."""
+                  keep_clear: float = 1.5, stand_prob: float = 0.0) -> None:
+  """New walkers: random count, random hallway positions; none within keep_clear of the car's start; each stands
+  still for the episode with probability stand_prob (explore v7g: STAND_PROB)."""
   n, k, dev = len(env_ids), MAX_PEOPLE, env.device
   lay = w.layout[env_ids, None].expand(n, k)
   a = torch.randint(0, NODES * NODES, (n, k), device=dev)
@@ -151,8 +200,12 @@ def reset_walkers(env: ManagerBasedRlEnv, w: Walkers, env_ids: torch.Tensor, car
   w.xy[env_ids] = xy + w.lane[env_ids, :, None] * torch.stack([-dvec[..., 1], dvec[..., 0]], -1)
   w.yaw[env_ids] = torch.atan2(dvec[..., 1], dvec[..., 0])
   w.speed[env_ids] = WALK_SPEED[0] + (WALK_SPEED[1] - WALK_SPEED[0]) * torch.rand(n, k, device=dev)
+  w.speed[env_ids] *= torch.rand(n, k, device=dev) >= stand_prob
   w.vel[env_ids] = 0.0
   w.waited[env_ids] = 0.0
+  w.side[env_ids] = 0.0
+  w.attentive[env_ids] = torch.rand(n, k, device=dev) < ATTENTIVE_PROB
+  w.distracted[env_ids] = torch.rand(n, k, device=dev) < DISTRACTED_PROB
   count = torch.randint(0, MAX_PEOPLE + 1, (n, 1), device=dev)
   clear = torch.linalg.norm(w.xy[env_ids] - car_xy[env_ids, None], dim=-1) > keep_clear
   w.active[env_ids] = (torch.arange(k, device=dev)[None] < count) & clear
